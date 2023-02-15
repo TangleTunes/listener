@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:just_audio/just_audio.dart';
 
@@ -13,7 +14,7 @@ class MyCustomSource extends StreamAudioSource {
     start ??= 0;
     end ??= 1956606;
     ByteCreator myByteCreator = ByteCreator();
-    Stream<List<int>> myStream = myByteCreator.stream;
+    Stream<Uint8List> myStream = myByteCreator.stream;
     return StreamAudioResponse(
       sourceLength: 300000,
       contentLength: end - start,
@@ -26,13 +27,13 @@ class MyCustomSource extends StreamAudioSource {
 
 class ByteCreator {
   var _count = 0;
-  final _controller = StreamController<List<int>>();
-  Stream<List<int>> get stream => _controller.stream;
+  final _controller = StreamController<Uint8List>();
+  Stream<Uint8List> get stream => _controller.stream;
   ByteCreator() {
     getAudioFileSize('assets/1234.mp3').then((fileLength) {
       Timer.periodic(Duration(seconds: 1), (t) {
-        int nextCount = _count + 20000;
-        if (_count + 40000 >= fileLength) {
+        int nextCount = _count + 40000;
+        if (nextCount >= fileLength) {
           nextCount = fileLength;
           loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
             _controller.sink.add(value);
@@ -43,7 +44,7 @@ class ByteCreator {
           loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
             _controller.sink.add(value);
           });
-          _count = _count + 20000;
+          _count = _count + 40000;
         }
       });
     });
