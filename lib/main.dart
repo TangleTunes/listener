@@ -88,12 +88,13 @@ class MyCustomSource extends StreamAudioSource {
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
+    print("start is $start, end is $end");
     start ??= 0;
-    end ??= 1500000;
+    end ??= 300000;
     ByteCreator myByteCreator = ByteCreator();
     Stream<List<int>> myStream = myByteCreator.stream;
     return StreamAudioResponse(
-      sourceLength: 1500000,
+      sourceLength: 300000,
       contentLength: end - start,
       offset: start,
       stream: myStream,
@@ -110,13 +111,19 @@ class ByteCreator {
     getAudioFileSize('assets/1234.mp3').then((fileLength) {
       Timer.periodic(Duration(seconds: 1), (t) {
         int nextCount = _count + 20000;
-        if (nextCount > fileLength) {
+        if (nextCount >= fileLength) {
           nextCount = fileLength;
+          loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
+            _controller.sink.add(value);
+          });
+          t.cancel(); //stop the timer
+          _controller.close(); //close the stream
+        } else {
+          loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
+            _controller.sink.add(value);
+          });
+          _count = _count + 20000;
         }
-        loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
-          _controller.sink.add(value);
-        });
-        _count = _count + 20000;
       });
     });
   }
