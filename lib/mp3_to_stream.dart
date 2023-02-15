@@ -8,3 +8,9 @@ Future<List<int>> loadAudioFile(String path, int start, int end) async {
       byteList.toList().map((byteList) => byteList.toInt()).toList();
   return convertedBytes;
 }
+
+Future<int> getAudioFileSize(String path) async {
+  ByteData data = await rootBundle.load(path);
+  Uint8List byteList = data.buffer.asUint8List();
+  return byteList.length;
+}
