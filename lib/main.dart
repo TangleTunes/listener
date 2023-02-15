@@ -76,27 +76,42 @@ class _MyHomePageState extends State<MyHomePage> {
 void playMusicFromStream() async {
   final player = AudioPlayer();
 
-  Uint8List bytes = await loadAudioFile('assets/stomp.mp3');
-  List<int> ints = bytes.toList().map((byte) => byte.toInt()).toList();
-  final streamAudioSource = MyCustomSource(ints);
+  // Uint8List bytes = await loadAudioFile('assets/stomp.mp3');
+  // List<int> ints = bytes.toList().map((byte) => byte.toInt()).toList();
+  final streamAudioSource = MyCustomSource();
   await player.setAudioSource(streamAudioSource);
   player.play();
 }
 
 class MyCustomSource extends StreamAudioSource {
-  final List<int> bytes;
-  MyCustomSource(this.bytes);
+  MyCustomSource();
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
     start ??= 0;
-    end ??= bytes.length;
+    end ??= 320000;
+    ByteCreator myByteCreator = ByteCreator();
+    Stream<List<int>> myStream = myByteCreator.stream;
     return StreamAudioResponse(
-      sourceLength: bytes.length,
+      sourceLength: 320000,
       contentLength: end - start,
       offset: start,
-      stream: Stream.value(bytes.sublist(start, end)),
+      stream: myStream,
       contentType: 'audio/mpeg', //MIME type of mp3 is mpeg
     );
+  }
+}
+
+class ByteCreator {
+  var _count = 0;
+  final _controller = StreamController<List<int>>();
+  Stream<List<int>> get stream => _controller.stream;
+  ByteCreator() {
+    Timer.periodic(Duration(seconds: 1), (t) {
+      loadAudioFile('assets/stomp.mp3', _count, _count + 32000).then((value) {
+        _controller.sink.add(value);
+      });
+      _count = _count + 32000;
+    });
   }
 }

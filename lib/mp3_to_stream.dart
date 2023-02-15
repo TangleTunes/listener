@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 
-Future<Uint8List> loadAudioFile(String path) async {
+Future<List<int>> loadAudioFile(String path, int start, int end) async {
   ByteData data = await rootBundle.load(path);
-  return data.buffer.asUint8List();
+  Uint8List byteList = data.buffer.asUint8List().sublist(start, end);
+  List<int> convertedBytes =
+      byteList.toList().map((byteList) => byteList.toInt()).toList();
+  return convertedBytes;
 }
