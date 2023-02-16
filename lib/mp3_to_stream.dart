@@ -62,13 +62,3 @@ Future<Uint8List> readFilePartially(File file, int offset, int length) async {
   await raf.close();
   return data;
 }
-
-void main() async {
-  var myMusicStream = await createStream(File('jelte.mp3'));
-  var i = 0;
-  await for (var buf in myMusicStream) {
-    print(i);
-    i++;
-    // print(buf);
-  }
-}
