@@ -1,55 +1,39 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:just_audio/just_audio.dart';
 
 import 'mp3_to_stream.dart';
 
-var BUFFER = 40000;
-var SONG_LEN = 187197;
-
 class MyCustomSource extends StreamAudioSource {
-  MyCustomSource();
+  late String pathName;
+  late Stream<Uint8List> stream;
+  late File file;
+  late int fileLength;
+
+  MyCustomSource(this.pathName) {
+    file = File(pathName);
+
+    init();
+    stream = createStream(file).asBroadcastStream();
+  }
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
-    print("start is $start, end is $end");
+    print('.request method called with $start and $end');
     start ??= 0;
-    end ??= SONG_LEN;
-    ByteCreator myByteCreator = ByteCreator();
-    Stream<Uint8List> myStream = myByteCreator.stream;
+    end ??= fileLength;
     return StreamAudioResponse(
-      sourceLength: SONG_LEN,
+      sourceLength: fileLength,
       contentLength: end - start,
       offset: start,
-      stream: myStream,
-      contentType: 'audio/mpeg', //MIME type of mp3 is mpeg
+      stream: stream,
+      contentType: 'audio/mpeg',
     );
   }
-}
 
-class ByteCreator {
-  var _count = 0;
-  final _controller = StreamController<Uint8List>();
-  Stream<Uint8List> get stream => _controller.stream;
-  ByteCreator() {
-    getAudioFileSize('assets/1234.mp3').then((fileLength) {
-      Timer.periodic(Duration(seconds: 1), (t) {
-        int nextCount = _count + BUFFER;
-        if (nextCount >= fileLength) {
-          nextCount = fileLength;
-          loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
-            _controller.sink.add(value);
-          });
-          t.cancel(); //stop the timer
-          _controller.close(); //close the stream
-        } else {
-          loadAudioFile('assets/1234.mp3', _count, nextCount).then((value) {
-            _controller.sink.add(value);
-          });
-          _count = _count + BUFFER;
-        }
-      });
-    });
+  void init() async {
+    fileLength = await getAudioFileSize(pathName);
   }
 }
