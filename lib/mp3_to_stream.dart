@@ -31,7 +31,6 @@ Stream<Uint8List> createStream(File file) async* {
   bool isFinished = false;
   int pos = 0;
   while (!isFinished) {
-    print('inside while loop');
     late Uint8List chunk;
 
     if (pos + chunkSize > length) {
@@ -50,6 +49,7 @@ Stream<Uint8List> createStream(File file) async* {
     pos += chunkSize;
     if (pos > length) {
       isFinished = true;
+      return;
     }
   }
 }
