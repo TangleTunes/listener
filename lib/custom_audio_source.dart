@@ -9,9 +9,11 @@ import 'mp3_to_stream.dart';
 
 class MyCustomSource extends StreamAudioSource {
   late String pathName;
-  DistributorContact distributorContact =
-      DistributorContact('assets/jelte.mp3');
-  MyCustomSource(this.pathName) {}
+  late DistributorContact distributorContact;
+
+  MyCustomSource(this.pathName) {
+    distributorContact = DistributorContact(pathName);
+  }
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {

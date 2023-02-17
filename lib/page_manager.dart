@@ -10,11 +10,16 @@ class PageManager {
   void _init() async {
     _audioPlayer = AudioPlayer(
         audioLoadConfiguration: AudioLoadConfiguration(
-            androidLoadControl: AndroidLoadControl(
-                minBufferDuration: Duration(seconds: 6),
-                maxBufferDuration: Duration(seconds: 6))));
+      androidLoadControl: AndroidLoadControl(
+          minBufferDuration: Duration(seconds: 6),
+          maxBufferDuration: Duration(seconds: 6),
+          bufferForPlaybackDuration: Duration(seconds: 6),
+
+          // prioritizeTimeOverSizeThresholds: true,
+          targetBufferBytes: 160000),
+    ));
     final streamAudioSource = MyCustomSource('assets/jelte.mp3');
-    await _audioPlayer.setAudioSource(streamAudioSource);
+    await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
 
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
