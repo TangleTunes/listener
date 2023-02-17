@@ -19,6 +19,7 @@ class PageManager {
           targetBufferBytes: 160000),
     ));
     final streamAudioSource = MyCustomSource('assets/jelte.mp3');
+    streamAudioSource.initialze();
     await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
 
     _audioPlayer.playerStateStream.listen((playerState) {

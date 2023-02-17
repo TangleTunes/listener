@@ -13,32 +13,30 @@ class ChunkStream {
 
   ChunkStream(this.distributorContact, this.songIdentifier) {}
 
-  Stream<Uint8List> createStream(int startByte) async* {
+  Stream<Uint8List> createStream(int startByte, List<Uint8List> storedChunks,
+      List<bool> isChunkCached) async* {
     var length = await distributorContact.giveMeFileSize();
-    print('creating a stream $length');
     bool isFinished = false;
     int chunkNum = startByte ~/ chunkSize;
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
 
     while (!isFinished) {
+      //Check whether the chunk in question is already cached on this device
+
       late Uint8List chunk;
-      if (startByte + chunkSize > length) {
-        // Uint8List chunk = await loadAudioFile('assets/jelte.mp3', pos, length);
-        Uint8List chunk = await distributorContact.giveMeChunk(chunkNum);
-        if (isFirst) {
-          yield chunk.sublist(offsetWithinChunk);
-        } else {
-          yield chunk;
-        }
+      if (isChunkCached[chunkNum]) {
+        chunk = storedChunks[chunkNum];
       } else {
-        // Uint8List chunk = await loadAudioFile('assets/jelte.mp3', pos, pos + chunkSize);
-        Uint8List chunk = await distributorContact.giveMeChunk(chunkNum);
-        if (isFirst) {
-          yield chunk.sublist(offsetWithinChunk);
-        } else {
-          yield chunk;
-        }
+        chunk = await distributorContact.giveMeChunk(chunkNum);
+        storedChunks[chunkNum] = chunk;
+        isChunkCached[chunkNum] = true;
+      }
+
+      if (isFirst) {
+        yield chunk.sublist(offsetWithinChunk);
+      } else {
+        yield chunk;
       }
       isFirst = false;
       await Future.delayed(Duration(seconds: 1)); //sleep
