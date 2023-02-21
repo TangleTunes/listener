@@ -15,7 +15,9 @@ class MyCustomSource extends StreamAudioSource {
   final int chunkSize = 32766;
   late int fileSize;
 
-  MyCustomSource(this.pathName) {
+  AudioPlayer _audioPlayer;
+
+  MyCustomSource(this.pathName, this._audioPlayer) {
     distributorContact = DistributorContact(pathName);
   }
 
@@ -33,8 +35,8 @@ class MyCustomSource extends StreamAudioSource {
 
     start ??= 0;
     end ??= fileSize;
-    ChunkStream chunkStream =
-        ChunkStream(distributorContact, distributorContact.songIdentifier);
+    ChunkStream chunkStream = ChunkStream(distributorContact,
+        distributorContact.songIdentifier, this._audioPlayer);
     Stream<Uint8List> stream = chunkStream
         .createStream(start, storedChunks, isChunkCached)
         .asBroadcastStream();

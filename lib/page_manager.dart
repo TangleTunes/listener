@@ -18,7 +18,7 @@ class PageManager {
           // prioritizeTimeOverSizeThresholds: true,
           targetBufferBytes: 160000),
     ));
-    final streamAudioSource = MyCustomSource('assets/jelte.mp3');
+    final streamAudioSource = MyCustomSource('assets/jelte.mp3', _audioPlayer);
     streamAudioSource.initialze();
     await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
 
