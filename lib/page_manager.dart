@@ -11,12 +11,12 @@ class PageManager {
     _audioPlayer = AudioPlayer(
         audioLoadConfiguration: AudioLoadConfiguration(
       androidLoadControl: AndroidLoadControl(
-          minBufferDuration: Duration(seconds: 6),
-          maxBufferDuration: Duration(seconds: 6),
-          bufferForPlaybackDuration: Duration(seconds: 6),
+        minBufferDuration: Duration(seconds: 6),
+        maxBufferDuration: Duration(seconds: 6),
+        // bufferForPlaybackDuration: Duration(seconds: 6),
 
-          // prioritizeTimeOverSizeThresholds: true,
-          targetBufferBytes: 160000),
+        prioritizeTimeOverSizeThresholds: true,
+      ),
     ));
     final streamAudioSource = MyCustomSource('assets/jelte.mp3');
     streamAudioSource.initialze();

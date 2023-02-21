@@ -8,15 +8,19 @@ import 'package:listener13/distributer_contact.dart';
 import 'mp3_to_stream.dart';
 
 class MyCustomSource extends StreamAudioSource {
+  int numberOfStreams = 0;
   late String pathName;
   late DistributorContact distributorContact;
   late List<Uint8List> storedChunks;
   late List<bool> isChunkCached;
   final int chunkSize = 32766;
   late int fileSize;
+  late ChunkStreamCreator chunkStream;
 
   MyCustomSource(this.pathName) {
     distributorContact = DistributorContact(pathName);
+    chunkStream = ChunkStreamCreator(
+        distributorContact, distributorContact.songIdentifier, this);
   }
 
   void initialze() async {
@@ -28,15 +32,13 @@ class MyCustomSource extends StreamAudioSource {
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
+    numberOfStreams++;
     print('.request method called with $start and $end');
     int fileSize = await distributorContact.giveMeFileSize();
-
     start ??= 0;
     end ??= fileSize;
-    ChunkStream chunkStream =
-        ChunkStream(distributorContact, distributorContact.songIdentifier);
     Stream<Uint8List> stream = chunkStream
-        .createStream(start, storedChunks, isChunkCached)
+        .createStream(start, storedChunks, isChunkCached, numberOfStreams)
         .asBroadcastStream();
     return StreamAudioResponse(
       sourceLength: fileSize,

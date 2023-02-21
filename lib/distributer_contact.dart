@@ -19,7 +19,8 @@ class DistributorContact {
     const FILE_SIZE = 965229;
     var byteStart = chunk * _chunkSize;
     var byteEnd = byteStart + _chunkSize;
-    print('returning chunk number $chunk which is from $byteStart');
+    // print('giveMe chunk number $chunk which is from $byteStart');
+    // print('is $byteStart plus $_chunkSize > $FILE_SIZE ?');
     if (byteStart + _chunkSize > FILE_SIZE) {
       return _loadAudioFile(songIdentifier, byteStart, FILE_SIZE);
     } else {
@@ -29,7 +30,7 @@ class DistributorContact {
 
   Future<Uint8List> _loadAudioFile(String path, int start, int end) async {
     ByteData data = await rootBundle.load(path);
-    print('loadAudioFile $start $end');
+    // print('loadAudioFile $start $end');
     Uint8List byteList = data.buffer.asUint8List().sublist(start, end);
     return byteList;
   }
