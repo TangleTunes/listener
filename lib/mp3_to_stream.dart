@@ -12,7 +12,7 @@ class ChunkStreamCreator {
   bool isFinished = false;
   DistributorContact distributorContact;
 
-  MyCustomSource forWhatSource;
+  Wrapper forWhatSource;
 
   ChunkStreamCreator(
       this.distributorContact, this.songIdentifier, this.forWhatSource) {}
@@ -27,7 +27,7 @@ class ChunkStreamCreator {
 
     while (!isFinished) {
       //Check whether the chunk in question is already cached on this device
-      if (forWhatSource.numberOfStreams == yourNum) {
+      if (forWhatSource.i == yourNum) {
         late Uint8List chunk;
         if (isChunkCached[chunkNum]) {
           chunk = storedChunks[chunkNum];
