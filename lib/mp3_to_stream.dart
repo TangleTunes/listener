@@ -27,11 +27,8 @@ class ChunkStreamCreator {
     bool isFirst = true;
 
     await for (final position in audioPlayer.positionStream) {
-      //Check whether the chunk in question is already cached on this device
       while (audioPlayer.bufferedPosition <= position + Duration(seconds: 10) &&
           !isFinished) {
-        print(
-            'bufferedposition: $audioPlayer.bufferedPosition position: $position');
         if (forWhatSource.i == yourNum) {
           late Uint8List chunk;
           if (isChunkCached[chunkNum]) {
@@ -48,7 +45,6 @@ class ChunkStreamCreator {
             var chunkLen = chunk.length;
             yield chunk;
           }
-          // print('I am resp for $startByte and YES yieling stuff');
           isFirst = false;
           await Future.delayed(Duration(milliseconds: 100)); //sleep
           chunkNum += 1;
@@ -58,7 +54,6 @@ class ChunkStreamCreator {
           }
         } else {
           isFinished = true;
-          // print('I am resp for $startByte and NOT yieling stuff');
         }
       }
     }
