@@ -8,17 +8,8 @@ class PageManager {
     _init();
   }
   void _init() async {
-    _audioPlayer = AudioPlayer(
-        audioLoadConfiguration: AudioLoadConfiguration(
-      androidLoadControl: AndroidLoadControl(
-        minBufferDuration: Duration(seconds: 6),
-        maxBufferDuration: Duration(seconds: 6),
-        // bufferForPlaybackDuration: Duration(seconds: 6),
-
-        prioritizeTimeOverSizeThresholds: true,
-      ),
-    ));
-    final streamAudioSource = MyCustomSource('assets/jelte.mp3');
+    _audioPlayer = AudioPlayer();
+    final streamAudioSource = MyCustomSource('assets/beach.mp3', _audioPlayer);
     streamAudioSource.initialze();
     await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
 
