@@ -40,19 +40,20 @@ class ChunkStreamCreator {
         if (isFirst) {
           yield chunk.sublist(offsetWithinChunk);
         } else {
+          var chunkLen = chunk.length;
           yield chunk;
         }
-        print('I am resp for $startByte and YES yieling stuff');
+        // print('I am resp for $startByte and YES yieling stuff');
         isFirst = false;
         await Future.delayed(Duration(seconds: 1)); //sleep
         chunkNum += 1;
-        if (chunkNum * chunkSize > length) {
+        if (chunkNum * chunkSize >= length) {
           isFinished = true;
           return;
         }
       } else {
         isFinished = true;
-        print('I am resp for $startByte and NOT yieling stuff');
+        // print('I am resp for $startByte and NOT yieling stuff');
       }
     }
   }

@@ -16,6 +16,7 @@ class DistributorContact {
   }
 
   Future<Uint8List> giveMeChunk(int chunk) async {
+    cost++;
     const FILE_SIZE = 965229;
     var byteStart = chunk * _chunkSize;
     var byteEnd = byteStart + _chunkSize;

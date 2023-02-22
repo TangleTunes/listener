@@ -25,9 +25,9 @@ class MyCustomSource extends StreamAudioSource {
 
   void initialze() async {
     fileSize = await distributorContact.giveMeFileSize();
-    storedChunks = List.filled(
-        fileSize ~/ chunkSize, Uint8List.fromList(List.filled(chunkSize, 0)));
-    isChunkCached = List.filled(fileSize ~/ chunkSize, false);
+    storedChunks = List.filled(fileSize ~/ chunkSize + 1,
+        Uint8List.fromList(List.filled(chunkSize, 0)));
+    isChunkCached = List.filled(fileSize ~/ chunkSize + 1, false);
   }
 
   @override
