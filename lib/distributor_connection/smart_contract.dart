@@ -9,9 +9,9 @@ import 'package:web3dart/web3dart.dart';
 
 void main(List<String> args) async {
   String rpcUrl =
-      "http://localhost:9090/chains/tst1pzdpzlwxnjw9t8xwyj89ymqkty08j6s96flnu4w8903k0xf3zx2jy3h5u5h/evm";
+      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
   EthereumAddress contractAddr =
-      EthereumAddress.fromHex('0xb3dB807507d6De3D9e2F335b2e4f6C5DE1Fa6A9E');
+      EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
   String privateKey = await loadPrivateKey();
   io.File abiFile =
       io.File('lib/distributor_connection/smartcontract.abi.json');
