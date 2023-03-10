@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -88,11 +89,13 @@ class DistributorContact {
     EthereumAddress contractAddr =
         EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
     String privateKey = await loadPrivateKey();
-    SmartContract smartContract = SmartContract(
-        rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
+    ByteData byteData = await rootBundle.load('assets/smartcontract.abi.json');
+    String abiCode = utf8.decode(byteData.buffer.asUint8List());
+    SmartContract smartContract =
+        SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
     await smartContract.init(rpcUrl, privateKey);
     String distributorHex = "0x74d0c7eb93c754318bca8174472a70038f751f2b";
-    Uint8List BODY = await smartContract.createChunkGetTransactionTest(
+    Uint8List BODY = await smartContract.createChunkGetTransaction(
         songId, chunkNum, amount, distributorHex);
     //Add body length as header (4 bytes)
 

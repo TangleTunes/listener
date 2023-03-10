@@ -43,11 +43,10 @@ class SmartContract {
   final String rpcUrl;
   final String privateKey;
   final EthereumAddress contractAddr;
-  final String abiFilePath;
+  String abiCode;
   late Web3Client client;
   late Credentials credentials;
   late EthereumAddress ownAddress;
-  late String abiCode;
   late DeployedContract contract;
 
   Future init(String rpcUrl, String privateKey) async {
@@ -55,14 +54,11 @@ class SmartContract {
     credentials = EthPrivateKey.fromHex(privateKey);
     ownAddress = credentials.address;
     // abiCode = await abiFile.readAsString();
-    ByteData byteData = await rootBundle.load(abiFilePath);
-    abiCode = utf8.decode(byteData.buffer.asUint8List());
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
   }
 
-  SmartContract(
-      this.rpcUrl, this.contractAddr, this.privateKey, this.abiFilePath);
+  SmartContract(this.rpcUrl, this.contractAddr, this.privateKey, this.abiCode);
 
   void deposit(int amount) async {
     try {
@@ -306,24 +302,6 @@ class SmartContract {
   }
 
   Future<Uint8List> createChunkGetTransaction(
-      Uint8List song, int index, int amount, String distributor) async {
-    Future<Uint8List> transaction_bytes = client.signTransaction(
-        credentials,
-        Transaction.callContract(
-            contract: contract,
-            function: contract.function('get_chunks'),
-            parameters: [
-              song,
-              BigInt.from(index),
-              BigInt.from(amount),
-              EthereumAddress.fromHex(distributor)
-            ]),
-        chainId: 1074);
-    print(transaction_bytes);
-    return transaction_bytes;
-  }
-
-  Future<Uint8List> createChunkGetTransactionTest(
       Uint8List song, int index, int amount, String distributor) async {
     // client.signTransaction(credentials, )
     print("Distributor address: $distributor");
