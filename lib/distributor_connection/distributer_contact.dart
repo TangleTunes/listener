@@ -15,7 +15,7 @@ class DistributorContact {
   int cost = 0;
   late int FILE_SIZE;
 
-  Socket? socket; // FIXME
+  // Socket? socket; // FIXME
 
   DistributorContact(this.songIdentifier);
 
@@ -27,30 +27,31 @@ class DistributorContact {
   }
 
   Future initialize() async {
-    socket = await Socket.connect("localhost", 3000);
+    // socket = await Socket.connect("localhost", 3000);
   }
 
   Future<Uint8List> requestChunk(int chunk) async {
     Future<Uint8List>? result = null;
+    Socket socket = await Socket.connect("localhost", 3000);
 
     /// 1. send tx-len
     /// 2. send iota-tx
     Uint8List songId = hexToBytes(songIdentifier);
     DistributorTcp distributorTcp = DistributorTcp();
-    distributorTcp.sendChunkReq(songId, chunk, 1, socket!);
+    distributorTcp.sendChunkReq(songId, chunk, 1, socket);
 
     /// 3. flush
-    await socket!.flush();
-    print("Socket flushed, now sleeping");
+    await socket.flush();
     // await Future.delayed(Duration(seconds: 10)); //sleep
-    var stream = socket!.transform(StreamTransformer.fromBind((stream) async* {
+    print("creating stream from tcp");
+    Stream<Uint8List> stream =
+        socket.transform(StreamTransformer.fromBind((tcpStream) async* {
       ListQueue<int> queue = ListQueue();
 
-      await for (final tcp_msg in stream) {
+      await for (final tcp_msg in tcpStream) {
         queue.addAll(tcp_msg);
 
         if (queue.length >= 8) {
-          //01001011 010101010
           Uint8List bodyLength = Uint8List(4);
 
           for (int i = 4; i < 8; i++) {
@@ -58,9 +59,6 @@ class DistributorContact {
           }
           final byteData = ByteData.view(bodyLength.buffer);
           int contentLength = byteData.getUint32(0, Endian.little);
-
-          // var bytes = bodyLength.buffer.asByteData();
-          // int contentLength = bytes.getUint32(0);
           print("content length is $contentLength");
           print(
               "queue.length is ${queue.length}, contentLength is ${contentLength}");
@@ -80,64 +78,13 @@ class DistributorContact {
               queue.removeFirst();
             }
             yield chunk;
-            print("yielded chunk $chunk");
           }
         }
       }
     }));
     print("awaiting stream");
+
     return await stream.first;
-
-    /// 4. receive chunk-id to buffer (store it)
-    ///
-    /// 5. receive chunk-len to buffer (store it)
-    /// 6. receive chunk to buffer (and don't discard excessive bytes! store them for next recv)
-    // listen for responses from the server
-    // socket.listen(
-    //   // handle data from the server
-    //   (Uint8List data) async {
-    //     queue.addAll(data);
-    //     if (queue.length >= 8) {
-    //       //01001011 010101010
-    //       Uint8List temp = new Uint8List(4);
-
-    //       for (int i = 4; i < 8; i++) {
-    //         temp[i] = queue.elementAt(i);
-    //       }
-    //       var bytes = temp.buffer.asByteData();
-    //       int contentLength = bytes.getUint32(0);
-    //       if (queue.length >= contentLength) {
-    //         //entire chunk in queue!
-    //         for (int i = 0; i < 8; i++) {
-    //           //remove first 8 elements
-    //           queue.removeFirst();
-    //         }
-    //         Uint8List chunk = Uint8List(contentLength);
-    //         for (final byte in queue.take(contentLength)) {
-    //           chunk.add(byte);
-    //         }
-    //         for (final byte in queue.take(contentLength)) {
-    //           queue.removeFirst();
-    //         }
-
-    //         //RETURN SOMETHING?!
-    //         yield chunk;
-    //       }
-    //     }
-    //   },
-
-    //   // handle errors
-    //   onError: (error) {
-    //     print(error);
-    //     socket.destroy();
-    //   },
-
-    //   // handle server ending connection
-    //   onDone: () {
-    //     print('Server left.');
-    //     socket.destroy();
-    //   },
-    // );
   }
 
   Future<Uint8List> _loadAudioFile(String path, int start, int end) async {

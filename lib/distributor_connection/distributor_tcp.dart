@@ -20,7 +20,7 @@ class DistributorTcp {
     SmartContract smartContract =
         SmartContract(rpcUrl, contractAddr, privateKey, abiFile);
     await smartContract.init(rpcUrl, privateKey);
-    String distributorHex = "0x4e14a01e2d3adcb483a56f1ffdea920da86c62cb";
+    String distributorHex = "0x74d0c7eb93c754318bca8174472a70038f751f2b";
     Uint8List BODY = await smartContract.createChunkGetTransactionTest(
         songId, chunkNum, amount, distributorHex);
     //Add body length as header (4 bytes)

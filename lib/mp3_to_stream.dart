@@ -5,7 +5,7 @@ import 'package:listener13/custom_audio_source.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:listener13/distributer_contact.dart';
+import 'package:listener13/distributor_connection/distributer_contact.dart';
 
 class ChunkStreamCreator {
   final chunkSize = 32766;

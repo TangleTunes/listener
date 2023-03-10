@@ -9,7 +9,9 @@ class PageManager {
   }
   void _init() async {
     _audioPlayer = AudioPlayer();
-    final streamAudioSource = MyCustomSource('assets/beach.mp3', _audioPlayer);
+    final streamAudioSource = MyCustomSource(
+        '0800000722040506080000072204050608000007220405060800000722040506',
+        _audioPlayer);
     streamAudioSource.initialze();
     await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
 
