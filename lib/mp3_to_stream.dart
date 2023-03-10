@@ -34,7 +34,7 @@ class ChunkStreamCreator {
           if (isChunkCached[chunkNum]) {
             chunk = storedChunks[chunkNum];
           } else {
-            chunk = await distributorContact.giveMeChunk(chunkNum);
+            chunk = await distributorContact.requestChunk(chunkNum);
             storedChunks[chunkNum] = chunk;
             isChunkCached[chunkNum] = true;
           }

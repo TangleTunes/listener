@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:just_audio/just_audio.dart';
-import 'package:listener13/distributer_contact.dart';
+import 'package:listener13/distributor_connection/distributer_contact.dart';
 
 import 'mp3_to_stream.dart';
 

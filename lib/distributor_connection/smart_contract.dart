@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:developer';
+import 'dart:io' as io;
 import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 
-import 'package:http/http.dart';
+//import 'package:flutter/foundation.dart';
 import 'package:web3dart/web3dart.dart';
 
 void main(List<String> args) async {
@@ -11,20 +13,22 @@ void main(List<String> args) async {
   EthereumAddress contractAddr =
       EthereumAddress.fromHex('0xb3dB807507d6De3D9e2F335b2e4f6C5DE1Fa6A9E');
   String privateKey = await loadPrivateKey();
-  File abiFile = File('lib/smartcontract.abi.json');
+  io.File abiFile =
+      io.File('lib/distributor_connection/smartcontract.abi.json');
   SmartContract smartContract =
       SmartContract(rpcUrl, contractAddr, privateKey, abiFile);
   await smartContract.init(rpcUrl, privateKey);
-  //smartContract.deleteUser();
   //smartContract.createUser("paul", "paul");
-  //smartContract.deposit(EtherAmount.fromInt(EtherUnit.ether, 1));
-  //smartContract.createUser("test2", "desc");
-  print(await smartContract.users());
-  //smartContract.deposit(2);
+  //smartContract.deposit(1);
+  //smartContract.deleteUser();
+
+  print(await smartContract.users(smartContract.ownAddress.toString()));
 }
 
 Future<String> loadPrivateKey() async {
-  final String loadJson = await File('lib/privatekey.json').readAsString();
+  final String loadJson =
+      await io.File('lib/distributor_connection/privatekey.json')
+          .readAsString();
   final decodedJson = jsonDecode(loadJson);
   String privateKey = decodedJson['privatekey'];
   return privateKey;
@@ -34,7 +38,7 @@ class SmartContract {
   final String rpcUrl;
   final String privateKey;
   final EthereumAddress contractAddr;
-  final File abiFile;
+  final io.File abiFile;
   late Web3Client client;
   late Credentials credentials;
   late EthereumAddress ownAddress;
@@ -42,7 +46,7 @@ class SmartContract {
   late DeployedContract contract;
 
   Future init(String rpcUrl, String privateKey) async {
-    client = Web3Client(rpcUrl, Client());
+    client = Web3Client(rpcUrl, http.Client());
     credentials = EthPrivateKey.fromHex(privateKey);
     ownAddress = credentials.address;
     abiCode = await abiFile.readAsString();
@@ -64,7 +68,6 @@ class SmartContract {
           chainId: 1074);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-      print(tx_receipt);
     } catch (e) {
       print(e);
     } finally {
@@ -83,7 +86,6 @@ class SmartContract {
           chainId: 1074);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-      print(tx_receipt);
     } catch (e) {
       print(e);
     } finally {
@@ -92,21 +94,15 @@ class SmartContract {
   }
 
   void deleteUser() async {
-    try {
-      String tx_hash = await client.sendTransaction(
-          credentials,
-          Transaction.callContract(
-              contract: contract,
-              function: contract.function('delete_user'),
-              parameters: []),
-          chainId: 1074);
-      TransactionReceipt? tx_receipt =
-          await client.getTransactionReceipt(tx_hash);
-    } catch (e) {
-      print(e);
-    } finally {
-      await client.dispose();
-    }
+    String tx_hash = await client.sendTransaction(
+        credentials,
+        Transaction.callContract(
+            contract: contract,
+            function: contract.function('delete_user'),
+            parameters: []),
+        chainId: 1074);
+    TransactionReceipt? tx_receipt =
+        await client.getTransactionReceipt(tx_hash);
   }
 
   void getChunks(
@@ -116,7 +112,7 @@ class SmartContract {
           credentials,
           Transaction.callContract(
               contract: contract,
-              function: contract.function('get_chunk'),
+              function: contract.function('get_chunks'),
               parameters: [
                 song,
                 index,
@@ -226,7 +222,7 @@ class SmartContract {
     return outputList;
   }
 
-  Future<List> genSongs(int index, int amount) async {
+  Future<List> getSongs(int index, int amount) async {
     List outputList = List.empty();
     try {
       outputList = await client.call(
@@ -271,13 +267,13 @@ class SmartContract {
     return outputList;
   }
 
-  Future<List> users() async {
+  Future<List> users(String address) async {
     List outputList = List.empty();
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('users'),
-          params: [ownAddress]);
+          params: [EthereumAddress.fromHex(address)]);
     } catch (e) {
       print(e);
     } finally {
@@ -299,5 +295,50 @@ class SmartContract {
       await client.dispose();
     }
     return outputList;
+  }
+
+  Future<Uint8List> createChunkGetTransaction(
+      Uint8List song, int index, int amount, String distributor) async {
+    Future<Uint8List> transaction_bytes = client.signTransaction(
+        credentials,
+        Transaction.callContract(
+            contract: contract,
+            function: contract.function('get_chunks'),
+            parameters: [
+              song,
+              BigInt.from(index),
+              BigInt.from(amount),
+              EthereumAddress.fromHex(distributor)
+            ]),
+        chainId: 1074);
+    print(transaction_bytes);
+    return transaction_bytes;
+  }
+
+  Future<Uint8List> createChunkGetTransactionTest(
+      Uint8List song, int index, int amount, String distributor) async {
+    // client.signTransaction(credentials, )
+    print("Distributor address: $distributor");
+    Uint8List data = contract.function('get_chunks').encodeCall([
+      song,
+      BigInt.from(index),
+      BigInt.from(amount),
+      EthereumAddress.fromHex(distributor)
+    ]);
+
+    var tx = Transaction(
+        from: ownAddress,
+        to: contractAddr,
+        gasPrice: EtherAmount.inWei(BigInt.from(1)),
+        maxGas: 100000,
+        data: data);
+
+    var signed_tx =
+        await client.signTransaction(credentials, tx, chainId: 1074);
+
+    // var response = await client.sendRawTransaction(signed_tx);
+    // print('response: $response');
+
+    return signed_tx;
   }
 }
