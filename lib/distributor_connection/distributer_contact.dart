@@ -3,11 +3,10 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
-//import 'package:flutter/services.dart';
 import 'package:web3dart/crypto.dart';
+import 'package:web3dart/web3dart.dart';
 
-import 'distributor_tcp.dart';
+import 'smart_contract.dart';
 
 class DistributorContact {
   final _chunkSize = 35000;
@@ -23,29 +22,26 @@ class DistributorContact {
     //ByteData data = await rootBundle.load(songIdentifier);
     //Uint8List byteList = data.buffer.asUint8List();
     // return byteList.length;
-    return 0; // FIXME
+    return 2113939; // FIXME
   }
 
   Future initialize() async {
     // socket = await Socket.connect("localhost", 3000);
   }
 
-  Future<Uint8List> requestChunk(int chunk) async {
-    print("inside requestChunk method");
+  Future<Uint8List> giveMeChunk(int chunk) async {
     Future<Uint8List>? result = null;
-    Socket socket = await Socket.connect("10.0.2.2", 3000);
-    print("socket created as $socket");
+    Socket socket = await Socket.connect("10.0.2.2", 3000); //FIXME
 
     /// 1. send tx-len
     /// 2. send iota-tx
     Uint8List songId = hexToBytes(songIdentifier);
-    DistributorTcp distributorTcp = DistributorTcp();
-    distributorTcp.sendChunkReq(songId, chunk, 1, socket);
+
+    sendTcpChunkRequest(songId, chunk, 1, socket);
 
     /// 3. flush
     await socket.flush();
     // await Future.delayed(Duration(seconds: 10)); //sleep
-    print("creating stream from tcp");
     Stream<Uint8List> stream =
         socket.transform(StreamTransformer.fromBind((tcpStream) async* {
       ListQueue<int> queue = ListQueue();
@@ -61,9 +57,6 @@ class DistributorContact {
           }
           final byteData = ByteData.view(bodyLength.buffer);
           int contentLength = byteData.getUint32(0, Endian.little);
-          print("content length is $contentLength");
-          print(
-              "queue.length is ${queue.length}, contentLength is ${contentLength}");
           if (queue.length >= contentLength) {
             //entire chunk in queue!
             for (int i = 0; i < 8; i++) {
@@ -84,15 +77,37 @@ class DistributorContact {
         }
       }
     }));
-    print("awaiting stream");
 
     return await stream.first;
   }
 
-  Future<Uint8List> _loadAudioFile(String path, int start, int end) async {
-    // ByteData data = await rootBundle.load(path);
-    // Uint8List byteList = data.buffer.asUint8List().sublist(start, end);
-    // return byteList;
-    return Uint8List(0); // FIXME
+  void sendTcpChunkRequest(
+      Uint8List songId, int chunkNum, int amount, Socket socket) async {
+    String rpcUrl =
+        "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
+    EthereumAddress contractAddr =
+        EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
+    String privateKey = await loadPrivateKey();
+    SmartContract smartContract = SmartContract(
+        rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
+    await smartContract.init(rpcUrl, privateKey);
+    String distributorHex = "0x74d0c7eb93c754318bca8174472a70038f751f2b";
+    Uint8List BODY = await smartContract.createChunkGetTransactionTest(
+        songId, chunkNum, amount, distributorHex);
+    //Add body length as header (4 bytes)
+
+    int bodyLength = BODY.length;
+    final byteD = ByteData(4);
+    byteD.setUint32(0, bodyLength, Endian.little);
+    Uint8List HEADER = byteD.buffer.asUint8List();
+
+    Uint8List PAYLOAD = Uint8List.fromList(HEADER + BODY);
+    await sendMessage(socket, PAYLOAD);
+  }
+
+  Future<void> sendMessage(Socket socket, Uint8List message) async {
+    socket.add(message);
+    socket.flush();
+    await Future.delayed(Duration(seconds: 2));
   }
 }

@@ -8,7 +8,7 @@ import 'dart:typed_data';
 import 'package:listener13/distributor_connection/distributer_contact.dart';
 
 class ChunkStreamCreator {
-  final chunkSize = 32766;
+  final chunkSize = 32500; //used to be 32766
   String songIdentifier;
   bool isFinished = false;
   DistributorContact distributorContact;
@@ -34,9 +34,7 @@ class ChunkStreamCreator {
           if (isChunkCached[chunkNum]) {
             chunk = storedChunks[chunkNum];
           } else {
-            print("requesting! $chunkNum");
-            chunk = await distributorContact.requestChunk(chunkNum);
-            print("requesting chunk $chunkNum an =d got $chunk");
+            chunk = await distributorContact.giveMeChunk(chunkNum);
             storedChunks[chunkNum] = chunk;
             isChunkCached[chunkNum] = true;
           }

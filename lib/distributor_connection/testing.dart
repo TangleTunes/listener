@@ -16,8 +16,8 @@ void main() async {
   //   song.add(returnedChunk);
   //   print("recieved chunk $i");
   // }
-  Uint8List returnedChunk = await d.requestChunk(0);
-  Uint8List returnedChunk1 = await d.requestChunk(1);
+  Uint8List returnedChunk = await d.giveMeChunk(0);
+  Uint8List returnedChunk1 = await d.giveMeChunk(1);
 
   print("Song decoding finished ");
 }
