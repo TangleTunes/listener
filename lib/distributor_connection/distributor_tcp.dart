@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:collection';
+import 'package:flutter/services.dart';
 import 'package:listener13/distributor_connection/distributer_contact.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
 
@@ -16,9 +17,8 @@ class DistributorTcp {
     EthereumAddress contractAddr =
         EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
     String privateKey = await loadPrivateKey();
-    File abiFile = File('lib/distributor_connection/smartcontract.abi.json');
-    SmartContract smartContract =
-        SmartContract(rpcUrl, contractAddr, privateKey, abiFile);
+    SmartContract smartContract = SmartContract(
+        rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
     await smartContract.init(rpcUrl, privateKey);
     String distributorHex = "0x74d0c7eb93c754318bca8174472a70038f751f2b";
     Uint8List BODY = await smartContract.createChunkGetTransactionTest(

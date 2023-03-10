@@ -34,7 +34,9 @@ class ChunkStreamCreator {
           if (isChunkCached[chunkNum]) {
             chunk = storedChunks[chunkNum];
           } else {
+            print("requesting! $chunkNum");
             chunk = await distributorContact.requestChunk(chunkNum);
+            print("requesting chunk $chunkNum an =d got $chunk");
             storedChunks[chunkNum] = chunk;
             isChunkCached[chunkNum] = true;
           }

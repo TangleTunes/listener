@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io' as io;
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 //import 'package:flutter/foundation.dart';
@@ -13,10 +14,8 @@ void main(List<String> args) async {
   EthereumAddress contractAddr =
       EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
   String privateKey = await loadPrivateKey();
-  io.File abiFile =
-      io.File('lib/distributor_connection/smartcontract.abi.json');
-  SmartContract smartContract =
-      SmartContract(rpcUrl, contractAddr, privateKey, abiFile);
+  SmartContract smartContract = SmartContract(
+      rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
   await smartContract.init(rpcUrl, privateKey);
   //smartContract.createUser("paul", "paul");
   //smartContract.deposit(1);
@@ -26,9 +25,15 @@ void main(List<String> args) async {
 }
 
 Future<String> loadPrivateKey() async {
-  final String loadJson =
-      await io.File('lib/distributor_connection/privatekey.json')
-          .readAsString();
+  ByteData pk = await rootBundle.load("assets/privatekey.json");
+
+  String loadJson = utf8.decode(pk.buffer.asUint8List());
+  // io.File abiFile =
+  //     io.File('lib/distributor_connection/smartcontract.abi.json');
+
+  // final String loadJson =
+  //     await io.File('lib/distributor_connection/privatekey.json')
+  //         .readAsString();
   final decodedJson = jsonDecode(loadJson);
   String privateKey = decodedJson['privatekey'];
   return privateKey;
@@ -38,7 +43,7 @@ class SmartContract {
   final String rpcUrl;
   final String privateKey;
   final EthereumAddress contractAddr;
-  final io.File abiFile;
+  final String abiFilePath;
   late Web3Client client;
   late Credentials credentials;
   late EthereumAddress ownAddress;
@@ -49,12 +54,15 @@ class SmartContract {
     client = Web3Client(rpcUrl, http.Client());
     credentials = EthPrivateKey.fromHex(privateKey);
     ownAddress = credentials.address;
-    abiCode = await abiFile.readAsString();
+    // abiCode = await abiFile.readAsString();
+    ByteData byteData = await rootBundle.load(abiFilePath);
+    abiCode = utf8.decode(byteData.buffer.asUint8List());
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
   }
 
-  SmartContract(this.rpcUrl, this.contractAddr, this.privateKey, this.abiFile);
+  SmartContract(
+      this.rpcUrl, this.contractAddr, this.privateKey, this.abiFilePath);
 
   void deposit(int amount) async {
     try {

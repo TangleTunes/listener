@@ -31,8 +31,10 @@ class DistributorContact {
   }
 
   Future<Uint8List> requestChunk(int chunk) async {
+    print("inside requestChunk method");
     Future<Uint8List>? result = null;
-    Socket socket = await Socket.connect("localhost", 3000);
+    Socket socket = await Socket.connect("10.0.2.2", 3000);
+    print("socket created as $socket");
 
     /// 1. send tx-len
     /// 2. send iota-tx
