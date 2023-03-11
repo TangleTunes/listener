@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'page_manager.dart';
+import 'audio_player/playback.dart';
 
 void main() => runApp(const MyApp());
 
@@ -12,12 +12,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final PageManager _pageManager;
+  late final Playback _playback;
 
   @override
   void initState() {
     super.initState();
-    _pageManager = PageManager();
+    _playback = Playback();
   }
 
   @override
@@ -29,11 +29,37 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               const Spacer(),
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () {
+                  _playback.setAudio(
+                      "0x51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2",
+                      2034553);
+                },
+                child: Text(
+                    'Song 0x51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2'),
+              ),
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () {
+                  _playback.setAudio(
+                      "0800000722040506080000072204050608000007220405060800000722040506",
+                      2113939);
+                },
+                child: Text(
+                    'Song 0800000722040506080000072204050608000007220405060800000722040506'),
+              ),
               ValueListenableBuilder<ProgressBarState>(
-                valueListenable: _pageManager.progressNotifier,
+                valueListenable: _playback.progressNotifier,
                 builder: (_, value, __) {
                   return ProgressBar(
-                    onSeek: _pageManager.seek,
+                    onSeek: _playback.seek,
                     progress: value.current,
                     buffered: value.buffered,
                     total: value.total,
@@ -41,7 +67,7 @@ class _MyAppState extends State<MyApp> {
                 },
               ),
               ValueListenableBuilder<ButtonState>(
-                valueListenable: _pageManager.buttonNotifier,
+                valueListenable: _playback.buttonNotifier,
                 builder: (_, value, __) {
                   switch (value) {
                     case ButtonState.loading:
@@ -55,13 +81,13 @@ class _MyAppState extends State<MyApp> {
                       return IconButton(
                         icon: const Icon(Icons.play_arrow),
                         iconSize: 32.0,
-                        onPressed: _pageManager.play,
+                        onPressed: _playback.play,
                       );
                     case ButtonState.playing:
                       return IconButton(
                         icon: const Icon(Icons.pause),
                         iconSize: 32.0,
-                        onPressed: _pageManager.pause,
+                        onPressed: _playback.pause,
                       );
                   }
                 },
@@ -75,7 +101,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _pageManager.dispose();
+    _playback.dispose();
     super.dispose();
   }
 }

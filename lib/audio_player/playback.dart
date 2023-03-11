@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'audio_player/custom_audio_source.dart';
+import 'custom_audio_source.dart';
 
-class PageManager {
+class Playback {
   late AudioPlayer _audioPlayer;
-  PageManager() {
+  Playback() {
     _init();
   }
-  void _init() async {
-    _audioPlayer = AudioPlayer();
-    final streamAudioSource = MyCustomSource(
-        '0800000722040506080000072204050608000007220405060800000722040506',
-        _audioPlayer);
+  void setAudio(String songIdentifier, int sizeInBytes) async {
+    final streamAudioSource =
+        MyCustomSource(songIdentifier, _audioPlayer, sizeInBytes);
     streamAudioSource.initialze();
     await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
+  }
 
+  void _init() async {
+    _audioPlayer = AudioPlayer();
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
       final processingState = playerState.processingState;

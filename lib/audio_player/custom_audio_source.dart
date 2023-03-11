@@ -13,12 +13,12 @@ class MyCustomSource extends StreamAudioSource {
   late DistributorContact distributorContact;
   late List<Uint8List> storedChunks;
   late List<bool> isChunkCached;
-  final int chunkSize = 32766;
+  final int chunkSize = 35000;
   late int fileSize;
   late ChunkStreamCreator chunkStream;
   AudioPlayer audioPlayer;
 
-  MyCustomSource(this.songIdentifier, this.audioPlayer) {
+  MyCustomSource(this.songIdentifier, this.audioPlayer, this.fileSize) {
     distributorContact = DistributorContact(songIdentifier);
     distributorContact.initialize();
     chunkStream = ChunkStreamCreator(
@@ -26,7 +26,6 @@ class MyCustomSource extends StreamAudioSource {
   }
 
   void initialze() async {
-    fileSize = await distributorContact.giveMeFileSize();
     storedChunks = List.filled(fileSize ~/ chunkSize + 1,
         Uint8List.fromList(List.filled(chunkSize, 0)));
     isChunkCached = List.filled(fileSize ~/ chunkSize + 1, false);
@@ -35,7 +34,6 @@ class MyCustomSource extends StreamAudioSource {
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
     numberOfStreams.i++;
-    int fileSize = await distributorContact.giveMeFileSize();
     start ??= 0;
     end ??= fileSize;
     Stream<Uint8List> stream = chunkStream
