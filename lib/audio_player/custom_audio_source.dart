@@ -9,7 +9,7 @@ import 'mp3_to_stream.dart';
 
 class MyCustomSource extends StreamAudioSource {
   Wrapper numberOfStreams = Wrapper();
-  late String pathName;
+  late String songIdentifier;
   late DistributorContact distributorContact;
   late List<Uint8List> storedChunks;
   late List<bool> isChunkCached;
@@ -18,8 +18,9 @@ class MyCustomSource extends StreamAudioSource {
   late ChunkStreamCreator chunkStream;
   AudioPlayer audioPlayer;
 
-  MyCustomSource(this.pathName, this.audioPlayer) {
-    distributorContact = DistributorContact(pathName);
+  MyCustomSource(this.songIdentifier, this.audioPlayer) {
+    distributorContact = DistributorContact(songIdentifier);
+    distributorContact.initialize();
     chunkStream = ChunkStreamCreator(
         distributorContact, distributorContact.songIdentifier, numberOfStreams);
   }

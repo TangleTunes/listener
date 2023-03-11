@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'dart:io' as io;
 import 'dart:typed_data';
+// import 'package:flutter/services.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,22 +20,16 @@ void main(List<String> args) async {
   //smartContract.deposit(1);
   //smartContract.deleteUser();
 
-  print(await smartContract.users(smartContract.ownAddress.toString()));
+  // print(await smartContract.users(smartContract.ownAddress.toString()));
 }
 
 Future<String> loadPrivateKey() async {
   ByteData pk = await rootBundle.load("assets/privatekey.json");
-
   String loadJson = utf8.decode(pk.buffer.asUint8List());
-  // io.File abiFile =
-  //     io.File('lib/distributor_connection/smartcontract.abi.json');
-
-  // final String loadJson =
-  //     await io.File('lib/distributor_connection/privatekey.json')
-  //         .readAsString();
   final decodedJson = jsonDecode(loadJson);
   String privateKey = decodedJson['privatekey'];
   return privateKey;
+  // return "xxx";
 }
 
 class SmartContract {
@@ -232,7 +225,7 @@ class SmartContract {
       outputList = await client.call(
           contract: contract,
           function: contract.function('get_songs'),
-          params: [index, amount]);
+          params: [BigInt.from(index), BigInt.from(amount)]);
     } catch (e) {
       print(e);
     } finally {

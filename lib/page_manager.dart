@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'custom_audio_source.dart';
+import 'audio_player/custom_audio_source.dart';
 
 class PageManager {
   late AudioPlayer _audioPlayer;
