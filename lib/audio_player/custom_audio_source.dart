@@ -18,11 +18,10 @@ class MyCustomSource extends StreamAudioSource {
   late ChunkStreamCreator chunkStream;
   AudioPlayer audioPlayer;
 
-  MyCustomSource(this.songIdentifier, this.audioPlayer, this.fileSize) {
-    distributorContact = DistributorContact(songIdentifier);
-    distributorContact.initialize();
+  MyCustomSource(this.songIdentifier, this.audioPlayer, this.fileSize,
+      this.distributorContact) {
     chunkStream = ChunkStreamCreator(
-        distributorContact, distributorContact.songIdentifier, numberOfStreams);
+        distributorContact, songIdentifier, fileSize, numberOfStreams);
   }
 
   void initialze() async {

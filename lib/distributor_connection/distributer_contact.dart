@@ -10,29 +10,28 @@ import 'package:web3dart/web3dart.dart';
 import 'smart_contract.dart';
 
 class DistributorContact {
-  final _chunkSize = 35000;
-  String songIdentifier;
-  int cost = 0;
-  late int FILE_SIZE;
+  late SmartContract smartContract;
+  String distributorHex;
+  String distributorUrl;
 
   // Socket? socket; // FIXME
 
-  DistributorContact(this.songIdentifier);
-
-  Future<int> giveMeFileSize() async {
-    //ByteData data = await rootBundle.load(songIdentifier);
-    //Uint8List byteList = data.buffer.asUint8List();
-    // return byteList.length;
-    return 2113939; // FIXME
+  DistributorContact(this.distributorHex, this.distributorUrl, String rpcUrl,
+      String contractAddress) {
+    initialize(rpcUrl, contractAddress);
   }
 
-  Future initialize() async {
-    // socket = await Socket.connect("localhost", 3000);
+  Future initialize(String rpcUrl, String contractAddress) async {
+    EthereumAddress contractAddr = EthereumAddress.fromHex(contractAddress);
+    String privateKey = await loadPrivateKey();
+    ByteData byteData = await rootBundle.load('assets/smartcontract.abi.json');
+    String abiCode = utf8.decode(byteData.buffer.asUint8List());
+    smartContract = SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
   }
 
-  Future<Uint8List> giveMeChunk(int chunk) async {
-    Future<Uint8List>? result = null;
-    Socket socket = await Socket.connect("10.0.2.2", 3000); //FIXME
+  Future<Uint8List> giveMeChunk(String songIdentifier, int chunk) async {
+    Uri uri = Uri.parse(distributorUrl);
+    Socket socket = await Socket.connect(uri.host, uri.port); //FIXME
 
     /// 1. send tx-len
     /// 2. send iota-tx
@@ -84,17 +83,6 @@ class DistributorContact {
 
   void sendTcpChunkRequest(
       Uint8List songId, int chunkNum, int amount, Socket socket) async {
-    String rpcUrl =
-        "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
-    EthereumAddress contractAddr =
-        EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
-    String privateKey = await loadPrivateKey();
-    ByteData byteData = await rootBundle.load('assets/smartcontract.abi.json');
-    String abiCode = utf8.decode(byteData.buffer.asUint8List());
-    SmartContract smartContract =
-        SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
-    await smartContract.init(rpcUrl, privateKey);
-    String distributorHex = "0x74d0c7eb93c754318bca8174472a70038f751f2b";
     Uint8List BODY = await smartContract.createChunkGetTransaction(
         songId, chunkNum, amount, distributorHex);
     //Add body length as header (4 bytes)

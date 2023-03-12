@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 // import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,7 +16,6 @@ void main(List<String> args) async {
   String privateKey = await loadPrivateKey();
   SmartContract smartContract = SmartContract(
       rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
-  await smartContract.init(rpcUrl, privateKey);
   //smartContract.createUser("paul", "paul");
   //smartContract.deposit(1);
   //smartContract.deleteUser();
@@ -42,16 +42,13 @@ class SmartContract {
   late EthereumAddress ownAddress;
   late DeployedContract contract;
 
-  Future init(String rpcUrl, String privateKey) async {
+  SmartContract(this.rpcUrl, this.contractAddr, this.privateKey, this.abiCode) {
     client = Web3Client(rpcUrl, http.Client());
     credentials = EthPrivateKey.fromHex(privateKey);
     ownAddress = credentials.address;
-    // abiCode = await abiFile.readAsString();
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
   }
-
-  SmartContract(this.rpcUrl, this.contractAddr, this.privateKey, this.abiCode);
 
   void deposit(int amount) async {
     try {
@@ -240,7 +237,7 @@ class SmartContract {
       outputList = await client.call(
           contract: contract,
           function: contract.function('song_list'),
-          params: [index]);
+          params: [BigInt.from(index)]);
     } catch (e) {
       print(e);
     } finally {
@@ -297,7 +294,6 @@ class SmartContract {
   Future<Uint8List> createChunkGetTransaction(
       Uint8List song, int index, int amount, String distributor) async {
     // client.signTransaction(credentials, )
-    print("Distributor address: $distributor");
     Uint8List data = contract.function('get_chunks').encodeCall([
       song,
       BigInt.from(index),
@@ -305,14 +301,14 @@ class SmartContract {
       EthereumAddress.fromHex(distributor)
     ]);
 
-    var tx = Transaction(
+    Transaction tx = Transaction(
         from: ownAddress,
         to: contractAddr,
         gasPrice: EtherAmount.inWei(BigInt.from(1)),
         maxGas: 100000,
         data: data);
 
-    var signed_tx =
+    Uint8List signed_tx =
         await client.signTransaction(credentials, tx, chainId: 1074);
 
     // var response = await client.sendRawTransaction(signed_tx);

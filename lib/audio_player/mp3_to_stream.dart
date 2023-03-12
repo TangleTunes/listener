@@ -12,15 +12,14 @@ class ChunkStreamCreator {
   String songIdentifier;
   bool isFinished = false;
   DistributorContact distributorContact;
-
+  int fileSize;
   Wrapper forWhatSource;
 
-  ChunkStreamCreator(
-      this.distributorContact, this.songIdentifier, this.forWhatSource) {}
+  ChunkStreamCreator(this.distributorContact, this.songIdentifier,
+      this.fileSize, this.forWhatSource) {}
 
   Stream<Uint8List> createStream(int startByte, List<Uint8List> storedChunks,
       List<bool> isChunkCached, int yourNum, AudioPlayer audioPlayer) async* {
-    var length = await distributorContact.giveMeFileSize();
     bool isFinished = false;
     int chunkNum = startByte ~/ chunkSize;
     int offsetWithinChunk = startByte % chunkSize;
@@ -34,7 +33,9 @@ class ChunkStreamCreator {
           if (isChunkCached[chunkNum]) {
             chunk = storedChunks[chunkNum];
           } else {
-            chunk = await distributorContact.giveMeChunk(chunkNum);
+            print("await distributorContact.giveMeChunk(chunkNum)");
+            chunk =
+                await distributorContact.giveMeChunk(songIdentifier, chunkNum);
             storedChunks[chunkNum] = chunk;
             isChunkCached[chunkNum] = true;
           }
@@ -48,7 +49,7 @@ class ChunkStreamCreator {
           isFirst = false;
           await Future.delayed(Duration(milliseconds: 100)); //sleep
           chunkNum += 1;
-          if (chunkNum * chunkSize >= length) {
+          if (chunkNum * chunkSize >= fileSize) {
             isFinished = true;
             return;
           }

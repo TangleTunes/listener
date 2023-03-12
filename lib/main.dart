@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'audio_player/playback.dart';
+import 'distributor_connection/distributer_contact.dart';
 
 void main() => runApp(const MyApp());
 
@@ -35,12 +36,18 @@ class _MyAppState extends State<MyApp> {
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () {
+                  DistributorContact distributorContact = DistributorContact(
+                      "0x74d0c7eb93c754318bca8174472a70038f751f2b",
+                      "http://10.0.2.2:3000",
+                      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm",
+                      "0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51");
                   _playback.setAudio(
-                      "0x51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2",
-                      2034553);
+                      "51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2",
+                      2034553,
+                      distributorContact);
                 },
                 child: Text(
-                    'Song 0x51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2'),
+                    'Song 51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2'),
               ),
               TextButton(
                 style: ButtonStyle(
@@ -48,9 +55,15 @@ class _MyAppState extends State<MyApp> {
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () {
+                  DistributorContact distributorContact = DistributorContact(
+                      "0x74d0c7eb93c754318bca8174472a70038f751f2b",
+                      "http://10.0.2.2:3000",
+                      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm",
+                      "0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51");
                   _playback.setAudio(
                       "0800000722040506080000072204050608000007220405060800000722040506",
-                      2113939);
+                      2113939,
+                      distributorContact);
                 },
                 child: Text(
                     'Song 0800000722040506080000072204050608000007220405060800000722040506'),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:listener13/distributor_connection/distributer_contact.dart';
 import 'custom_audio_source.dart';
 
 class Playback {
@@ -7,9 +8,10 @@ class Playback {
   Playback() {
     _init();
   }
-  void setAudio(String songIdentifier, int sizeInBytes) async {
-    final streamAudioSource =
-        MyCustomSource(songIdentifier, _audioPlayer, sizeInBytes);
+  void setAudio(String songIdentifier, int sizeInBytes,
+      DistributorContact distributorContact) async {
+    final streamAudioSource = MyCustomSource(
+        songIdentifier, _audioPlayer, sizeInBytes, distributorContact);
     streamAudioSource.initialze();
     await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
   }

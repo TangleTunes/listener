@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:listener13/distributor_connection/smart_contract.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:convert/convert.dart';
 
 void main() async {
   // DistributorContact d = DistributorContact(
@@ -34,7 +37,12 @@ void main() async {
           .readAsString();
   SmartContract smartContract =
       SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
-  smartContract.init(rpcUrl, privateKey);
-  var ans = await smartContract.getSongs(0, 0);
-  print(ans);
+  var songList = await smartContract.songList(0);
+  print(songList.toString());
+  String songId = hex.encode(songList[0] as List<int>);
+  print("songId $songId");
+  var song1Info = await smartContract.songs(Uint8List.fromList(songList[0]));
+  var song1Size = song1Info[4];
+  print("song1Info $song1Info");
+  print("song1Size $song1Size");
 }
