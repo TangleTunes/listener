@@ -42,6 +42,10 @@ dependencies:
   web_socket_channel: ^2.3.0
   tcp_socket_connection: ^0.3.1
   http: ^0.13.5
+  encrypt: ^5.0.1
+  pointycastle: ^3.6.2
+  crypto: ^3.0.2
+  cryptography: ^2.5.0
 
 dev_dependencies:
   flutter_test:

@@ -9,27 +9,19 @@ import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
 
 void main(List<String> args) async {
-  String rpcUrl =
-      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
-  EthereumAddress contractAddr =
-      EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
-  String privateKey = await loadPrivateKey();
-  SmartContract smartContract = SmartContract(
-      rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
+  // String rpcUrl =
+  //     "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
+  // EthereumAddress contractAddr =
+  //     EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
+  // // String privateKey = await loadPrivateKey();
+  // String privateKey = "lol"; //FIXME
+  // SmartContract smartContract = SmartContract(
+  //     rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
   //smartContract.createUser("paul", "paul");
   //smartContract.deposit(1);
   //smartContract.deleteUser();
 
   // print(await smartContract.users(smartContract.ownAddress.toString()));
-}
-
-Future<String> loadPrivateKey() async {
-  ByteData pk = await rootBundle.load("assets/privatekey.json");
-  String loadJson = utf8.decode(pk.buffer.asUint8List());
-  final decodedJson = jsonDecode(loadJson);
-  String privateKey = decodedJson['privatekey'];
-  return privateKey;
-  // return "xxx";
 }
 
 class SmartContract {

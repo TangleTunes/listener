@@ -13,17 +13,17 @@ class DistributorContact {
   late SmartContract smartContract;
   String distributorHex;
   String distributorUrl;
+  String privateKey;
 
   // Socket? socket; // FIXME
 
-  DistributorContact(this.distributorHex, this.distributorUrl, String rpcUrl,
-      String contractAddress) {
+  DistributorContact(this.privateKey, this.distributorHex, this.distributorUrl,
+      String rpcUrl, String contractAddress) {
     initialize(rpcUrl, contractAddress);
   }
 
   Future initialize(String rpcUrl, String contractAddress) async {
     EthereumAddress contractAddr = EthereumAddress.fromHex(contractAddress);
-    String privateKey = await loadPrivateKey();
     ByteData byteData = await rootBundle.load('assets/smartcontract.abi.json');
     String abiCode = utf8.decode(byteData.buffer.asUint8List());
     smartContract = SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
