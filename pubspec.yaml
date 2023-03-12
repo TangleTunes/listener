@@ -42,8 +42,6 @@ dependencies:
   web_socket_channel: ^2.3.0
   tcp_socket_connection: ^0.3.1
   http: ^0.13.5
-  encrypt: ^5.0.1
-  cryptography: ^2.5.0
 
 
 dev_dependencies:

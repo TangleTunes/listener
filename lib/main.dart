@@ -31,8 +31,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initilize() async {
-    String privateKey = await unlockPrivateKey("password123");
-    print("unlockPrivateKey $privateKey");
     ByteData byteData = await rootBundle.load(
         "assets/privatekey.json"); //FIXME remove! (this line is temporary so that privatekey is not pushed to git)
     String loadJson = utf8.decode(byteData.buffer
@@ -41,10 +39,10 @@ class _MyAppState extends State<MyApp> {
         loadJson); //FIXME remove! (this line is temporary so that privatekey is not pushed to git)
     String pk = decodedJson[
         'privatekey']; //FIXME: replace pk with password set by user input!
-    print("decodedjson $pk");
-    setPrivateKey(pk, "password123");
-    // String privateKey = await unlockPrivateKey("password123");
-    // print("unlockPrivateKey $privateKey");
+    setPrivateKey(
+        pk, "password123"); //FIXME replace password123 with user input
+    String privateKey = await unlockPrivateKey(
+        "password123"); //FIXME replace password123 with user input
     ownCredentials = EthPrivateKey.fromHex(privateKey);
 
     EthereumAddress contractAddr =
