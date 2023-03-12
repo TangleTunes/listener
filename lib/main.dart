@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:listener13/account/account.dart';
+import 'package:listener13/distributor_connection/smart_contract.dart';
+import 'package:web3dart/web3dart.dart';
 import 'audio_player/playback.dart';
 import 'distributor_connection/distributer_contact.dart';
 
@@ -18,7 +20,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final Playback _playback;
-  late String privateKey;
+  late Credentials ownCredentials;
+  late SmartContract smartContract;
 
   @override
   void initState() {
@@ -28,6 +31,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initilize() async {
+    String privateKey = await unlockPrivateKey("password123");
+    print("unlockPrivateKey $privateKey");
     ByteData byteData = await rootBundle.load(
         "assets/privatekey.json"); //FIXME remove! (this line is temporary so that privatekey is not pushed to git)
     String loadJson = utf8.decode(byteData.buffer
@@ -38,8 +43,20 @@ class _MyAppState extends State<MyApp> {
         'privatekey']; //FIXME: replace pk with password set by user input!
     print("decodedjson $pk");
     setPrivateKey(pk, "password123");
-    privateKey = await unlockPrivateKey("password123");
-    print("unlockPrivateKey $privateKey");
+    // String privateKey = await unlockPrivateKey("password123");
+    // print("unlockPrivateKey $privateKey");
+    ownCredentials = EthPrivateKey.fromHex(privateKey);
+
+    EthereumAddress contractAddr =
+        EthereumAddress.fromHex("0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51");
+    ByteData smartContractByteData =
+        await rootBundle.load('assets/smartcontract.abi.json');
+    String abiCode = utf8.decode(smartContractByteData.buffer.asUint8List());
+    smartContract = SmartContract(
+        "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm",
+        contractAddr,
+        ownCredentials,
+        abiCode);
   }
 
   @override
@@ -58,11 +75,10 @@ class _MyAppState extends State<MyApp> {
                 ),
                 onPressed: () {
                   DistributorContact distributorContact = DistributorContact(
-                      privateKey,
+                      smartContract,
+                      ownCredentials,
                       "0x74d0c7eb93c754318bca8174472a70038f751f2b",
-                      "http://10.0.2.2:3000",
-                      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm",
-                      "0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51");
+                      "http://10.0.2.2:3000");
                   _playback.setAudio(
                       "51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2",
                       2034553,
@@ -78,11 +94,10 @@ class _MyAppState extends State<MyApp> {
                 ),
                 onPressed: () {
                   DistributorContact distributorContact = DistributorContact(
-                      privateKey,
+                      smartContract,
+                      ownCredentials,
                       "0x74d0c7eb93c754318bca8174472a70038f751f2b",
-                      "http://10.0.2.2:3000",
-                      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm",
-                      "0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51");
+                      "http://10.0.2.2:3000");
                   _playback.setAudio(
                       "0800000722040506080000072204050608000007220405060800000722040506",
                       2113939,

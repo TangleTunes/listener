@@ -26,18 +26,17 @@ void main(List<String> args) async {
 
 class SmartContract {
   final String rpcUrl;
-  final String privateKey;
   final EthereumAddress contractAddr;
   String abiCode;
   late Web3Client client;
-  late Credentials credentials;
+  late Credentials ownCredentials;
   late EthereumAddress ownAddress;
   late DeployedContract contract;
 
-  SmartContract(this.rpcUrl, this.contractAddr, this.privateKey, this.abiCode) {
+  SmartContract(
+      this.rpcUrl, this.contractAddr, this.ownCredentials, this.abiCode) {
     client = Web3Client(rpcUrl, http.Client());
-    credentials = EthPrivateKey.fromHex(privateKey);
-    ownAddress = credentials.address;
+    ownAddress = ownCredentials.address;
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
   }
@@ -45,7 +44,7 @@ class SmartContract {
   void deposit(int amount) async {
     try {
       String tx_hash = await client.sendTransaction(
-          credentials,
+          ownCredentials,
           Transaction.callContract(
               contract: contract,
               function: contract.function('deposit'),
@@ -64,7 +63,7 @@ class SmartContract {
   void createUser(String name, String description) async {
     try {
       String tx_hash = await client.sendTransaction(
-          credentials,
+          ownCredentials,
           Transaction.callContract(
               contract: contract,
               function: contract.function('create_user'),
@@ -81,7 +80,7 @@ class SmartContract {
 
   void deleteUser() async {
     String tx_hash = await client.sendTransaction(
-        credentials,
+        ownCredentials,
         Transaction.callContract(
             contract: contract,
             function: contract.function('delete_user'),
@@ -95,7 +94,7 @@ class SmartContract {
       Uint8List song, int index, int amount, String distributor) async {
     try {
       String tx_hash = await client.sendTransaction(
-          credentials,
+          ownCredentials,
           Transaction.callContract(
               contract: contract,
               function: contract.function('get_chunks'),
@@ -118,7 +117,7 @@ class SmartContract {
   void withdraw(int amount) async {
     try {
       String tx_hash = await client.sendTransaction(
-          credentials,
+          ownCredentials,
           Transaction.callContract(
               contract: contract,
               function: contract.function('withdraw'),
@@ -301,7 +300,7 @@ class SmartContract {
         data: data);
 
     Uint8List signed_tx =
-        await client.signTransaction(credentials, tx, chainId: 1074);
+        await client.signTransaction(ownCredentials, tx, chainId: 1074);
 
     // var response = await client.sendRawTransaction(signed_tx);
     // print('response: $response');

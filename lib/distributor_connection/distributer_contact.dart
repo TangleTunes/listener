@@ -13,21 +13,16 @@ class DistributorContact {
   late SmartContract smartContract;
   String distributorHex;
   String distributorUrl;
-  String privateKey;
+  Credentials ownCredentials;
 
   // Socket? socket; // FIXME
 
-  DistributorContact(this.privateKey, this.distributorHex, this.distributorUrl,
-      String rpcUrl, String contractAddress) {
-    initialize(rpcUrl, contractAddress);
-  }
-
-  Future initialize(String rpcUrl, String contractAddress) async {
-    EthereumAddress contractAddr = EthereumAddress.fromHex(contractAddress);
-    ByteData byteData = await rootBundle.load('assets/smartcontract.abi.json');
-    String abiCode = utf8.decode(byteData.buffer.asUint8List());
-    smartContract = SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
-  }
+  DistributorContact(
+    this.smartContract,
+    this.ownCredentials,
+    this.distributorHex,
+    this.distributorUrl,
+  ) {}
 
   Future<Uint8List> giveMeChunk(String songIdentifier, int chunk) async {
     Uri uri = Uri.parse(distributorUrl);

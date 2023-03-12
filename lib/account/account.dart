@@ -1,16 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:listener13/distributor_connection/smart_contract.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:web3dart/web3dart.dart';
 
-void createAccount(String username, String password) {
-  // String privateKey = unlockPrivateKey(password);
-  // SmartContract smartContract =
-  //     SmartContract(rpcUrl, contractAddr, privateKey, abiCode);
-  // smartContract.createUser(username, "Descriptionless");
+Credentials createAccount(
+    String username, String password, SmartContract smartContract) {
+  EthPrivateKey credentials = EthPrivateKey.createRandom(Random.secure());
+  String privateKey = base64.encode(credentials.privateKey);
+  print("read pk as $privateKey");
+  setPrivateKey(privateKey, password);
+  smartContract.createUser(username, "Descriptionless");
+  return credentials;
 }
 
 void coupleAccount(String privateKey, String password) {
