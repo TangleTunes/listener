@@ -17,7 +17,7 @@ Credentials createAccount(
 void setPrivateKey(String privateKey, String password) async {
   EthPrivateKey ethPrivateKey =
       EthPrivateKey(Uint8List.fromList(utf8.encode(privateKey)));
-  Wallet wallet = Wallet.createNew(ethPrivateKey, password, Random());
+  Wallet wallet = Wallet.createNew(ethPrivateKey, password, Random.secure());
   String v3walletEncrypted = wallet.toJson();
 
   final directory = await getApplicationDocumentsDirectory();
@@ -39,4 +39,15 @@ Future<String> unlockPrivateKey(String password) async {
   Uint8List pk = wallet.privateKey.privateKey;
   String privateKey = utf8.decode(pk);
   return privateKey;
+}
+
+Future<bool> alreadyCoupled() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/pk.json');
+    String contents = await file.readAsString();
+    return jsonDecode(contents)['privatekey'] != null;
+  } catch (e) {
+    return false;
+  }
 }
