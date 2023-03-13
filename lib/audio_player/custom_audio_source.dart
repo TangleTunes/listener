@@ -17,6 +17,7 @@ class MyCustomSource extends StreamAudioSource {
   late int fileSize;
   late ChunkStreamCreator chunkStream;
   AudioPlayer audioPlayer;
+  late List<bool> isChunkRequested;
 
   MyCustomSource(this.songIdentifier, this.audioPlayer, this.fileSize,
       this.distributorContact) {
@@ -28,6 +29,8 @@ class MyCustomSource extends StreamAudioSource {
     storedChunks = List.filled(fileSize ~/ chunkSize + 1,
         Uint8List.fromList(List.filled(chunkSize, 0)));
     isChunkCached = List.filled(fileSize ~/ chunkSize + 1, false);
+    isChunkRequested = List.filled(fileSize ~/ chunkSize + 1, false);
+
     // audioPlayer.positionStream.listen((event) {
     //   // if buffer < 10
     //   // request new chunks over tcp
@@ -39,9 +42,10 @@ class MyCustomSource extends StreamAudioSource {
     numberOfStreams.i++;
     start ??= 0;
     end ??= fileSize;
+    print("request method called with start $start and end $end");
     Stream<Uint8List> stream = chunkStream
-        .createStream(
-            start, storedChunks, isChunkCached, numberOfStreams.i, audioPlayer)
+        .createStream(start, storedChunks, isChunkCached, isChunkRequested,
+            numberOfStreams.i, audioPlayer)
         .asBroadcastStream();
     return StreamAudioResponse(
       sourceLength: fileSize,

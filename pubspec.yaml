@@ -42,6 +42,8 @@ dependencies:
   web_socket_channel: ^2.3.0
   tcp_socket_connection: ^0.3.1
   http: ^0.13.5
+  async: ^2.10.0
+  tuple: ^2.0.1
 
 
 dev_dependencies:

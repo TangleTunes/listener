@@ -280,9 +280,9 @@ class SmartContract {
     return outputList;
   }
 
-  Future<Uint8List> createChunkGetTransaction(
-      Uint8List song, int index, int amount, String distributor) async {
-    print("ownAddress $ownAddress");
+  Future<Uint8List> createChunkGetTransaction(Uint8List song, int index,
+      int amount, String distributor, int nonce) async {
+    print("createChunkGetTransaction with nonce $nonce");
     // client.signTransaction(credentials, )
     Uint8List data = contract.function('get_chunks').encodeCall([
       song,
@@ -296,14 +296,12 @@ class SmartContract {
         to: contractAddr,
         gasPrice: EtherAmount.inWei(BigInt.from(1)),
         maxGas: 100000,
-        data: data);
+        data: data,
+        nonce: nonce);
 
-    Uint8List signed_tx =
+    Uint8List signedTx =
         await client.signTransaction(ownCredentials, tx, chainId: 1074);
 
-    // var response = await client.sendRawTransaction(signed_tx);
-    // print('response: $response');
-
-    return signed_tx;
+    return signedTx;
   }
 }
