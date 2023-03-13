@@ -15,18 +15,25 @@ class DistributorContact {
   String distributorUrl;
   Credentials ownCredentials;
 
-  // Socket? socket; // FIXME
+  late Socket socket; // FIXME
 
   DistributorContact(
     this.smartContract,
     this.ownCredentials,
     this.distributorHex,
     this.distributorUrl,
-  ) {}
+  ) {
+    initialize();
+  }
+
+  void initialize() async {
+    Uri uri = Uri.parse(distributorUrl);
+    socket = await Socket.connect(uri.host, uri.port); //FIXME
+  }
 
   Future<Uint8List> giveMeChunk(String songIdentifier, int chunk) async {
-    Uri uri = Uri.parse(distributorUrl);
-    Socket socket = await Socket.connect(uri.host, uri.port); //FIXME
+    // Uri uri = Uri.parse(distributorUrl);
+    // Socket socket = await Socket.connect(uri.host, uri.port); //FIXME
 
     /// 1. send tx-len
     /// 2. send iota-tx
@@ -37,41 +44,48 @@ class DistributorContact {
     /// 3. flush
     await socket.flush();
     // await Future.delayed(Duration(seconds: 10)); //sleep
-    Stream<Uint8List> stream =
-        socket.transform(StreamTransformer.fromBind((tcpStream) async* {
-      ListQueue<int> queue = ListQueue();
+    Stream<Uint8List> stream = socket.transform(
+      StreamTransformer.fromHandlers(handleData: (tcp_msg, sink) {
+        ListQueue<int> queue = ListQueue();
 
-      await for (final tcp_msg in tcpStream) {
         queue.addAll(tcp_msg);
 
-        if (queue.length >= 8) {
+        while (queue.length >= 8) {
           Uint8List bodyLength = Uint8List(4);
 
           for (int i = 4; i < 8; i++) {
             bodyLength[i - 4] = queue.elementAt(i);
           }
+
           final byteData = ByteData.view(bodyLength.buffer);
           int contentLength = byteData.getUint32(0, Endian.little);
-          if (queue.length >= contentLength) {
-            //entire chunk in queue!
+
+          if (queue.length >= contentLength + 8) {
+            // entire chunk in queue!
             for (int i = 0; i < 8; i++) {
-              //remove first 8 elements
+              // remove first 8 elements
               queue.removeFirst();
             }
+
             Uint8List chunk = Uint8List(contentLength);
             int index = 0;
+
             for (final byte in queue.take(contentLength)) {
-              chunk[index] = (byte);
+              chunk[index] = byte;
               index++;
             }
+
             for (int j = 0; j < index; j++) {
               queue.removeFirst();
             }
-            yield chunk;
+
+            sink.add(chunk);
+          } else {
+            break;
           }
         }
-      }
-    }));
+      }),
+    );
 
     return await stream.first;
   }
