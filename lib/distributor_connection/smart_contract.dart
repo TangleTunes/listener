@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
@@ -281,6 +282,7 @@ class SmartContract {
 
   Future<Uint8List> createChunkGetTransaction(
       Uint8List song, int index, int amount, String distributor) async {
+    print("ownAddress $ownAddress");
     // client.signTransaction(credentials, )
     Uint8List data = contract.function('get_chunks').encodeCall([
       song,

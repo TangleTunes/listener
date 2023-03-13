@@ -25,6 +25,22 @@ class ChunkStreamCreator {
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
 
+    // while (!isFinished) {
+    //   if (audioPlayer.bufferedPosition <=
+    //       audioPlayer.position + Duration(seconds: 10)) {}
+    // }
+    // // await for position in positionStream {
+    // //  while requested_buffer < 10 {
+    // //    tcp.request_chunk();
+    // //    requested_buffer ++;
+    // //  }
+    // //  if chunk_cached(current_chunk) {
+    // //    yield get_from_cache(current_chunk)
+    // //  } else {
+    // //    chunk = tcp.next_chunk();
+    // //  }
+    // // }
+
     await for (final position in audioPlayer.positionStream) {
       while (audioPlayer.bufferedPosition <= position + Duration(seconds: 10) &&
           !isFinished) {
