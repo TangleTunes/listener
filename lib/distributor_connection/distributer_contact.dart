@@ -88,16 +88,16 @@ class DistributorContact {
   }
 
   Future<void> requestChunk(
-      String songIdentifier, int chunk, int amount, int nonce) async {
+      String songIdentifier, int chunk, int amount) async {
     print("Tcp requested chunk $chunk");
     Uint8List songId = hexToBytes(songIdentifier);
-    await sendTcpChunkRequest(songId, chunk, amount, socket, nonce);
+    await sendTcpChunkRequest(songId, chunk, amount, socket);
   }
 
-  Future<void> sendTcpChunkRequest(Uint8List songId, int chunkNum, int amount,
-      Socket socket, int nonce) async {
+  Future<void> sendTcpChunkRequest(
+      Uint8List songId, int chunkNum, int amount, Socket socket) async {
     Uint8List BODY = await smartContract.createChunkGetTransaction(
-        songId, chunkNum, amount, distributorHex, nonce);
+        songId, chunkNum, amount, distributorHex);
     //Add body length as header (4 bytes)
 
     int bodyLength = BODY.length;

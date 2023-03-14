@@ -25,17 +25,8 @@ class ChunkStreamCreator {
   // The next chunk number this stream should yield
   late int chunkNum;
 
-  late int nonce;
-
   ChunkStreamCreator(this.distributorContact, this.songIdentifier,
-      this.fileSize, this.forWhatSource) {
-    init();
-  }
-
-  void init() async {
-    nonce = await distributorContact.smartContract.client
-        .getTransactionCount(distributorContact.smartContract.ownAddress);
-  }
+      this.fileSize, this.forWhatSource) {}
 
   Future<void> requestIfNotRequested(List<bool> isChunkRequested) async {
     int requestRangeStart = chunkNum;
@@ -49,9 +40,7 @@ class ChunkStreamCreator {
         requestedChunk++;
       }
       // print("sending a chunk request from $chunkStart with amount of $amount");
-      await distributorContact.requestChunk(
-          songIdentifier, chunkStart, amount, nonce);
-      nonce++;
+      await distributorContact.requestChunk(songIdentifier, chunkStart, amount);
     }
     // for (int i = chunkNum; i < chunkNum + requestBufferSize; i++) {
     //   if (!isChunkRequested[i]) {
