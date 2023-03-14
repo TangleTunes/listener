@@ -14,7 +14,7 @@ Credentials createAccount(
   return credentials;
 }
 
-void setPrivateKey(String privateKey, String password) async {
+Future<void> setPrivateKey(String privateKey, String password) async {
   EthPrivateKey ethPrivateKey =
       EthPrivateKey(Uint8List.fromList(utf8.encode(privateKey)));
   Wallet wallet = Wallet.createNew(ethPrivateKey, password, Random.secure());

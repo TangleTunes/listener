@@ -16,18 +16,16 @@ class DistributorContact {
   late SmartContract smartContract;
   String distributorHex;
   String distributorUrl;
-  Credentials ownCredentials;
 
   late Socket socket; // FIXME
   late Stream<Tuple2<int, Uint8List>> stream;
 
   DistributorContact(
     this.smartContract,
-    this.ownCredentials,
     this.distributorHex,
     this.distributorUrl,
   ) {
-    initialize();
+    // initialize();
   }
 
   int readInt32(ListQueue<int> queue, int startAt) {
@@ -39,7 +37,7 @@ class DistributorContact {
     return byteData.getUint32(0, Endian.little);
   }
 
-  void initialize() async {
+  Future<void> initialize() async {
     Uri uri = Uri.parse(distributorUrl);
     socket = await Socket.connect(uri.host, uri.port); //FIXME
     stream = socket.transform(StreamTransformer.fromBind((tcpStream) async* {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:listener13/account/account.dart';
+import 'package:listener13/account/specify_smart_contract.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
 import 'package:web3dart/web3dart.dart';
 import 'audio_player/playback.dart';
@@ -32,30 +33,25 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initilize() async {
-    ByteData byteData = await rootBundle.load(
-        "assets/privatekey.json"); //FIXME remove! (this line is temporary so that privatekey is not pushed to git)
-    String loadJson = utf8.decode(byteData.buffer
-        .asUint8List()); //FIXME remove! (this line is temporary so that privatekey is not pushed to git)
-    final decodedJson = jsonDecode(
-        loadJson); //FIXME remove! (this line is temporary so that privatekey is not pushed to git)
-    String pk = decodedJson[
-        'privatekey']; //FIXME: replace pk with password set by user input!
-    setPrivateKey(
-        pk, "password123"); //FIXME replace password123 with user input
-    String privateKey = await unlockPrivateKey(
-        "password123"); //FIXME replace password123 with user input
-    ownCredentials = EthPrivateKey.fromHex(privateKey);
+    //FIXME the following block of code should be replaced with user interactions
+    //----------------------------------------------------------------------
+    ByteData byteData = await rootBundle.load("assets/privatekey.json");
+    String loadJson = utf8.decode(byteData.buffer.asUint8List());
+    final decodedJson = jsonDecode(loadJson);
+    String pk = decodedJson['privatekey'];
+    await setPrivateKey(pk, "password123");
+    String privateKey = await unlockPrivateKey("password123");
 
-    EthereumAddress contractAddr =
-        EthereumAddress.fromHex("0xb5F7F76bbdE176AC0A45EA1125F17784d8247aF4");
-    ByteData smartContractByteData =
-        await rootBundle.load('assets/smartcontract.abi.json');
-    String abiCode = utf8.decode(smartContractByteData.buffer.asUint8List());
+    //-------------------------------------------------------------------
+    ownCredentials = EthPrivateKey.fromHex(privateKey);
+    await initilizeSmartContractInfoWithAsset();
+
     smartContract = SmartContract(
-        "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm",
-        contractAddr,
+        await readNodeUrl(),
+        await readContractAdress(),
+        await readChainId(),
         ownCredentials,
-        abiCode);
+        await readAbiFromAssets());
     songsList = smartContract.getSongs(0, 1).toString();
     print("My public key is ${ownCredentials.address}");
   }
@@ -78,7 +74,6 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () {
                   DistributorContact distributorContact = DistributorContact(
                       smartContract,
-                      ownCredentials,
                       "0x74d0c7eb93c754318bca8174472a70038f751f2b",
                       "http://10.0.2.2:3000");
                   _playback.setAudio(
@@ -97,7 +92,6 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () {
                   DistributorContact distributorContact = DistributorContact(
                       smartContract,
-                      ownCredentials,
                       "0x74d0c7eb93c754318bca8174472a70038f751f2b",
                       "http://10.0.2.2:3000");
                   _playback.setAudio(
@@ -113,12 +107,13 @@ class _MyAppState extends State<MyApp> {
                   foregroundColor:
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   DistributorContact distributorContact = DistributorContact(
                       smartContract,
-                      ownCredentials,
                       "0x74d0c7eb93c754318bca8174472a70038f751f2b",
                       "http://10.0.2.2:3000");
+                  await distributorContact.initialize();
+
                   _playback.setAudio(
                       "486df48c7468457fc8fbbdc0cd1ce036b2b21e2f093559be3c37fcb024c1facf",
                       2113939,

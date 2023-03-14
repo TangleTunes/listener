@@ -44,6 +44,7 @@ dependencies:
   http: ^0.13.5
   async: ^2.10.0
   tuple: ^2.0.1
+  toml: ^0.14.0
 
 
 dev_dependencies:

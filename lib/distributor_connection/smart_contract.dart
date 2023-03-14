@@ -10,28 +10,30 @@ import 'package:web3dart/web3dart.dart';
 
 class SmartContract {
   final String rpcUrl;
-  final EthereumAddress contractAddr;
+  late EthereumAddress contractAddr;
   String abiCode;
   late Web3Client client;
   late Credentials ownCredentials;
   late EthereumAddress ownAddress;
   late DeployedContract contract;
+  int chainId;
   late int nonce;
 
-  SmartContract(
-      this.rpcUrl, this.contractAddr, this.ownCredentials, this.abiCode) {
+  SmartContract(this.rpcUrl, String contractAddress, this.chainId,
+      this.ownCredentials, this.abiCode) {
+    contractAddr = EthereumAddress.fromHex(contractAddress);
     client = Web3Client(rpcUrl, http.Client());
     ownAddress = ownCredentials.address;
-    initialize();
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
+    initialize();
   }
 
-  void initialize() async {
+  Future<void> initialize() async {
     nonce = await client.getTransactionCount(ownAddress);
   }
 
-  void deposit(int amount) async {
+  Future<void> deposit(int amount) async {
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -40,7 +42,7 @@ class SmartContract {
               function: contract.function('deposit'),
               parameters: [],
               value: EtherAmount.fromInt(EtherUnit.ether, amount)),
-          chainId: 1074);
+          chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
@@ -50,7 +52,7 @@ class SmartContract {
     }
   }
 
-  void createUser(String name, String description) async {
+  Future<void> createUser(String name, String description) async {
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -58,7 +60,7 @@ class SmartContract {
               contract: contract,
               function: contract.function('create_user'),
               parameters: [name, description]),
-          chainId: 1074);
+          chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
@@ -68,19 +70,19 @@ class SmartContract {
     }
   }
 
-  void deleteUser() async {
+  Future<void> deleteUser() async {
     String tx_hash = await client.sendTransaction(
         ownCredentials,
         Transaction.callContract(
             contract: contract,
             function: contract.function('delete_user'),
             parameters: []),
-        chainId: 1074);
+        chainId: chainId);
     TransactionReceipt? tx_receipt =
         await client.getTransactionReceipt(tx_hash);
   }
 
-  void getChunks(
+  Future<void> getChunks(
       Uint8List song, int index, int amount, String distributor) async {
     try {
       String tx_hash = await client.sendTransaction(
@@ -94,7 +96,7 @@ class SmartContract {
                 amount,
                 EthereumAddress.fromHex(distributor)
               ]),
-          chainId: 1074);
+          chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
@@ -104,7 +106,7 @@ class SmartContract {
     }
   }
 
-  void withdraw(int amount) async {
+  Future<void> withdraw(int amount) async {
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -112,7 +114,7 @@ class SmartContract {
               contract: contract,
               function: contract.function('withdraw'),
               parameters: [amount]),
-          chainId: 1074);
+          chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
@@ -290,10 +292,9 @@ class SmartContract {
         maxGas: 300000,
         data: data,
         nonce: nonce);
-
+    nonce++; //Increment nonce after creating the transaction
     Uint8List signedTx =
-        await client.signTransaction(ownCredentials, tx, chainId: 1074);
-    nonce++;
+        await client.signTransaction(ownCredentials, tx, chainId: chainId);
     return signedTx;
   }
 }
