@@ -38,14 +38,28 @@ class ChunkStreamCreator {
   }
 
   Future<void> requestIfNotRequested(List<bool> isChunkRequested) async {
-    for (int i = chunkNum; i < chunkNum + requestBufferSize; i++) {
-      if (!isChunkRequested[i]) {
-        print("Sending chunk request $chunkNum with nonce $nonce");
-        await distributorContact.requestChunk(songIdentifier, i, nonce);
-        nonce++;
-        isChunkRequested[i] = true;
+    int requestRangeStart = chunkNum;
+    int requestedChunk = chunkNum;
+    while (requestedChunk < requestRangeStart + requestBufferSize) {
+      int amount = 0;
+      int chunkStart = requestedChunk;
+      while (!isChunkRequested[requestedChunk] &&
+          requestedChunk < requestRangeStart + requestBufferSize) {
+        amount++;
+        requestedChunk++;
       }
+      print("sending a chunk request from $chunkStart with amount of $amount");
+      await distributorContact.requestChunk(
+          songIdentifier, chunkStart, amount, nonce);
     }
+    // for (int i = chunkNum; i < chunkNum + requestBufferSize; i++) {
+    //   if (!isChunkRequested[i]) {
+    //     print("Sending chunk request $chunkNum with nonce $nonce");
+    //     await distributorContact.requestChunk(songIdentifier, i, nonce);
+    //     nonce++;
+    //     isChunkRequested[i] = true;
+    //   }
+    // }
   }
 
   Stream<Uint8List> createStream(
@@ -66,18 +80,17 @@ class ChunkStreamCreator {
         return;
       }
       if (val.runtimeType == Duration) {
-        print("StreamGroup has yielded a duration!");
         await requestIfNotRequested(isChunkRequested);
       } else {
-        print("StreamGroup has yielded a chunk!");
         //tcp stream yielded something
         val as Tuple2<int, Uint8List>;
         var chunkId = val.item1;
         var chunkData = val.item2;
         storedChunks[chunkId] = chunkData;
         isChunkCached[chunkId] = true;
+        print("chunkId $chunkId");
       }
-
+      print("Chunknum: $chunkNum");
       if (isChunkCached[chunkNum]) {
         Uint8List chunk;
         if (isFirst) {
@@ -86,6 +99,7 @@ class ChunkStreamCreator {
         } else {
           chunk = storedChunks[chunkNum];
         }
+        print("yielding a chunk! ${chunkNum}");
         chunkNum++;
         if (chunkNum * chunkSize >= fileSize) {
           isFinished = true;

@@ -10,6 +10,8 @@ import 'package:web3dart/web3dart.dart';
 
 import 'smart_contract.dart';
 
+const int chunkSize = 32500; //used to be 32766
+
 class DistributorContact {
   late SmartContract smartContract;
   String distributorHex;
@@ -51,31 +53,45 @@ class DistributorContact {
           int contentLength = readInt32(queue, 4);
 
           if (queue.length >= contentLength) {
-            //entire chunk in queue!
+            //oentire response from distributor in queue!
             for (int i = 0; i < 8; i++) {
-              //remove first 8 elements
+              //remove  header of tcp messsage
               queue.removeFirst();
             }
-            Uint8List chunk = Uint8List(contentLength);
-            int index = 0;
-            for (final byte in queue.take(contentLength)) {
-              chunk[index] = (byte);
-              index++;
+            int bytesLeftInTcpMsg = contentLength;
+            int chunkAmount = (contentLength / chunkSize).ceil();
+            while (bytesLeftInTcpMsg > 0) {
+              int chunkLength;
+              if (bytesLeftInTcpMsg > chunkSize) {
+                chunkLength = chunkSize;
+              } else {
+                chunkLength = bytesLeftInTcpMsg;
+              }
+              Uint8List chunk = Uint8List(chunkLength);
+              int index = 0;
+              for (final byte in queue.take(chunkLength)) {
+                chunk[index] = byte;
+                index++;
+              }
+              for (int j = 0; j < index; j++) {
+                //pop bytes that we just read
+                queue.removeFirst();
+              }
+              bytesLeftInTcpMsg = bytesLeftInTcpMsg - chunkLength;
+              yield Tuple2(chunkId, chunk);
+              chunkId++;
             }
-            for (int j = 0; j < index; j++) {
-              queue.removeFirst();
-            }
-            yield Tuple2(chunkId, chunk);
           }
         }
       }
     }));
   }
 
-  Future<void> requestChunk(String songIdentifier, int chunk, int nonce) async {
+  Future<void> requestChunk(
+      String songIdentifier, int chunk, int amount, int nonce) async {
     print("Tcp requested chunk $chunk");
     Uint8List songId = hexToBytes(songIdentifier);
-    await sendTcpChunkRequest(songId, chunk, 1, socket, nonce);
+    await sendTcpChunkRequest(songId, chunk, amount, socket, nonce);
   }
 
   Future<void> sendTcpChunkRequest(Uint8List songId, int chunkNum, int amount,

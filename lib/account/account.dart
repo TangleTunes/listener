@@ -26,6 +26,8 @@ void setPrivateKey(String privateKey, String password) async {
     file.create();
   }
   final data = {'privatekey': v3walletEncrypted};
+  print("pk.json contains $data");
+
   await file.writeAsString(jsonEncode(data));
 }
 
@@ -33,7 +35,7 @@ Future<String> unlockPrivateKey(String password) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/pk.json');
   String contents = await file.readAsString();
-  final decodedJson = jsonDecode(contents);
+  final decodedJson = json.decode(contents);
   String encoded = decodedJson['privatekey'];
   Wallet wallet = Wallet.fromJson(encoded, password);
   Uint8List pk = wallet.privateKey.privateKey;
@@ -46,7 +48,7 @@ Future<bool> alreadyCoupled() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/pk.json');
     String contents = await file.readAsString();
-    return jsonDecode(contents)['privatekey'] != null;
+    return jsonDecode(contents)['privatekey'] != null; //FIXME? json.decode
   } catch (e) {
     return false;
   }
