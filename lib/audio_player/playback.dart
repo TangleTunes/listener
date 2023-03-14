@@ -6,17 +6,6 @@ import 'custom_audio_source.dart';
 class Playback {
   late AudioPlayer _audioPlayer;
   Playback() {
-    _init();
-  }
-  void setAudio(String songIdentifier, int sizeInBytes,
-      DistributorContact distributorContact) async {
-    final streamAudioSource = MyCustomSource(
-        songIdentifier, _audioPlayer, sizeInBytes, distributorContact);
-    streamAudioSource.initialze();
-    await _audioPlayer.setAudioSource(streamAudioSource, preload: false);
-  }
-
-  void _init() async {
     _audioPlayer = AudioPlayer();
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
@@ -58,6 +47,12 @@ class Playback {
         total: totalDuration ?? Duration.zero,
       );
     });
+  }
+  Future<void> setAudio(String songIdentifier, int sizeInBytes,
+      DistributorContact distributorContact) async {
+    final streamAudioSource = MyCustomSource(
+        songIdentifier, _audioPlayer, sizeInBytes, distributorContact);
+    await _audioPlayer.setAudioSource(streamAudioSource);
   }
 
   void seek(Duration position) {

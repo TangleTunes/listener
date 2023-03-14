@@ -8,12 +8,19 @@ import 'package:toml/toml.dart';
 
 const String scTomlFileName = "sc.toml";
 
-Future<void> initilizeSmartContractInfoWithAsset() async {
-  ByteData smartContractSettingsByteData =
-      await rootBundle.load('assets/SmartContract.toml');
-  String tomlString =
-      utf8.decode(smartContractSettingsByteData.buffer.asUint8List());
-  await writeToFile(scTomlFileName, tomlString);
+Future<void> initilizeSmartContractIfNotSet() async {
+  try {
+    Map<String, dynamic> tomlMap = await readTomlFile();
+    tomlMap["contract_address"];
+    tomlMap["node_url"];
+    tomlMap["chaid_id"];
+  } catch (e) {
+    ByteData smartContractSettingsByteData =
+        await rootBundle.load('assets/SmartContract.toml');
+    String tomlString =
+        utf8.decode(smartContractSettingsByteData.buffer.asUint8List());
+    await writeToFile(scTomlFileName, tomlString);
+  }
 }
 
 Future<String> readAbiFromAssets() async {
@@ -65,6 +72,7 @@ Future<Map<String, dynamic>> readTomlFile() async {
 
 Future<void> writeToTomlFile(Map<String, dynamic> tomlMap) async {
   String tomlString = TomlDocument.fromMap(tomlMap).toString();
+
   await writeToFile(scTomlFileName, tomlString);
 }
 
@@ -72,7 +80,8 @@ Future<void> writeToFile(String filename, String content) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/$filename');
   if (await file.exists()) {
-    file.create();
+    await file.create();
   }
+  print("$filename now contains $content");
   await file.writeAsString(content);
 }

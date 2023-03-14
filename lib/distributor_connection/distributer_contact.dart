@@ -13,34 +13,27 @@ import 'smart_contract.dart';
 const int chunkSize = 32500; //used to be 32766
 
 class DistributorContact {
-  late SmartContract smartContract;
+  SmartContract smartContract;
   String distributorHex;
   String distributorUrl;
 
   late Socket socket; // FIXME
   late Stream<Tuple2<int, Uint8List>> stream;
 
-  DistributorContact(
-    this.smartContract,
-    this.distributorHex,
-    this.distributorUrl,
-  ) {
-    // initialize();
-  }
+  DistributorContact._create(
+      this.smartContract, this.distributorHex, this.distributorUrl) {}
 
-  int readInt32(ListQueue<int> queue, int startAt) {
-    Uint8List resultData = Uint8List(4);
-    for (int i = 0; i < 4; i++) {
-      resultData[i] = queue.elementAt(i + startAt);
-    }
-    final byteData = ByteData.view(resultData.buffer);
-    return byteData.getUint32(0, Endian.little);
-  }
+  /// Public factory
+  static Future<DistributorContact> create(
+      SmartContract smartC, String hex, String url) async {
+    // Call the private constructor
+    var thisObj = DistributorContact._create(smartC, hex, url);
 
-  Future<void> initialize() async {
-    Uri uri = Uri.parse(distributorUrl);
-    socket = await Socket.connect(uri.host, uri.port); //FIXME
-    stream = socket.transform(StreamTransformer.fromBind((tcpStream) async* {
+    // Do initialization that requires async
+    Uri uri = Uri.parse(thisObj.distributorUrl);
+    thisObj.socket = await Socket.connect(uri.host, uri.port); //FIXME
+    thisObj.stream =
+        thisObj.socket.transform(StreamTransformer.fromBind((tcpStream) async* {
       ListQueue<int> queue = ListQueue();
 
       await for (final tcp_msg in tcpStream) {
@@ -83,6 +76,8 @@ class DistributorContact {
         }
       }
     })).asBroadcastStream();
+    // Return the fully initialized object
+    return thisObj;
   }
 
   Future<void> requestChunk(
@@ -108,4 +103,13 @@ class DistributorContact {
     await socket.flush();
     // await Future.delayed(Duration(seconds: 2));
   }
+}
+
+int readInt32(ListQueue<int> queue, int startAt) {
+  Uint8List resultData = Uint8List(4);
+  for (int i = 0; i < 4; i++) {
+    resultData[i] = queue.elementAt(i + startAt);
+  }
+  final byteData = ByteData.view(resultData.buffer);
+  return byteData.getUint32(0, Endian.little);
 }

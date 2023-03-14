@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:listener13/account/specify_smart_contract.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:web3dart/web3dart.dart';
@@ -19,16 +20,8 @@ Future<void> setPrivateKey(String privateKey, String password) async {
       EthPrivateKey(Uint8List.fromList(utf8.encode(privateKey)));
   Wallet wallet = Wallet.createNew(ethPrivateKey, password, Random.secure());
   String v3walletEncrypted = wallet.toJson();
-
-  final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/pk.json');
-  if (await file.exists()) {
-    file.create();
-  }
   final data = {'privatekey': v3walletEncrypted};
-  print("pk.json contains $data");
-
-  await file.writeAsString(jsonEncode(data));
+  await writeToFile("pk.json", jsonEncode(data));
 }
 
 Future<String> unlockPrivateKey(String password) async {

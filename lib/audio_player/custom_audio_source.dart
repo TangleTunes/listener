@@ -23,18 +23,10 @@ class MyCustomSource extends StreamAudioSource {
       this.distributorContact) {
     chunkStream = ChunkStreamCreator(
         distributorContact, songIdentifier, fileSize, numberOfStreams);
-  }
-
-  void initialze() async {
     storedChunks = List.filled(fileSize ~/ chunkSize + 1,
         Uint8List.fromList(List.filled(chunkSize, 0)));
     isChunkCached = List.filled(fileSize ~/ chunkSize + 1, false);
     isChunkRequested = List.filled(fileSize ~/ chunkSize + 1, false);
-
-    // audioPlayer.positionStream.listen((event) {
-    //   // if buffer < 10
-    //   // request new chunks over tcp
-    // });
   }
 
   @override

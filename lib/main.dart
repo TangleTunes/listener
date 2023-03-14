@@ -23,13 +23,13 @@ class _MyAppState extends State<MyApp> {
   late final Playback _playback;
   late Credentials ownCredentials;
   late SmartContract smartContract;
-  var songsList;
+  late List<dynamic> songsList = List.empty();
 
   @override
   void initState() {
-    super.initState();
     _playback = Playback();
     initilize();
+    super.initState();
   }
 
   void initilize() async {
@@ -44,15 +44,20 @@ class _MyAppState extends State<MyApp> {
 
     //-------------------------------------------------------------------
     ownCredentials = EthPrivateKey.fromHex(privateKey);
-    await initilizeSmartContractInfoWithAsset();
+    await writeToFile("sc.toml",
+        "making this toml file unreadbale so that initilizeSmartContractIfNotSet is always triggered and will contain what is set in asset's toml file");
+    await initilizeSmartContractIfNotSet();
 
-    smartContract = SmartContract(
+    smartContract = await SmartContract.create(
         await readNodeUrl(),
         await readContractAdress(),
         await readChainId(),
         ownCredentials,
         await readAbiFromAssets());
-    songsList = smartContract.getSongs(0, 1).toString();
+    songsList = await smartContract.getSongs(0, 1);
+    setState(() {});
+
+    print("songs list $songsList");
     print("My public key is ${ownCredentials.address}");
   }
 
@@ -71,12 +76,13 @@ class _MyAppState extends State<MyApp> {
                   foregroundColor:
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
-                onPressed: () {
-                  DistributorContact distributorContact = DistributorContact(
-                      smartContract,
-                      "0x74d0c7eb93c754318bca8174472a70038f751f2b",
-                      "http://10.0.2.2:3000");
-                  _playback.setAudio(
+                onPressed: () async {
+                  DistributorContact distributorContact =
+                      await DistributorContact.create(
+                          smartContract,
+                          "0x74d0c7eb93c754318bca8174472a70038f751f2b",
+                          "http://10.0.2.2:3000");
+                  await _playback.setAudio(
                       "51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2",
                       2034553,
                       distributorContact);
@@ -89,12 +95,13 @@ class _MyAppState extends State<MyApp> {
                   foregroundColor:
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
-                onPressed: () {
-                  DistributorContact distributorContact = DistributorContact(
-                      smartContract,
-                      "0x74d0c7eb93c754318bca8174472a70038f751f2b",
-                      "http://10.0.2.2:3000");
-                  _playback.setAudio(
+                onPressed: () async {
+                  DistributorContact distributorContact =
+                      await DistributorContact.create(
+                          smartContract,
+                          "0x74d0c7eb93c754318bca8174472a70038f751f2b",
+                          "http://10.0.2.2:3000");
+                  await _playback.setAudio(
                       "0800000722040506080000072204050608000007220405060800000722040506",
                       2113939,
                       distributorContact);
@@ -108,13 +115,12 @@ class _MyAppState extends State<MyApp> {
                       MaterialStateProperty.all<Color>(Colors.blue),
                 ),
                 onPressed: () async {
-                  DistributorContact distributorContact = DistributorContact(
-                      smartContract,
-                      "0x74d0c7eb93c754318bca8174472a70038f751f2b",
-                      "http://10.0.2.2:3000");
-                  await distributorContact.initialize();
-
-                  _playback.setAudio(
+                  DistributorContact distributorContact =
+                      await DistributorContact.create(
+                          smartContract,
+                          "0x74d0c7eb93c754318bca8174472a70038f751f2b",
+                          "http://10.0.2.2:3000");
+                  await _playback.setAudio(
                       "486df48c7468457fc8fbbdc0cd1ce036b2b21e2f093559be3c37fcb024c1facf",
                       2113939,
                       distributorContact);

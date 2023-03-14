@@ -101,9 +101,11 @@ class ChunkStreamCreator {
           chunk = storedChunks[chunkNum];
         }
         print("yielding a chunk! ${chunkNum} I am stream $yourNum");
-        chunkNum++;
+
         if (chunkNum * chunkSize >= fileSize) {
           isFinished = true;
+        } else {
+          chunkNum++;
         }
         yield chunk;
       }

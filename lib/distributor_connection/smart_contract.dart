@@ -18,19 +18,29 @@ class SmartContract {
   late DeployedContract contract;
   int chainId;
   late int nonce;
-
-  SmartContract(this.rpcUrl, String contractAddress, this.chainId,
+  SmartContract._create(this.rpcUrl, String contractAddress, this.chainId,
       this.ownCredentials, this.abiCode) {
+    // Do most of your initialization here, that's what a constructor is for
     contractAddr = EthereumAddress.fromHex(contractAddress);
     client = Web3Client(rpcUrl, http.Client());
     ownAddress = ownCredentials.address;
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
-    initialize();
   }
 
-  Future<void> initialize() async {
-    nonce = await client.getTransactionCount(ownAddress);
+  /// Public factory
+  static Future<SmartContract> create(String rpcUrl, String contractAddress,
+      int chainId, Credentials ownCredentials, String abiCode) async {
+    // Call the private constructor
+    var thisObj = SmartContract._create(
+        rpcUrl, contractAddress, chainId, ownCredentials, abiCode);
+
+    // Do initialization that requires async
+    thisObj.nonce =
+        await thisObj.client.getTransactionCount(thisObj.ownAddress);
+
+    // Return the fully initialized object
+    return thisObj;
   }
 
   Future<void> deposit(int amount) async {
