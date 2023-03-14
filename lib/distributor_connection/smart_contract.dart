@@ -1,25 +1,40 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:web3dart/crypto.dart';
+import 'package:convert/convert.dart';
 
 import 'package:web3dart/web3dart.dart';
 
 void main(List<String> args) async {
-  // String rpcUrl =
-  //     "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
-  // EthereumAddress contractAddr =
-  //     EthereumAddress.fromHex('0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51');
-  // // String privateKey = await loadPrivateKey();
-  // String privateKey = "lol"; //FIXME
-  // SmartContract smartContract = SmartContract(
-  //     rpcUrl, contractAddr, privateKey, 'assets/smartcontract.abi.json');
-  //smartContract.createUser("paul", "paul");
-  //smartContract.deposit(1);
-  //smartContract.deleteUser();
+  String rpcUrl =
+      "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
+  EthereumAddress contractAddr =
+      EthereumAddress.fromHex('0xb5F7F76bbdE176AC0A45EA1125F17784d8247aF4');
+  // String privateKey = await loadPrivateKey();
+  File file = File(
+      '/Users/paul/Documents/UniversityOfTwente/Module11/Listener13/listener13/listener/lib/distributor_connection/smartcontract.abi.json');
+  String content = await file.readAsString();
+  SmartContract smartContract = SmartContract(
+      rpcUrl,
+      contractAddr,
+      EthPrivateKey.fromHex("0xC5bE09A6296610a826CBDc75E86ea7A3B086Ae81"),
+      content);
 
-  // print(await smartContract.users(smartContract.ownAddress.toString()));
+  var x = await smartContract.getSongs(0, 1);
+  // print("x at 0 ${x[0][0][0]}");
+  String s = hex.encode(x[0][0][0]);
+  print('string s $s');
+  Uint8List hexaaa = hexToBytes(
+      "51dba6a00c006f51b012f6e6c1516675ee4146e03628e3567980ed1c354441f2");
+  // print("hex $hex");
+
+  print(await smartContract.getRandDistributor(x[0][0][0]));
+  // print(await smartContract.songListLength());
+
+  // print(await smartContract.getSongs(0, 1));
 }
 
 class SmartContract {
@@ -295,7 +310,7 @@ class SmartContract {
         from: ownAddress,
         to: contractAddr,
         gasPrice: EtherAmount.inWei(BigInt.from(1)),
-        maxGas: 100000,
+        maxGas: 300000,
         data: data,
         nonce: nonce);
 

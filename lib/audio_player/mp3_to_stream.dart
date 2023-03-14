@@ -48,9 +48,10 @@ class ChunkStreamCreator {
         amount++;
         requestedChunk++;
       }
-      print("sending a chunk request from $chunkStart with amount of $amount");
+      // print("sending a chunk request from $chunkStart with amount of $amount");
       await distributorContact.requestChunk(
           songIdentifier, chunkStart, amount, nonce);
+      nonce++;
     }
     // for (int i = chunkNum; i < chunkNum + requestBufferSize; i++) {
     //   if (!isChunkRequested[i]) {
@@ -71,15 +72,26 @@ class ChunkStreamCreator {
       AudioPlayer audioPlayer) async* {
     bool isFinished = false;
     chunkNum = startByte ~/ chunkSize;
+    print("ChunkNum $chunkNum just initialized");
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
 
-    await for (final val in StreamGroup.merge(
-        [audioPlayer.positionStream, distributorContact.stream])) {
+    await for (final val in StreamGroup.merge([
+      audioPlayer.createPositionStream(
+          // steps: 8,
+          minPeriod: Duration(seconds: 4),
+          maxPeriod: Duration(seconds: 5)),
+      distributorContact.stream
+    ])) {
+      print("for what source ${forWhatSource.i}, yournum $yourNum");
       if (forWhatSource.i != yourNum || isFinished) {
+        print("isfinished");
         return;
       }
       if (val.runtimeType == Duration) {
+        int milisec = (val as Duration).inMilliseconds;
+        print("val as duration ${val as Duration}");
+        // int chunkToEmit= val as Duration;
         await requestIfNotRequested(isChunkRequested);
       } else {
         //tcp stream yielded something
@@ -88,9 +100,9 @@ class ChunkStreamCreator {
         var chunkData = val.item2;
         storedChunks[chunkId] = chunkData;
         isChunkCached[chunkId] = true;
-        print("chunkId $chunkId");
       }
-      print("Chunknum: $chunkNum");
+      // print("isChunkCached: $isChunkCached");
+
       if (isChunkCached[chunkNum]) {
         Uint8List chunk;
         if (isFirst) {
@@ -99,7 +111,7 @@ class ChunkStreamCreator {
         } else {
           chunk = storedChunks[chunkNum];
         }
-        print("yielding a chunk! ${chunkNum}");
+        print("yielding a chunk! ${chunkNum} I am stream $yourNum");
         chunkNum++;
         if (chunkNum * chunkSize >= fileSize) {
           isFinished = true;

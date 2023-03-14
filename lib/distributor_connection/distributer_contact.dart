@@ -84,7 +84,7 @@ class DistributorContact {
           }
         }
       }
-    }));
+    })).asBroadcastStream();
   }
 
   Future<void> requestChunk(

@@ -22,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   late final Playback _playback;
   late Credentials ownCredentials;
   late SmartContract smartContract;
+  var songsList;
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _MyAppState extends State<MyApp> {
     ownCredentials = EthPrivateKey.fromHex(privateKey);
 
     EthereumAddress contractAddr =
-        EthereumAddress.fromHex("0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51");
+        EthereumAddress.fromHex("0xb5F7F76bbdE176AC0A45EA1125F17784d8247aF4");
     ByteData smartContractByteData =
         await rootBundle.load('assets/smartcontract.abi.json');
     String abiCode = utf8.decode(smartContractByteData.buffer.asUint8List());
@@ -55,6 +56,8 @@ class _MyAppState extends State<MyApp> {
         contractAddr,
         ownCredentials,
         abiCode);
+    songsList = smartContract.getSongs(0, 1).toString();
+    print("My public key is ${ownCredentials.address}");
   }
 
   @override
@@ -66,6 +69,7 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               const Spacer(),
+              Text(songsList.toString()),
               TextButton(
                 style: ButtonStyle(
                   foregroundColor:
@@ -103,6 +107,25 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text(
                     'Song 0800000722040506080000072204050608000007220405060800000722040506'),
+              ),
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () {
+                  DistributorContact distributorContact = DistributorContact(
+                      smartContract,
+                      ownCredentials,
+                      "0x74d0c7eb93c754318bca8174472a70038f751f2b",
+                      "http://10.0.2.2:3000");
+                  _playback.setAudio(
+                      "486df48c7468457fc8fbbdc0cd1ce036b2b21e2f093559be3c37fcb024c1facf",
+                      2113939,
+                      distributorContact);
+                },
+                child: Text(
+                    'Song 486df48c7468457fc8fbbdc0cd1ce036b2b21e2f093559be3c37fcb024c1facf'),
               ),
               ValueListenableBuilder<ProgressBarState>(
                 valueListenable: _playback.progressNotifier,
