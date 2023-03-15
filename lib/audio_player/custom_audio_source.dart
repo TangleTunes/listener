@@ -21,8 +21,8 @@ class MyCustomSource extends StreamAudioSource {
 
   MyCustomSource(this.songIdentifier, this.audioPlayer, this.fileSize,
       this.distributorContact) {
-    chunkStream = ChunkStreamCreator(
-        distributorContact, songIdentifier, fileSize, numberOfStreams);
+    chunkStream = ChunkStreamCreator(distributorContact, songIdentifier,
+        fileSize, chunkSize, numberOfStreams);
     storedChunks = List.filled((fileSize / chunkSize).ceil(),
         Uint8List.fromList(List.filled(chunkSize, 0)));
     isChunkCached = List.filled((fileSize / chunkSize).ceil(), false);

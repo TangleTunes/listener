@@ -56,6 +56,7 @@ class Playback {
   }
 
   void seek(Duration position) {
+    print("user seeked to $position");
     _audioPlayer.seek(position);
   }
 
