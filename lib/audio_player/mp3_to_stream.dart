@@ -86,7 +86,8 @@ class ChunkStreamCreator {
       int yourNum,
       AudioPlayer audioPlayer) async* {
     bool isFinished = false;
-    chunkNum = startByte ~/ chunkSize;
+    chunkNum = (startByte - 1) ~/ chunkSize;
+    print("initilized chunkNum as $chunkNum");
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
 
@@ -97,36 +98,39 @@ class ChunkStreamCreator {
           maxPeriod: Duration(seconds: 5)),
       distributorContact.stream
     ])) {
-      if (forWhatSource.i != yourNum || isFinished) {
-        return;
-      }
-      if (val.runtimeType == Duration) {
-        int milisec = (val as Duration).inMilliseconds;
-        // int chunkToEmit= val as Duration;
-        await requestIfNotRequested(isChunkRequested);
-      } else {
-        val as Tuple2<int, Uint8List>;
-        var chunkId = val.item1;
-        var chunkData = val.item2;
-        storedChunks[chunkId] = chunkData;
-        isChunkCached[chunkId] = true;
-      }
-      // print("isChunkCached: $isChunkCached");
+      if (forWhatSource.i == yourNum && !isFinished) {
+        if (val.runtimeType == Duration) {
+          int milisec = (val as Duration).inMilliseconds;
+          // int chunkToEmit= val as Duration;
+          await requestIfNotRequested(isChunkRequested);
+        } else {
+          val as Tuple2<int, Uint8List>;
+          var chunkId = val.item1;
+          var chunkData = val.item2;
+          storedChunks[chunkId] = chunkData;
+          isChunkCached[chunkId] = true;
+        }
+        print(
+            "what is going on ${chunkNum} isChunkCached.length: ${isChunkCached.length}");
 
-      if (isChunkCached[chunkNum]) {
-        Uint8List chunk;
-        if (isFirst) {
-          chunk = storedChunks[chunkNum].sublist(offsetWithinChunk);
-          isFirst = false;
-        } else {
-          chunk = storedChunks[chunkNum];
+        if (isChunkCached[chunkNum]) {
+          Uint8List chunk;
+          if (isFirst) {
+            chunk = storedChunks[chunkNum].sublist(offsetWithinChunk);
+            isFirst = false;
+          } else {
+            chunk = storedChunks[chunkNum];
+          }
+          print("I am stream $yourNum yielding chunk ${chunkNum}");
+          // print("if statement is $chunkNum < ${isChunkCached.length - 1}?");
+          if (chunkNum < isChunkCached.length - 1) {
+            chunkNum++;
+            print("incremented chunkNum to $chunkNum");
+          } else {
+            isFinished = true;
+          }
+          yield chunk;
         }
-        if (chunkNum < isChunkCached.length - 1) {
-          chunkNum++;
-        } else {
-          isFinished = true;
-        }
-        yield chunk;
       }
     }
 
