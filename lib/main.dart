@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         await readChainId(),
         ownCredentials,
         await readAbiFromAssets());
-    songsList = await smartContract.getSongs(0, 1);
+    songsList = await smartContract.getSongs(0, 2);
     setState(() {});
 
     print("songs list $songsList");

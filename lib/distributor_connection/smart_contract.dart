@@ -286,7 +286,8 @@ class SmartContract {
 
   Future<Uint8List> createChunkGetTransaction(
       Uint8List song, int index, int amount, String distributor) async {
-    print("createChunkGetTransaction with nonce $nonce");
+    print(
+        "createChunkGetTransaction index $index amount $amount with nonce $nonce");
     // client.signTransaction(credentials, )
     Uint8List data = contract.function('get_chunks').encodeCall([
       song,

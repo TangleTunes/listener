@@ -12,7 +12,7 @@ const int chunkSize = 32500; //used to be 32766
 
 class ChunkStreamCreator {
   // How many chunks should be buffered as outgoing requests
-  static int requestBufferSize = 5;
+  static int requestBufferSize = 20;
   DistributorContact distributorContact;
   // THe size in bytes of the music file
   int fileSize;
@@ -29,19 +29,45 @@ class ChunkStreamCreator {
       this.fileSize, this.forWhatSource) {}
 
   Future<void> requestIfNotRequested(List<bool> isChunkRequested) async {
+    //v3
     int requestRangeStart = chunkNum;
-    int requestedChunk = chunkNum;
-    while (requestedChunk < requestRangeStart + requestBufferSize) {
-      int amount = 0;
-      int chunkStart = requestedChunk;
-      while (!isChunkRequested[requestedChunk] &&
-          requestedChunk < requestRangeStart + requestBufferSize) {
-        amount++;
-        requestedChunk++;
-      }
-      // print("sending a chunk request from $chunkStart with amount of $amount");
-      await distributorContact.requestChunk(songIdentifier, chunkStart, amount);
+    int chunkToBeRequested = chunkNum;
+    int amount = 0;
+    while (chunkToBeRequested < isChunkRequested.length &&
+        !isChunkRequested[chunkToBeRequested] &&
+        amount < requestBufferSize) {
+      amount++;
+      isChunkRequested[chunkToBeRequested] = true;
+      chunkToBeRequested++;
     }
+    if (amount != 0) {
+      await distributorContact.requestChunk(
+          songIdentifier, requestRangeStart, amount);
+    }
+    // for (int i = requestRangeStart; i <= chunkNum + requestBufferSize; i++) {
+    //   isChunkRequested[i] = true;
+    //   chunkNum++;
+    // }
+
+    //v2
+    // int requestRangeStart = chunkNum;
+    // int requestedChunk = chunkNum;
+    // while (requestedChunk < requestRangeStart + requestBufferSize) {
+    //   int amount = 0;
+    //   int chunkStart = requestedChunk;
+    //   while (!isChunkRequested[requestedChunk] &&
+    //       requestedChunk < requestRangeStart + requestBufferSize) {
+    //     isChunkRequested[requestedChunk] = true;
+    //     amount++;
+    //     requestedChunk++;
+    //   }
+    //   if (amount != 0) {
+    //     await distributorContact.requestChunk(
+    //         songIdentifier, chunkStart, amount);
+    //   }
+    // }
+
+    //v1--------
     // for (int i = chunkNum; i < chunkNum + requestBufferSize; i++) {
     //   if (!isChunkRequested[i]) {
     //     print("Sending chunk request $chunkNum with nonce $nonce");
@@ -61,7 +87,6 @@ class ChunkStreamCreator {
       AudioPlayer audioPlayer) async* {
     bool isFinished = false;
     chunkNum = startByte ~/ chunkSize;
-    print("ChunkNum $chunkNum just initialized");
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
 
@@ -72,18 +97,14 @@ class ChunkStreamCreator {
           maxPeriod: Duration(seconds: 5)),
       distributorContact.stream
     ])) {
-      print("for what source ${forWhatSource.i}, yournum $yourNum");
       if (forWhatSource.i != yourNum || isFinished) {
-        print("isfinished");
         return;
       }
       if (val.runtimeType == Duration) {
         int milisec = (val as Duration).inMilliseconds;
-        print("val as duration ${val as Duration}");
         // int chunkToEmit= val as Duration;
         await requestIfNotRequested(isChunkRequested);
       } else {
-        //tcp stream yielded something
         val as Tuple2<int, Uint8List>;
         var chunkId = val.item1;
         var chunkData = val.item2;
@@ -100,12 +121,10 @@ class ChunkStreamCreator {
         } else {
           chunk = storedChunks[chunkNum];
         }
-        print("yielding a chunk! ${chunkNum} I am stream $yourNum");
-
-        if (chunkNum * chunkSize >= fileSize) {
-          isFinished = true;
-        } else {
+        if (chunkNum < isChunkCached.length - 1) {
           chunkNum++;
+        } else {
+          isFinished = true;
         }
         yield chunk;
       }
