@@ -14,12 +14,12 @@ import '../user_settings/manage_smart_contract_details.dart';
 import '../distributor_connection/smart_contract.dart';
 import '../providers/credentials_provider.dart';
 
-class SplashForSCCheck extends StatefulWidget {
+class LoadingSmartContractInfo extends StatefulWidget {
   @override
-  _SplashPageForLoadingSCState createState() => _SplashPageForLoadingSCState();
+  _LoadingSmartContractState createState() => _LoadingSmartContractState();
 }
 
-class _SplashPageForLoadingSCState extends State<SplashForSCCheck> {
+class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
   String nodeUrl = "";
   String contractAddr = "";
   int chainId = 0;
@@ -68,7 +68,7 @@ class _SplashPageForLoadingSCState extends State<SplashForSCCheck> {
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
-                  Navigator.pushNamed(context, "/discovery");
+                  Navigator.pushNamed(context, "/load_songs");
                 },
                 child: Text("Continue"),
               )

@@ -10,12 +10,12 @@ import 'package:provider/provider.dart';
 import '../distributor_connection/smart_contract.dart';
 import '../providers/smart_contract_provider.dart';
 
-class SplashPageForLoadingPK extends StatefulWidget {
+class LoadingCredentials extends StatefulWidget {
   @override
-  _SplashPageForLoadingPKState createState() => _SplashPageForLoadingPKState();
+  _LoadingCredentialsState createState() => _LoadingCredentialsState();
 }
 
-class _SplashPageForLoadingPKState extends State<SplashPageForLoadingPK> {
+class _LoadingCredentialsState extends State<LoadingCredentials> {
   bool shouldProceed = false;
   String initialRoute = "/";
   String pk = "";
@@ -60,7 +60,6 @@ class _SplashPageForLoadingPKState extends State<SplashPageForLoadingPK> {
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
                   Navigator.pushNamed(context, initialRoute);
-                  print(" Navigator.pushNamed(context, initialRoute); done");
                 },
                 child: Text("Continue"),
               )

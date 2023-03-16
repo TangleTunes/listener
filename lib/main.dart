@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:listener13/providers/current_song_provider.dart';
+import 'package:listener13/providers/playback_provider.dart';
+import 'package:listener13/screens/load_songs.dart';
+import 'package:listener13/screens/smart_contract_settings.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/user_settings/manage_smart_contract_details.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
@@ -26,6 +30,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SongListProvider()),
         ChangeNotifierProvider(create: (_) => SmartContractProvider()),
         ChangeNotifierProvider(create: (_) => CredentialsProvider()),
+        ChangeNotifierProvider(create: (_) => CurrentSongProvider()),
+        ChangeNotifierProvider(create: (_) => PlaybackProvider()),
       ],
       child: MyApp(),
     ),
@@ -38,19 +44,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read<SongListProvider>().setSongsList([
-      Song(songName: "Spanish song", artist: "Gonzales", duration: 34, price: 4)
+      Song(
+          songName: "Spanish song",
+          artist: "Gonzales",
+          duration: 34,
+          price: 4,
+          byteSize: 45,
+          songId: Uint8List(0))
     ]);
 
     return MaterialApp(
       initialRoute: "/load_credentials",
       routes: {
-        '/load_credentials': (context) => SplashPageForLoadingPK(),
+        '/load_credentials': (context) => LoadingCredentials(),
         '/discovery': (context) => DiscoveryPage(),
         '/unlock': (context) => UnlockAccount(),
-        '/load_smart_contract': (context) => SplashForSCCheck(),
+        '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple': (context) => CoupleAccount(),
         '/account': (context) => AccountPage(),
         '/library': (context) => LibraryPage(),
+        '/smart_contract_settings': (context) => SmartContractSettings(),
+        '/load_songs': (context) => LoadingSongs(),
       },
     );
   }

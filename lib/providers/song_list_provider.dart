@@ -1,4 +1,8 @@
+import 'dart:ffi';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:listener13/distributor_connection/distributer_contact.dart';
 
 class SongListProvider with ChangeNotifier {
   List<Song> _songsList = [];
@@ -22,11 +26,17 @@ class Song {
   String artist;
   int duration;
   int price;
+  int byteSize;
+  Uint8List songId;
+  late DistributorContact? distributorContact;
 
   Song({
     required this.songName,
     required this.artist,
     required this.duration,
     required this.price,
+    required this.byteSize,
+    required this.songId,
+    this.distributorContact,
   });
 }

@@ -1,12 +1,16 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:listener13/components/audioplayer.dart';
+import 'package:listener13/providers/current_song_provider.dart';
+import 'package:listener13/providers/playback_provider.dart';
 import 'package:listener13/theme/theme_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 
+import '../audio_player/playback.dart';
 import '../providers/song_list_provider.dart';
 import 'library.dart';
 import 'account.dart';
@@ -21,6 +25,12 @@ class DiscoveryPage extends StatefulWidget {
 class _DiscoveryPageState extends State<DiscoveryPage> {
   int _selectedIndex = 1;
   double _value = 20;
+  @override
+  void initState() {
+    print("discovery init state called");
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +159,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   },
                   emptyWidget: const EmptyView(),
                   onRefresh: () async {},
-                  onItemSelected: (Song item) {},
+                  onItemSelected: (Song item) {
+                    context.read<CurrentSongProvider>().setSong(item);
+                  },
                   inputDecoration: InputDecoration(
                     isDense: true,
                     hintText: 'Search here',
@@ -172,6 +184,20 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   ),
                 ),
               ),
+            ),
+            ValueListenableBuilder<ProgressBarState>(
+              valueListenable: context
+                  .read<PlaybackProvider>()
+                  .getPlayback()
+                  .progressNotifier,
+              builder: (_, value, __) {
+                return ProgressBar(
+                  onSeek: context.read<PlaybackProvider>().getPlayback().seek,
+                  progress: value.current,
+                  buffered: value.buffered,
+                  total: value.total,
+                );
+              },
             ),
             Container(
               color: Color(0xFF091227),
@@ -198,6 +224,35 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                       builder: (BuildContext context) => audioPlayer(context)),
                 ],
               ),
+            ),
+            ValueListenableBuilder<ButtonState>(
+              valueListenable:
+                  context.read<PlaybackProvider>().getPlayback().buttonNotifier,
+              builder: (_, value, __) {
+                switch (value) {
+                  case ButtonState.loading:
+                    return Container(
+                      margin: const EdgeInsets.all(8.0),
+                      width: 32.0,
+                      height: 32.0,
+                      child: const CircularProgressIndicator(),
+                    );
+                  case ButtonState.paused:
+                    return IconButton(
+                      icon: const Icon(Icons.play_arrow),
+                      iconSize: 32.0,
+                      onPressed:
+                          context.read<PlaybackProvider>().getPlayback().play,
+                    );
+                  case ButtonState.playing:
+                    return IconButton(
+                      icon: const Icon(Icons.pause),
+                      iconSize: 32.0,
+                      onPressed:
+                          context.read<PlaybackProvider>().getPlayback().pause,
+                    );
+                }
+              },
             ),
           ],
         ),
@@ -302,7 +357,12 @@ class _SongItemState extends State<SongItem> {
                         ),
                         child: IconButton(
                             padding: EdgeInsets.zero,
-                            onPressed: null,
+                            onPressed: () {
+                              context
+                                  .read<PlaybackProvider>()
+                                  .getPlayback()
+                                  .play;
+                            },
                             icon: Icon(
                               Icons.play_arrow,
                               color: COLOR_SECONDARY,

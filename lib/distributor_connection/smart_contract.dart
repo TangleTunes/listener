@@ -29,7 +29,6 @@ class SmartContract {
   }
   @override
   String toString() {
-    // TODO: implement toString
     return "contractAddr: $contractAddr, rpcUrl: $rpcUrl,ownAddress: $ownAddress";
   }
 
@@ -214,13 +213,13 @@ class SmartContract {
     return outputList;
   }
 
-  Future<List> getSongs(int index, int amount) async {
+  Future<List> getSongs(BigInt index, BigInt amount) async {
     List outputList = List.empty();
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('get_songs'),
-          params: [BigInt.from(index), BigInt.from(amount)]);
+          params: [index, amount]);
     } catch (e) {
       print(e);
     } finally {
