@@ -37,7 +37,6 @@ class DistributorContact {
       ListQueue<int> queue = ListQueue();
 
       await for (final tcp_msg in tcpStream) {
-        print("recieved tcp_msg $tcp_msg");
         queue.addAll(tcp_msg);
 
         if (queue.length >= 8) {

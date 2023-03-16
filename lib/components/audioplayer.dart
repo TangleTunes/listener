@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:web3dart/crypto.dart';
 import 'dart:convert';
 import 'package:convert/convert.dart';
+import 'package:web3dart/web3dart.dart';
 
 import 'dart:typed_data';
 import '../audio_player/playback.dart';
@@ -59,17 +60,12 @@ Widget audioPlayer(BuildContext context) {
               SmartContract sc =
                   context.read<SmartContractProvider>().getSmartContract();
               Song currentSong = context.read<CurrentSongProvider>().getSong();
-              List<dynamic> randomDistributor =
+              List<dynamic> scDistributorAnswer =
                   await sc.getRandDistributor(currentSong.songId);
-              print("randomdistribytor $randomDistributor");
+              String distributorHex = scDistributorAnswer[0].hex;
+              String ip = scDistributorAnswer[1];
               DistributorContact dc = await DistributorContact.create(
-                  sc,
-                  "0x81D61340198D506239D55C911eeC68633C44d78b",
-                  "http://217.104.126.34:3000");
-              // DistributorContact dc = await DistributorContact.create(
-              //     sc,
-              //     "0x74d0c7eb93c754318bca8174472a70038f751f2b",
-              //     "http://10.0.2.2:3000"); //FIXME change to call smart contract with get_rand_sistributor
+                  sc, distributorHex, ("http://$ip"));
               context.read<CurrentSongProvider>().setDistributor(dc);
               Playback playback =
                   context.read<PlaybackProvider>().getPlayback();
