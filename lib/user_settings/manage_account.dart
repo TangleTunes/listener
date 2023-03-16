@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:listener13/account/specify_smart_contract.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:web3dart/web3dart.dart';
+
+import 'file_writer.dart';
 
 Credentials createAccount(
     String username, String password, SmartContract smartContract) {

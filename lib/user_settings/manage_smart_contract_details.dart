@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toml/toml.dart';
 
+import 'file_writer.dart';
+
 const String scTomlFileName = "sc.toml";
 
 Future<void> initilizeSmartContractIfNotSet() async {
@@ -74,14 +76,4 @@ Future<void> writeToTomlFile(Map<String, dynamic> tomlMap) async {
   String tomlString = TomlDocument.fromMap(tomlMap).toString();
 
   await writeToFile(scTomlFileName, tomlString);
-}
-
-Future<void> writeToFile(String filename, String content) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/$filename');
-  if (await file.exists()) {
-    await file.create();
-  }
-  print("$filename now contains $content");
-  await file.writeAsString(content);
 }

@@ -27,6 +27,11 @@ class SmartContract {
     contract = DeployedContract(
         ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
   }
+  @override
+  String toString() {
+    // TODO: implement toString
+    return "contractAddr: $contractAddr, rpcUrl: $rpcUrl,ownAddress: $ownAddress";
+  }
 
   /// Public factory
   static Future<SmartContract> create(String rpcUrl, String contractAddress,
