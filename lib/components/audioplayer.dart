@@ -3,6 +3,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:listener13/distributor_connection/distributer_contact.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
 import 'package:listener13/providers/current_song_provider.dart';
@@ -60,6 +61,14 @@ Widget audioPlayer(BuildContext context) {
               SmartContract sc =
                   context.read<SmartContractProvider>().getSmartContract();
               Song currentSong = context.read<CurrentSongProvider>().getSong();
+              Fluttertoast.showToast(
+                  msg: "Finding a distributor...",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
               List<dynamic> scDistributorAnswer =
                   await sc.getRandDistributor(currentSong.songId);
               String distributorHex = scDistributorAnswer[0].hex;

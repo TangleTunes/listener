@@ -82,7 +82,6 @@ class DistributorContact {
 
   Future<void> requestChunk(
       String songIdentifier, int chunk, int amount) async {
-    print("Tcp requested chunk $chunk");
     Uint8List songId = hexToBytes(songIdentifier);
     await sendTcpChunkRequest(songId, chunk, amount, socket);
   }

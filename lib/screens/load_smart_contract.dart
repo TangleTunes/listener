@@ -62,9 +62,11 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
   Widget build(BuildContext context) {
     print("build method of sc check");
     return Scaffold(
-      //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
-      body: Center(
-        child: shouldProceed
+        //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
+        body: Center(
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text("Load smart contract"),
+        shouldProceed
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
@@ -73,7 +75,7 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
                 child: Text("Continue"),
               )
             : CircularProgressIndicator(), //show splash screen here instead of progress indicator
-      ),
-    );
+      ]),
+    ));
   }
 }

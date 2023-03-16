@@ -55,13 +55,6 @@ class _LoadingSongsState extends State<LoadingSongs> {
           price: price.toInt()));
     }
     context.read<SongListProvider>().setSongsList(songList);
-    context.read<SongListProvider>().updateSongListWithANewSong(Song(
-        songName: "Tester",
-        artist: "ok",
-        duration: 34,
-        price: 7,
-        songId: Uint8List(1),
-        byteSize: 78));
 
     Song firstSong = context.read<SongListProvider>().getSongsList()[0];
     print("fetched fistr song");
@@ -83,9 +76,11 @@ class _LoadingSongsState extends State<LoadingSongs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
-      body: Center(
-        child: shouldProceed
+        //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
+        body: Center(
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text("Load songs"),
+        shouldProceed
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
@@ -94,7 +89,7 @@ class _LoadingSongsState extends State<LoadingSongs> {
                 child: Text("Continue"),
               )
             : CircularProgressIndicator(), //show splash screen here instead of progress indicator
-      ),
-    );
+      ]),
+    ));
   }
 }
