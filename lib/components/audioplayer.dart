@@ -22,7 +22,6 @@ import '../providers/song_list_provider.dart';
 
 @override
 Widget audioPlayer(BuildContext context) {
-  Song song = context.read<CurrentSongProvider>().getSong();
   return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
     Padding(
       padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
@@ -31,12 +30,17 @@ Widget audioPlayer(BuildContext context) {
 
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(song.songName,
+          Text(context.watch<CurrentSongProvider>().getSong().songName,
               style: TextStyle(
                   color: COLOR_SECONDARY,
                   fontSize: 19,
                   fontWeight: FontWeight.bold)),
-          Text(song.artist.toUpperCase(),
+          Text(
+              context
+                  .watch<CurrentSongProvider>()
+                  .getSong()
+                  .artist
+                  .toUpperCase(),
               style: TextStyle(
                 color: Color(0xFFA5C0FF).withOpacity(0.7),
                 fontSize: 11,

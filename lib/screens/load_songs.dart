@@ -58,7 +58,7 @@ class _LoadingSongsState extends State<LoadingSongs> {
 
     Song firstSong = context.read<SongListProvider>().getSongsList()[0];
     print("fetched fistr song");
-    context.read<CurrentSongProvider>().setSong(firstSong);
+    context.read<CurrentSongProvider>().updateSong(firstSong);
     print("set current song to $firstSong");
 
     context.read<PlaybackProvider>().setPlayback(Playback());

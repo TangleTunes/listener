@@ -11,7 +11,7 @@ class CurrentSongProvider with ChangeNotifier {
     return _song;
   }
 
-  void setSong(Song song) {
+  void updateSong(Song song) {
     _song = song;
     notifyListeners();
   }

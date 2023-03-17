@@ -160,7 +160,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   emptyWidget: const EmptyView(),
                   onRefresh: () async {},
                   onItemSelected: (Song item) {
-                    context.read<CurrentSongProvider>().setSong(item);
+                    context.read<CurrentSongProvider>().updateSong(item);
                   },
                   inputDecoration: InputDecoration(
                     isDense: true,
@@ -346,27 +346,6 @@ class _SongItemState extends State<SongItem> {
                             }
                           });
                         },
-                      ),
-                      //the play song button
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: COLOR_TERTIARY,
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                        ),
-                        child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              context
-                                  .read<PlaybackProvider>()
-                                  .getPlayback()
-                                  .play;
-                            },
-                            icon: Icon(
-                              Icons.play_arrow,
-                              color: COLOR_SECONDARY,
-                            )),
                       ),
                     ],
                   )

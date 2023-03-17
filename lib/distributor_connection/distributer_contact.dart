@@ -31,7 +31,8 @@ class DistributorContact {
 
     // Do initialization that requires async
     Uri uri = Uri.parse(thisObj.distributorUrl);
-    thisObj.socket = await Socket.connect(uri.host, uri.port); //FIXME
+    thisObj.socket = await Socket.connect(
+        uri.host, uri.port); //FIXME error handling if this fails
     thisObj.stream =
         thisObj.socket.transform(StreamTransformer.fromBind((tcpStream) async* {
       ListQueue<int> queue = ListQueue();
