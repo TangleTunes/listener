@@ -43,11 +43,14 @@ import 'package:toml/toml.dart';
 // }
 
 void main(List<String> args) async {
-  final file = File('lib/distributor_connection/SmartContract.toml');
-  final tomlString = file.readAsStringSync();
-  Map<String, dynamic> tomlMap = TomlDocument.parse(tomlString).toMap();
-  print(tomlMap["contract_address"]);
-  tomlMap["myman"] = "yes";
+  Uri uri = Uri.parse("tcp://192.168.2.3:4000");
+  print(uri.port);
+  print(uri.host);
+  // final file = File('lib/distributor_connection/SmartContract.toml');
+  // final tomlString = file.readAsStringSync();
+  // Map<String, dynamic> tomlMap = TomlDocument.parse(tomlString).toMap();
+  // print(tomlMap["contract_address"]);
+  // tomlMap["myman"] = "yes";
   // String rpcUrl =
   //     "http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm";
   // EthereumAddress contractAddr =

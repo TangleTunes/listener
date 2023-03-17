@@ -3,36 +3,45 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:either_dart/either.dart';
 import 'package:flutter/services.dart';
+import 'package:listener13/error_handling/app_error.dart';
 import 'package:tuple/tuple.dart';
 import 'package:web3dart/crypto.dart';
-import 'package:web3dart/web3dart.dart';
-
 import 'smart_contract.dart';
 
-const int chunkSize = 32500; //used to be 32766
+const int chunkSize = 32500;
 
 class DistributorContact {
   SmartContract smartContract;
   String distributorHex;
-  String distributorUrl;
+  String distributorIP;
+  int distributorPort;
 
   late Socket socket; // FIXME
   late Stream<Tuple2<int, Uint8List>> stream;
 
-  DistributorContact._create(
-      this.smartContract, this.distributorHex, this.distributorUrl) {}
+  DistributorContact._create(this.smartContract, this.distributorHex,
+      this.distributorIP, this.distributorPort) {}
 
   /// Public factory
-  static Future<DistributorContact> create(
-      SmartContract smartC, String hex, String url) async {
+  static Future<Either<MyError, DistributorContact>> create(
+      SmartContract smartC, String hex, String ip, int port) async {
     // Call the private constructor
-    var thisObj = DistributorContact._create(smartC, hex, url);
+    var thisObj = DistributorContact._create(smartC, hex, ip, port);
 
     // Do initialization that requires async
-    Uri uri = Uri.parse(thisObj.distributorUrl);
-    thisObj.socket = await Socket.connect(
-        uri.host, uri.port); //FIXME error handling if this fails
+
+    try {
+      thisObj.socket = await Socket.connect(thisObj.distributorIP,
+          thisObj.distributorPort); //FIXME error handling if this fails
+    } on Exception catch (e) {
+      return Left(MyError(
+          key: AppError.SocketConnectionFailed,
+          message:
+              "Could not connect to distributor at ${thisObj.distributorIP}:${thisObj.distributorPort}",
+          exception: e));
+    }
     thisObj.stream =
         thisObj.socket.transform(StreamTransformer.fromBind((tcpStream) async* {
       ListQueue<int> queue = ListQueue();
@@ -78,29 +87,38 @@ class DistributorContact {
       }
     })).asBroadcastStream();
     // Return the fully initialized object
-    return thisObj;
+    return Right(thisObj);
   }
 
-  Future<void> requestChunk(
-      String songIdentifier, int chunk, int amount) async {
+  Future<Either<MyError, Null>> requestChunks(
+      String songIdentifier, int from, int amount) async {
     Uint8List songId = hexToBytes(songIdentifier);
-    await sendTcpChunkRequest(songId, chunk, amount, socket);
-  }
+    var potentialChunkTransaction = await smartContract
+        .createChunkGetTransaction(songId, from, amount, distributorHex);
+    if (potentialChunkTransaction.isRight) {
+      Uint8List BODY = potentialChunkTransaction.right;
+      int bodyLength = BODY.length;
+      final byteD = ByteData(4);
+      byteD.setUint32(0, bodyLength, Endian.little);
+      Uint8List HEADER = byteD.buffer.asUint8List();
 
-  Future<void> sendTcpChunkRequest(
-      Uint8List songId, int chunkNum, int amount, Socket socket) async {
-    Uint8List BODY = await smartContract.createChunkGetTransaction(
-        songId, chunkNum, amount, distributorHex);
+      Uint8List PAYLOAD = Uint8List.fromList(HEADER + BODY);
+      try {
+        socket.add(PAYLOAD);
+        await socket.flush();
+        return Right(null);
+      } on Exception catch (e) {
+        return Left(MyError(
+            key: AppError.SendingTcpFailed,
+            exception: e,
+            message:
+                "Unable to send a chunk request to socket ${socket.address}:${socket.port}"));
+      }
+    } else {
+      return Left(potentialChunkTransaction.left);
+    }
     //Add body length as header (4 bytes)
 
-    int bodyLength = BODY.length;
-    final byteD = ByteData(4);
-    byteD.setUint32(0, bodyLength, Endian.little);
-    Uint8List HEADER = byteD.buffer.asUint8List();
-
-    Uint8List PAYLOAD = Uint8List.fromList(HEADER + BODY);
-    socket.add(PAYLOAD);
-    await socket.flush();
     // await Future.delayed(Duration(seconds: 2));
   }
 }

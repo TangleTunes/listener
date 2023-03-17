@@ -43,8 +43,8 @@ class ChunkStreamCreator {
       chunkToBeRequested++;
     }
     if (amount != 0) {
-      await distributorContact.requestChunk(
-          songIdentifier, requestRangeStart, amount);
+      await distributorContact.requestChunks(songIdentifier, requestRangeStart,
+          amount); //FIXME no error handling at the moment
     }
   }
 

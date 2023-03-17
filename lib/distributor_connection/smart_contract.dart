@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:either_dart/either.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/crypto.dart';
 import 'package:convert/convert.dart';
 
 import 'package:web3dart/web3dart.dart';
+
+import '../error_handling/app_error.dart';
 
 class SmartContract {
   final String rpcUrl;
@@ -18,6 +21,7 @@ class SmartContract {
   late DeployedContract contract;
   int chainId;
   late int nonce;
+
   SmartContract._create(this.rpcUrl, String contractAddress, this.chainId,
       this.ownCredentials, this.abiCode) {
     // Do most of your initialization here, that's what a constructor is for
@@ -33,21 +37,44 @@ class SmartContract {
   }
 
   /// Public factory
-  static Future<SmartContract> create(String rpcUrl, String contractAddress,
-      int chainId, Credentials ownCredentials, String abiCode) async {
+  static Future<Either<MyError, SmartContract>> create(
+      String rpcUrl,
+      String contractAddress,
+      int chainId,
+      Credentials ownCredentials,
+      String abiCode) async {
     // Call the private constructor
-    var thisObj = SmartContract._create(
+    SmartContract contract = SmartContract._create(
         rpcUrl, contractAddress, chainId, ownCredentials, abiCode);
 
-    // Do initialization that requires async
-    thisObj.nonce =
-        await thisObj.client.getTransactionCount(thisObj.ownAddress);
-
-    // Return the fully initialized object
-    return thisObj;
+    Either<MyError, int> potentialNonce = await contract.getNonce();
+    if (potentialNonce.isRight) {
+      contract.nonce = potentialNonce.right;
+      return Right(contract);
+    } else {
+      return Left(potentialNonce.left);
+    }
   }
 
-  Future<void> deposit(int amount) async {
+  Future<Either<MyError, int>> getNonce() async {
+    int myNonce = 0;
+    Either<MyError, int> returnEither = Right(myNonce);
+    try {
+      myNonce = await client.getTransactionCount(ownAddress);
+      returnEither = Right(myNonce);
+    } on Exception catch (e) {
+      return Left(MyError(
+          key: AppError.DetermineNonceFailed,
+          message: "Unable to determine the nonce",
+          exception: e));
+    } finally {
+      await client.dispose();
+    }
+    return returnEither;
+  }
+
+  Future<Either<MyError, Null>> deposit(int amount) async {
+    Either<MyError, Null> returnEither = Right(null);
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -59,14 +86,20 @@ class SmartContract {
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-    } catch (e) {
-      print(e);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractTransactionFailed,
+          message: "The deposit transaction failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
+    return returnEither;
   }
 
-  Future<void> createUser(String name, String description) async {
+  Future<Either<MyError, Null>> createUser(
+      String name, String description) async {
+    Either<MyError, Null> returnEither = Right(null);
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -77,27 +110,41 @@ class SmartContract {
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-    } catch (e) {
-      print(e);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractTransactionFailed,
+          message: "The create_user transaction failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
+    return returnEither;
   }
 
-  Future<void> deleteUser() async {
-    String tx_hash = await client.sendTransaction(
-        ownCredentials,
-        Transaction.callContract(
-            contract: contract,
-            function: contract.function('delete_user'),
-            parameters: []),
-        chainId: chainId);
-    TransactionReceipt? tx_receipt =
-        await client.getTransactionReceipt(tx_hash);
+  Future<Either<MyError, Null>> deleteUser() async {
+    Either<MyError, Null> returnEither = Right(null);
+    try {
+      String tx_hash = await client.sendTransaction(
+          ownCredentials,
+          Transaction.callContract(
+              contract: contract,
+              function: contract.function('delete_user'),
+              parameters: []),
+          chainId: chainId);
+      TransactionReceipt? tx_receipt =
+          await client.getTransactionReceipt(tx_hash);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractTransactionFailed,
+          message: "The delete_user transaction failed",
+          exception: e));
+    }
+    return returnEither;
   }
 
-  Future<void> getChunks(
+  Future<Either<MyError, Null>> getChunks(
       Uint8List song, int index, int amount, String distributor) async {
+    Either<MyError, Null> returnEither = Right(null);
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -113,14 +160,19 @@ class SmartContract {
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-    } catch (e) {
-      print(e);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractTransactionFailed,
+          message: "The get_chunks transaction failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
+    return returnEither;
   }
 
-  Future<void> withdraw(int amount) async {
+  Future<Either<MyError, Null>> withdraw(int amount) async {
+    Either<MyError, Null> returnEither = Right(null);
     try {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
@@ -131,185 +183,260 @@ class SmartContract {
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-    } catch (e) {
-      print(e);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractTransactionFailed,
+          message: "The withdraw transaction failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
+    return returnEither;
   }
 
-  Future<List> checkChunk(Uint8List song, int index, Uint8List chunk) async {
+  Future<Either<MyError, List>> checkChunk(
+      Uint8List song, int index, Uint8List chunk) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('check_chunk'),
           params: [song, index, chunk]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The check_chunk call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> chunksLength(Uint8List song) async {
+  Future<Either<MyError, List>> chunksLength(Uint8List song) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('chunks_length'),
           params: [song]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The chunks_length call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> distributions(Uint8List song) async {
+  Future<Either<MyError, List>> distributions(Uint8List song) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('distributions'),
           params: [song]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The distributions call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> genSongId(String name, String author) async {
+  Future<Either<MyError, List>> genSongId(String name, String author) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('gen_song_id'),
           params: [name, EthereumAddress.fromHex(author)]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The gen_song_id call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> getRandDistributor(Uint8List song) async {
+  Future<Either<MyError, List>> getRandDistributor(Uint8List song) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('get_rand_distributor'),
           params: [song]);
-    } catch (e) {
-      print(e);
+      if (outputList.length > 0) {
+        returnEither = Right(outputList);
+      } else {
+        returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The get_rand_distributor call failed",
+        ));
+      }
+    } on Exception catch (e) {
+      print("Exception! $e and outputlist ${outputList[0]}");
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The get_rand_distributor call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> getSongs(BigInt index, BigInt amount) async {
+  Future<Either<MyError, List>> getSongs(BigInt index, BigInt amount) async {
+    //TODO: add check wether song list is nonempty
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('get_songs'),
           params: [index, amount]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The get_songs call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> songList(int index) async {
+  Future<Either<MyError, List>> songList(int index) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('song_list'),
           params: [BigInt.from(index)]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The songs_list call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> songListLength() async {
+  Future<Either<MyError, List>> songListLength() async {
+    //TODO change to check if list is nonempty
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('song_list_length'),
           params: []);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The songs_list_length call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> users(String address) async {
+  Future<Either<MyError, List>> users(String address) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('users'),
           params: [EthereumAddress.fromHex(address)]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The users call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<List> songs(Uint8List song) async {
+  Future<Either<MyError, List>> songs(Uint8List song) async {
     List outputList = List.empty();
+    Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
           contract: contract,
           function: contract.function('songs'),
           params: [song]);
-    } catch (e) {
-      print(e);
+      returnEither = Right(outputList);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractCallFailed,
+          message: "The songs call failed",
+          exception: e));
     } finally {
       await client.dispose();
     }
-    return outputList;
+    return returnEither;
   }
 
-  Future<Uint8List> createChunkGetTransaction(
+  Future<Either<MyError, Uint8List>> createChunkGetTransaction(
       Uint8List song, int index, int amount, String distributor) async {
-    print(
-        "createChunkGetTransaction index $index amount $amount with nonce $nonce");
-    // client.signTransaction(credentials, )
-    Uint8List data = contract.function('get_chunks').encodeCall([
-      song,
-      BigInt.from(index),
-      BigInt.from(amount),
-      EthereumAddress.fromHex(distributor)
-    ]);
+    Uint8List signedTx = Uint8List(0);
+    Either<MyError, Uint8List> returnEither = Right(signedTx);
+    try {
+      print(
+          "createChunkGetTransaction index $index amount $amount with nonce $nonce");
+      // client.signTransaction(credentials, )
+      Uint8List data = contract.function('get_chunks').encodeCall([
+        song,
+        BigInt.from(index),
+        BigInt.from(amount),
+        EthereumAddress.fromHex(distributor)
+      ]);
 
-    Transaction tx = Transaction(
-        from: ownAddress,
-        to: contractAddr,
-        gasPrice: EtherAmount.inWei(BigInt.from(1)),
-        maxGas: 300000,
-        data: data,
-        nonce: nonce);
-    nonce++; //Increment nonce after creating the transaction
-    Uint8List signedTx =
-        await client.signTransaction(ownCredentials, tx, chainId: chainId);
-    return signedTx;
+      Transaction tx = Transaction(
+          from: ownAddress,
+          to: contractAddr,
+          gasPrice: EtherAmount.inWei(BigInt.from(1)),
+          maxGas: 300000,
+          data: data,
+          nonce: nonce);
+      nonce++; //Increment nonce after creating the transaction
+      signedTx =
+          await client.signTransaction(ownCredentials, tx, chainId: chainId);
+      returnEither = Right(signedTx);
+    } on Exception catch (e) {
+      returnEither = Left(MyError(
+          key: AppError.SmartContractSignTransactionFailed,
+          message: "Failed encoding and/or signing the get_chunks transaction",
+          exception: e));
+    }
+    return returnEither;
   }
 }

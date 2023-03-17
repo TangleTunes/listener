@@ -1,6 +1,8 @@
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:listener13/distributor_connection/distributer_contact.dart';
+import '../error_handling/app_error.dart';
 import 'custom_audio_source.dart';
 
 class Playback {
@@ -48,11 +50,19 @@ class Playback {
       );
     });
   }
-  Future<void> setAudio(String songIdentifier, int sizeInBytes,
+  Future<Either<MyError, Null>> setAudio(String songIdentifier, int sizeInBytes,
       DistributorContact distributorContact) async {
     final streamAudioSource = MyCustomSource(
         songIdentifier, _audioPlayer, sizeInBytes, distributorContact);
-    await _audioPlayer.setAudioSource(streamAudioSource);
+    try {
+      await _audioPlayer.setAudioSource(streamAudioSource);
+      return Right(null);
+    } on PlayerException catch (e) {
+      return Left(MyError(
+          key: AppError.PlaybackError,
+          message: "Unable to set playback source",
+          exception: e));
+    }
   }
 
   void seek(Duration position) {

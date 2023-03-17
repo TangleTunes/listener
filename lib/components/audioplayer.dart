@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:listener13/distributor_connection/distributer_contact.dart';
@@ -18,6 +19,8 @@ import 'package:web3dart/web3dart.dart';
 
 import 'dart:typed_data';
 import '../audio_player/playback.dart';
+import '../error_handling/app_error.dart';
+import '../error_handling/toast.dart';
 import '../providers/song_list_provider.dart';
 
 @override
@@ -65,32 +68,41 @@ Widget audioPlayer(BuildContext context) {
               SmartContract sc =
                   context.read<SmartContractProvider>().getSmartContract();
               Song currentSong = context.read<CurrentSongProvider>().getSong();
-              Fluttertoast.showToast(
-                  msg: "Finding a distributor...",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
-              List<dynamic> scDistributorAnswer =
+              toast("Finding a distributor");
+              Either<MyError, List<dynamic>> scDistributorAnswer =
                   await sc.getRandDistributor(currentSong.songId);
-              String distributorHex = scDistributorAnswer[0].hex;
-              String ip = scDistributorAnswer[1];
-              DistributorContact dc = await DistributorContact.create(
-                  sc, distributorHex, ("http://$ip"));
-              context.read<CurrentSongProvider>().setDistributor(dc);
-              Playback playback =
-                  context.read<PlaybackProvider>().getPlayback();
+              if (scDistributorAnswer.isRight) {
+                String distributorHex = scDistributorAnswer.right[0].hex;
+                Uri uri = Uri.parse("tcp://" + scDistributorAnswer.right[1]);
+                Either<MyError, DistributorContact> dc =
+                    await DistributorContact.create(
+                        sc, distributorHex, uri.host, uri.port);
+                if (dc.isRight) {
+                  context.read<CurrentSongProvider>().setDistributor(dc.right);
+                } else {
+                  toast(dc.left.message);
+                }
 
-              Uint8List songidBytes = currentSong.songId;
-              String songIdentifier = hex.encode(songidBytes);
-              if (currentSong.distributorContact != null) {
-                playback.setAudio(songIdentifier, currentSong.byteSize,
-                    currentSong.distributorContact as DistributorContact);
+                Playback playback =
+                    context.read<PlaybackProvider>().getPlayback();
+
+                Uint8List songidBytes = currentSong.songId;
+                String songIdentifier = hex.encode(songidBytes);
+                if (currentSong.distributorContact != null) {
+                  Either<MyError, Null> setAudio = await playback.setAudio(
+                      songIdentifier,
+                      currentSong.byteSize,
+                      currentSong.distributorContact as DistributorContact);
+                  if (setAudio.isRight) {
+                  } else {
+                    toast(setAudio.left.message);
+                  }
+                } else {
+                  toast("No node is distributing this song");
+                }
               } else {
-                print(
-                    "ERROR no distributor for playing the song ${currentSong.songName}");
+                toast(scDistributorAnswer.left.message);
+                Navigator.pushNamed(context, "/smart_contract_settings");
               }
             },
             iconSize: 35,
