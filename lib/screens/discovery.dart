@@ -28,7 +28,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   @override
   void initState() {
     print("discovery init state called");
-    // TODO: implement initState
+    if (context.read<SongListProvider>().getSongsList().isEmpty) {
+      Navigator.pushNamed(context, "/load_songs");
+    }
     super.initState();
   }
 
@@ -98,16 +100,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   //style: const TextStyle(fontSize: 25),
                   onPaginate: () async {
                     await Future.delayed(const Duration(milliseconds: 1000));
-                    setState(() {
-                      // songs.addAll([
-                      //   Song(
-                      //     songName: 'Macarena',
-                      //     artist: 'IDK',
-                      //     duration: 450,
-                      //     price: 15,
-                      //   ),
-                      // ]);
-                    });
+                    setState(() {});
                   },
                   builder: (Song song) => SongItem(song: song),
                   loadingWidget: Column(

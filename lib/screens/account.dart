@@ -2,7 +2,10 @@
 
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:listener13/audio_player/playback.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
+import 'package:listener13/providers/playback_provider.dart';
 import 'package:listener13/providers/smart_contract_provider.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +31,7 @@ class _AccountPageState extends State<AccountPage> {
   final contractAddrController = TextEditingController();
   final chainIdController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final privateKeyController = TextEditingController();
+  String privateKey = "unlock to view";
   final passwordController = TextEditingController();
   late bool _privateKeyVisible = false;
   final _formKeyForPasswordForm = GlobalKey<FormState>();
@@ -62,7 +65,6 @@ class _AccountPageState extends State<AccountPage> {
   void dispose() {
     // Clean up the controller when the widget is disposed.
     passwordController.dispose();
-    privateKeyController.dispose();
     rpcUrlController.dispose();
     contractAddrController.dispose();
     chainIdController.dispose();
@@ -75,12 +77,13 @@ class _AccountPageState extends State<AccountPage> {
       _selectedIndex = index;
       switch (_selectedIndex) {
         case 0:
+          Navigator.pushNamed(context, "/library");
+
           break;
         case 1:
           Navigator.pushNamed(context, "/discovery");
           break;
         case 2:
-          Navigator.pushNamed(context, "/account");
           break;
       }
     });
@@ -185,8 +188,7 @@ class _AccountPageState extends State<AccountPage> {
                                           _privateKeyVisible = true;
                                         });
 
-                                        privateKeyController.text =
-                                            potentialPrivateKey.right;
+                                        privateKey = potentialPrivateKey.right;
                                       } else {
                                         //Display error message
                                         toast(potentialPrivateKey.left.message);
@@ -200,118 +202,41 @@ class _AccountPageState extends State<AccountPage> {
                       ],
                     ),
                   ),
-                  Form(
-                    key: _formKeyForPrivateKeyForm,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextFormField(
-                          enabled: _privateKeyVisible,
-                          decoration: InputDecoration(
-                            labelText: 'Private Key',
-                          ),
-                          controller: privateKeyController,
-
-                          // The validator receives the text that the user has entered.
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Required';
-                            }
-                            return null;
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: ElevatedButton(
-                            onPressed: _privateKeyVisible
-                                ? () async {
-                                    if (_formKeyForPrivateKeyForm.currentState!
-                                        .validate()) {
-                                      // If the form is valid, display a snackbar. In the real world,
-                                      // you'd often call a server or save the information in a database.
-                                      await setPrivateKey(
-                                          privateKeyController.text,
-                                          passwordController.text);
-                                      context
-                                          .read<CredentialsProvider>()
-                                          .setOwnCredentials(
-                                              privateKeyController.text);
-                                      toast("Private key set!");
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Processing Data')),
-                                      );
-                                    }
-                                  }
-                                : null,
-                            child: const Text('Change private key'),
-                          ),
-                        ),
-                      ],
-                    ),
+                  Text("Your private key: $privateKey"),
+                  IconButton(
+                    onPressed: _privateKeyVisible
+                        ? () async {
+                            await Clipboard.setData(
+                                ClipboardData(text: privateKey));
+                          }
+                        : null,
+                    icon: Icon(Icons.content_copy),
                   ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/couple_account");
+                      },
+                      child: Text("Couple a different account")),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/create_account");
+                      },
+                      child: Text("Create a new acount"))
                 ])),
                 Center(
                     child: Column(children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'RPCUrl',
-                          ),
-                          controller: rpcUrlController,
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Smart Contract Address',
-                          ),
-                          controller: contractAddrController,
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Chain ID',
-                          ),
-                          keyboardType: TextInputType.number,
-                          controller: chainIdController,
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              // If the form is valid, display a snackbar. In the real world,
-                              // you'd often call a server or save the information in a database.
-                              Either<MyError, SmartContract>
-                                  potentialSmartContract =
-                                  await SmartContract.create(
-                                      rpcUrlController.text,
-                                      contractAddrController.text,
-                                      int.parse(chainIdController.text),
-                                      context
-                                          .read<CredentialsProvider>()
-                                          .getCredentials());
-
-                              if (potentialSmartContract.isRight) {
-                                context
-                                    .read<SmartContractProvider>()
-                                    .updateSmartContract(
-                                        potentialSmartContract.right);
-                              } else {
-                                toast("Could not reach this smart contract");
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Processing Data')),
-                              );
-                            }
-                          },
-                          child: const Text('Set Smart Contract Details'),
-                        ),
-                      ],
-                    ),
-                  ),
+                  Text(
+                      "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract().rpcUrl}"),
+                  Text(
+                      "Hex: ${context.watch<SmartContractProvider>().getSmartContract().contractAddr}"),
+                  Text(
+                      "Chain id: ${context.watch<SmartContractProvider>().getSmartContract().chainId}"),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, "/smart_contract_settings");
+                      },
+                      child: Text("Change details"))
                 ]))
               ],
             )));

@@ -135,7 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: () {
                       Navigator.pushNamed(
                         context,
-                        "/couple",
+                        "/couple_account",
                       );
                     },
                     child: Text('Couple it.',

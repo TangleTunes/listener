@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:listener13/providers/balance_provider.dart';
 import 'package:listener13/providers/current_song_provider.dart';
 import 'package:listener13/providers/playback_provider.dart';
+import 'package:listener13/screens/create_account.dart';
 import 'package:listener13/screens/load_songs.dart';
 import 'package:listener13/screens/smart_contract_settings.dart';
 import 'package:listener13/user_settings/manage_account.dart';
@@ -62,10 +63,12 @@ class MyApp extends StatelessWidget {
         '/discovery': (context) => DiscoveryPage(),
         '/unlock': (context) => UnlockPage(),
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
-        '/couple': (context) => CoupleAccount(),
+        '/couple_account': (context) => CoupleAccount(),
         '/account': (context) => AccountPage(tabSelected: 0),
         '/library': (context) => LibraryPage(),
         '/load_songs': (context) => LoadingSongs(),
+        "/smart_contract_settings": (context) => SmartContractSettings(),
+        "/create_account": (context) => RegisterPage(),
       },
     );
   }

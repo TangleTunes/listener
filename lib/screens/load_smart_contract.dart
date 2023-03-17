@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:listener13/error_handling/toast.dart';
 import 'package:listener13/screens/account.dart';
+import 'package:listener13/screens/discovery.dart';
 import 'package:listener13/screens/load_songs.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/providers/smart_contract_provider.dart';
@@ -76,8 +77,9 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
         shouldProceed
             ? ElevatedButton(
                 onPressed: () {
+                  //move to next screen and pass the prefs if you want
+                  print("hereee");
                   Navigator.push(context, MaterialPageRoute(builder: nextPage));
-                  // Navigator.pushNamed(context, nextPage);//hereeeee
                 },
                 child: Text("Continue"),
               )

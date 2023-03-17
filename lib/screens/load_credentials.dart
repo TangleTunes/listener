@@ -17,7 +17,7 @@ class LoadingCredentials extends StatefulWidget {
 
 class _LoadingCredentialsState extends State<LoadingCredentials> {
   bool shouldProceed = false;
-  String initialRoute = "/";
+  String nextRoute = "/";
   String pk = "";
   _fetchPrefs() async {
     print("_fetchPrefs");
@@ -31,10 +31,10 @@ class _LoadingCredentialsState extends State<LoadingCredentials> {
     //------------------------------
 
     if (await alreadyCoupled()) {
-      initialRoute = "/unlock";
+      nextRoute = "/unlock";
       print("already coupled");
     } else {
-      initialRoute = "/create_account";
+      nextRoute = "/create_account";
       print("not coupled");
     }
     setState(() {
@@ -61,7 +61,7 @@ class _LoadingCredentialsState extends State<LoadingCredentials> {
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
-                  Navigator.pushNamed(context, initialRoute);
+                  Navigator.pushNamed(context, nextRoute);
                 },
                 child: Text("Continue"),
               )

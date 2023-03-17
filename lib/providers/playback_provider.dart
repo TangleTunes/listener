@@ -6,7 +6,7 @@ import 'package:web3dart/credentials.dart';
 import '../distributor_connection/smart_contract.dart';
 
 class PlaybackProvider with ChangeNotifier {
-  late Playback _playback;
+  Playback _playback = Playback();
 
   Playback getPlayback() {
     return _playback;

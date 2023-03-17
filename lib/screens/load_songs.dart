@@ -62,19 +62,14 @@ class _LoadingSongsState extends State<LoadingSongs> {
         context.read<CurrentSongProvider>().updateSong(firstSong);
         print("set current song to $firstSong");
 
-        context.read<PlaybackProvider>().setPlayback(Playback());
+        // context.read<PlaybackProvider>().setPlayback(Playback());
       } else {
         toast(potentialSongList.left.message);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AccountPage(tabSelected: 1)));
-        // Navigator.pushNamed(context, "/smart_contract_settings");
+        Navigator.pushNamed(context, "/smart_contract_settings");
       }
     } else {
       toast(potentialSongListLength.left.message);
-      MaterialPageRoute(builder: (context) => AccountPage(tabSelected: 1));
-      // Navigator.pushNamed(context, "/smart_contract_settings");
+      Navigator.pushNamed(context, "/smart_contract_settings");
     }
     setState(() {
       shouldProceed = true; //got the prefs; set to some value if needed
@@ -98,7 +93,8 @@ class _LoadingSongsState extends State<LoadingSongs> {
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
-                  Navigator.pushNamed(context, "/discovery");
+                  Navigator.pushNamed(
+                      context, "/discovery"); //FIXME here should be discovery
                 },
                 child: Text("Continue"),
               )
