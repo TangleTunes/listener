@@ -22,6 +22,7 @@ import '../audio_player/playback.dart';
 import '../error_handling/app_error.dart';
 import '../error_handling/toast.dart';
 import '../providers/song_list_provider.dart';
+import '../screens/account.dart';
 
 @override
 Widget audioPlayer(BuildContext context) {
@@ -102,7 +103,9 @@ Widget audioPlayer(BuildContext context) {
                 }
               } else {
                 toast(scDistributorAnswer.left.message);
-                Navigator.pushNamed(context, "/smart_contract_settings");
+                MaterialPageRoute(
+                    builder: (context) => AccountPage(tabSelected: 1));
+                // Navigator.pushNamed(context, "/smart_contract_settings");
               }
             },
             iconSize: 35,

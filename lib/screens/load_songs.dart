@@ -9,6 +9,7 @@ import 'package:listener13/audio_player/playback.dart';
 import 'package:listener13/error_handling/app_error.dart';
 import 'package:listener13/error_handling/toast.dart';
 import 'package:listener13/providers/playback_provider.dart';
+import 'package:listener13/screens/account.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/providers/smart_contract_provider.dart';
 import 'package:provider/provider.dart';
@@ -64,11 +65,16 @@ class _LoadingSongsState extends State<LoadingSongs> {
         context.read<PlaybackProvider>().setPlayback(Playback());
       } else {
         toast(potentialSongList.left.message);
-        Navigator.pushNamed(context, "/smart_contract_settings");
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AccountPage(tabSelected: 1)));
+        // Navigator.pushNamed(context, "/smart_contract_settings");
       }
     } else {
       toast(potentialSongListLength.left.message);
-      Navigator.pushNamed(context, "/smart_contract_settings");
+      MaterialPageRoute(builder: (context) => AccountPage(tabSelected: 1));
+      // Navigator.pushNamed(context, "/smart_contract_settings");
     }
     setState(() {
       shouldProceed = true; //got the prefs; set to some value if needed

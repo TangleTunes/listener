@@ -10,26 +10,25 @@ import 'package:convert/convert.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../error_handling/app_error.dart';
+import '../user_settings/manage_smart_contract_details.dart';
 
 class SmartContract {
   final String rpcUrl;
   late EthereumAddress contractAddr;
-  String abiCode;
+  late String abiCode;
   late Web3Client client;
   late Credentials ownCredentials;
   late EthereumAddress ownAddress;
-  late DeployedContract contract;
+  late DeployedContract deployedContract;
   int chainId;
   late int nonce;
 
-  SmartContract._create(this.rpcUrl, String contractAddress, this.chainId,
-      this.ownCredentials, this.abiCode) {
+  SmartContract._create(
+      this.rpcUrl, String contractAddress, this.chainId, this.ownCredentials) {
     // Do most of your initialization here, that's what a constructor is for
-    contractAddr = EthereumAddress.fromHex(contractAddress);
+
     client = Web3Client(rpcUrl, http.Client());
     ownAddress = ownCredentials.address;
-    contract = DeployedContract(
-        ContractAbi.fromJson(abiCode, 'TangleTunes'), contractAddr);
   }
   @override
   String toString() {
@@ -37,16 +36,23 @@ class SmartContract {
   }
 
   /// Public factory
-  static Future<Either<MyError, SmartContract>> create(
-      String rpcUrl,
-      String contractAddress,
-      int chainId,
-      Credentials ownCredentials,
-      String abiCode) async {
+  static Future<Either<MyError, SmartContract>> create(String rpcUrl,
+      String contractAddress, int chainId, Credentials ownCredentials) async {
     // Call the private constructor
-    SmartContract contract = SmartContract._create(
-        rpcUrl, contractAddress, chainId, ownCredentials, abiCode);
-
+    SmartContract contract =
+        SmartContract._create(rpcUrl, contractAddress, chainId, ownCredentials);
+    try {
+      contract.contractAddr = EthereumAddress.fromHex(contractAddress);
+    } on ArgumentError catch (e) {
+      return Left(MyError(
+        key: AppError.SmartContractCreateFailed,
+        message: "Invalid hex",
+      ));
+    }
+    contract.abiCode = await readAbiFromAssets();
+    contract.deployedContract = DeployedContract(
+        ContractAbi.fromJson(contract.abiCode, 'TangleTunes'),
+        contract.contractAddr);
     Either<MyError, int> potentialNonce = await contract.getNonce();
     if (potentialNonce.isRight) {
       contract.nonce = potentialNonce.right;
@@ -79,8 +85,8 @@ class SmartContract {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
           Transaction.callContract(
-              contract: contract,
-              function: contract.function('deposit'),
+              contract: deployedContract,
+              function: deployedContract.function('deposit'),
               parameters: [],
               value: EtherAmount.fromInt(EtherUnit.ether, amount)),
           chainId: chainId);
@@ -104,8 +110,8 @@ class SmartContract {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
           Transaction.callContract(
-              contract: contract,
-              function: contract.function('create_user'),
+              contract: deployedContract,
+              function: deployedContract.function('create_user'),
               parameters: [name, description]),
           chainId: chainId);
       TransactionReceipt? tx_receipt =
@@ -127,8 +133,8 @@ class SmartContract {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
           Transaction.callContract(
-              contract: contract,
-              function: contract.function('delete_user'),
+              contract: deployedContract,
+              function: deployedContract.function('delete_user'),
               parameters: []),
           chainId: chainId);
       TransactionReceipt? tx_receipt =
@@ -149,8 +155,8 @@ class SmartContract {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
           Transaction.callContract(
-              contract: contract,
-              function: contract.function('get_chunks'),
+              contract: deployedContract,
+              function: deployedContract.function('get_chunks'),
               parameters: [
                 song,
                 index,
@@ -177,8 +183,8 @@ class SmartContract {
       String tx_hash = await client.sendTransaction(
           ownCredentials,
           Transaction.callContract(
-              contract: contract,
-              function: contract.function('withdraw'),
+              contract: deployedContract,
+              function: deployedContract.function('withdraw'),
               parameters: [amount]),
           chainId: chainId);
       TransactionReceipt? tx_receipt =
@@ -200,8 +206,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('check_chunk'),
+          contract: deployedContract,
+          function: deployedContract.function('check_chunk'),
           params: [song, index, chunk]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -220,8 +226,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('chunks_length'),
+          contract: deployedContract,
+          function: deployedContract.function('chunks_length'),
           params: [song]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -240,8 +246,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('distributions'),
+          contract: deployedContract,
+          function: deployedContract.function('distributions'),
           params: [song]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -260,8 +266,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('gen_song_id'),
+          contract: deployedContract,
+          function: deployedContract.function('gen_song_id'),
           params: [name, EthereumAddress.fromHex(author)]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -280,8 +286,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('get_rand_distributor'),
+          contract: deployedContract,
+          function: deployedContract.function('get_rand_distributor'),
           params: [song]);
       if (outputList.length > 0) {
         returnEither = Right(outputList);
@@ -309,8 +315,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('get_songs'),
+          contract: deployedContract,
+          function: deployedContract.function('get_songs'),
           params: [index, amount]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -329,8 +335,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('song_list'),
+          contract: deployedContract,
+          function: deployedContract.function('song_list'),
           params: [BigInt.from(index)]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -350,8 +356,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('song_list_length'),
+          contract: deployedContract,
+          function: deployedContract.function('song_list_length'),
           params: []);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -370,8 +376,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('users'),
+          contract: deployedContract,
+          function: deployedContract.function('users'),
           params: [EthereumAddress.fromHex(address)]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -390,8 +396,8 @@ class SmartContract {
     Either<MyError, List> returnEither = Right(outputList);
     try {
       outputList = await client.call(
-          contract: contract,
-          function: contract.function('songs'),
+          contract: deployedContract,
+          function: deployedContract.function('songs'),
           params: [song]);
       returnEither = Right(outputList);
     } on Exception catch (e) {
@@ -413,7 +419,7 @@ class SmartContract {
       print(
           "createChunkGetTransaction index $index amount $amount with nonce $nonce");
       // client.signTransaction(credentials, )
-      Uint8List data = contract.function('get_chunks').encodeCall([
+      Uint8List data = deployedContract.function('get_chunks').encodeCall([
         song,
         BigInt.from(index),
         BigInt.from(amount),

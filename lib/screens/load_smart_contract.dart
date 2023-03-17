@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:listener13/error_handling/toast.dart';
+import 'package:listener13/screens/account.dart';
+import 'package:listener13/screens/load_songs.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/providers/smart_contract_provider.dart';
 import 'package:provider/provider.dart';
@@ -29,9 +31,10 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
   String abi = "";
   bool shouldProceed = false;
   late SmartContract smartContract;
-  String nextPage = "/load_songs";
+  late WidgetBuilder nextPage;
 
   _fetchPrefs(BuildContext context) async {
+    nextPage = (context) => LoadingSongs();
     await writeToFile("sc.toml",
         "making this toml file unreadbale so that initilizeSmartContractIfNotSet is always triggered and will contain what is set in asset's toml file"); //FIXME for development purposes only, remove this line
     await initilizeSmartContractIfNotSet();
@@ -42,14 +45,14 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
     abi = await readAbiFromAssets();
     Credentials credentials =
         context.read<CredentialsProvider>().getCredentials();
-    Either<MyError, SmartContract> potentialSc = await SmartContract.create(
-        nodeUrl, contractAddr, chainId, credentials, abi);
+    Either<MyError, SmartContract> potentialSc =
+        await SmartContract.create(nodeUrl, contractAddr, chainId, credentials);
     if (potentialSc.isRight) {
       smartContract = potentialSc.right;
       context.read<SmartContractProvider>().setSmartContract(smartContract);
     } else {
       toast(potentialSc.left.message);
-      nextPage = "/smart_contract_settings";
+      nextPage = (context) => AccountPage(tabSelected: 1);
     }
 
     setState(() {
@@ -73,8 +76,8 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
         shouldProceed
             ? ElevatedButton(
                 onPressed: () {
-                  //move to next screen and pass the prefs if you want
-                  Navigator.pushNamed(context, nextPage);
+                  Navigator.push(context, MaterialPageRoute(builder: nextPage));
+                  // Navigator.pushNamed(context, nextPage);//hereeeee
                 },
                 child: Text("Continue"),
               )
