@@ -5,8 +5,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
 import 'package:listener13/theme/theme_constants.dart';
 
-class CoupleAccount extends StatelessWidget {
-  const CoupleAccount({super.key});
+class CoupleAccount extends StatefulWidget {
+  const CoupleAccount({Key? key}) : super(key: key);
+
+  @override
+  State<CoupleAccount> createState() => _CoupleAccountState();
+}
+
+class _CoupleAccountState extends State<CoupleAccount> {
+  final passwordFieldController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    passwordFieldController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +65,8 @@ class CoupleAccount extends StatelessWidget {
             ),
             SizedBox(height: 6),
             Builder(
-                builder: (BuildContext context) => passwordTextInput(context)),
+                builder: (BuildContext context) =>
+                    passwordTextInput(context, passwordFieldController)),
 
             //The second text input box for your password
             SizedBox(height: 20),

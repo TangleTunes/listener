@@ -9,6 +9,6 @@ class SmartContractSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-        "Your smart contract: ${context.read<SmartContractProvider>().getSmartContract().toString()} Editing not yet implemented");
+        "Your smart contract: ${context.watch<SmartContractProvider>().getSmartContract().toString()} Editing not yet implemented");
   }
 }

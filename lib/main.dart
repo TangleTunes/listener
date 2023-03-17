@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:listener13/providers/balance_provider.dart';
 import 'package:listener13/providers/current_song_provider.dart';
 import 'package:listener13/providers/playback_provider.dart';
 import 'package:listener13/screens/load_songs.dart';
@@ -32,6 +33,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CredentialsProvider()),
         ChangeNotifierProvider(create: (_) => CurrentSongProvider()),
         ChangeNotifierProvider(create: (_) => PlaybackProvider()),
+        ChangeNotifierProvider(create: (_) => BalanceProvider()),
       ],
       child: MyApp(),
     ),
@@ -58,7 +60,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/load_credentials': (context) => LoadingCredentials(),
         '/discovery': (context) => DiscoveryPage(),
-        '/unlock': (context) => UnlockAccount(),
+        '/unlock': (context) => UnlockPage(),
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple': (context) => CoupleAccount(),
         '/account': (context) => AccountPage(),

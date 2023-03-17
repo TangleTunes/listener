@@ -22,11 +22,13 @@ Widget usernameTextInput(BuildContext context) {
       ));
 }
 
-Widget passwordTextInput(BuildContext context) {
+Widget passwordTextInput(
+    BuildContext context, TextEditingController controller) {
   return Container(
       width: 372,
       height: 56,
       child: TextField(
+        controller: controller,
         obscureText: true,
         decoration: InputDecoration(
             border: OutlineInputBorder(

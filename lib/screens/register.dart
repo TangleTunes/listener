@@ -7,8 +7,22 @@ import 'package:listener13/theme/theme_constants.dart';
 
 import 'couple_account.dart';
 
-class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final passwordFieldController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    passwordFieldController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +86,8 @@ class RegisterPage extends StatelessWidget {
             ),
             SizedBox(height: 6),
             Builder(
-                builder: (BuildContext context) => passwordTextInput(context)),
+                builder: (BuildContext context) =>
+                    passwordTextInput(context, passwordFieldController)),
 
             //The third text input box for repeating your password
             SizedBox(height: 20),

@@ -7,6 +7,7 @@ enum AppError {
   DetermineNonceFailed,
   SendingTcpFailed,
   PlaybackError,
+  IncorrectPrivateKeyPassword,
   // some errors codes
 }
 
