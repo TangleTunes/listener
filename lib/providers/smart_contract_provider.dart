@@ -3,9 +3,9 @@ import 'package:web3dart/credentials.dart';
 import '../distributor_connection/smart_contract.dart';
 
 class SmartContractProvider with ChangeNotifier {
-  late SmartContract _smartContract;
+  SmartContract? _smartContract;
 
-  SmartContract getSmartContract() {
+  SmartContract? getSmartContract() {
     return _smartContract;
   }
 

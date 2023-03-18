@@ -4,7 +4,8 @@ import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
-import 'package:listener13/error_handling/toast.dart';
+import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener13/utils/toast.dart';
 import 'package:listener13/user_settings/manage_smart_contract_details.dart';
 import 'package:listener13/providers/credentials_provider.dart';
 import 'package:listener13/theme/theme_constants.dart';
@@ -24,18 +25,17 @@ class UnlockPage extends StatefulWidget {
 }
 
 class _UnlockPageState extends State<UnlockPage> {
-  final myController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    myController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("building unlock account page");
     return Scaffold(
         //extendBodyBehindAppBar: true,
         body: Center(
@@ -75,7 +75,7 @@ class _UnlockPageState extends State<UnlockPage> {
         SizedBox(height: 6),
         Builder(
             builder: (BuildContext context) =>
-                passwordTextInput(context, myController)),
+                passwordTextInput(context, passwordController)),
 
         SizedBox(height: 25),
         //the register button, which redirects you to the discovery page iff you filled in all the boxes
@@ -86,15 +86,20 @@ class _UnlockPageState extends State<UnlockPage> {
               style: ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
               onPressed: () async {
                 Either<MyError, String> potentialPrivateKey =
-                    await unlockPrivateKey(myController.text);
+                    await unlockPrivateKey(passwordController.text);
                 if (potentialPrivateKey.isRight) {
                   context
                       .read<CredentialsProvider>()
                       .setOwnCredentials(potentialPrivateKey.right);
                   // implement it to navigate to the discovery page
-                  Navigator.pushNamed(context, '/load_smart_contract');
-                } else {
+                  goToPage(context, "/discovery");
+                } else if (potentialPrivateKey.left.key ==
+                    AppError.IncorrectPrivateKeyPassword) {
                   toast(potentialPrivateKey.left.message);
+                } else if (potentialPrivateKey.left.key ==
+                    AppError.NonexistetOrCorruptedPrivateKeyFile) {
+                  toast(potentialPrivateKey.left.message);
+                  goToPage(context, "/couple_account");
                 }
               },
               child: Text('Unlock', style: GoogleFonts.poppins(fontSize: 16)),
@@ -111,7 +116,7 @@ class _UnlockPageState extends State<UnlockPage> {
                 )),
             TextButton(
                 onPressed: () {
-                  //TODO implement a pop up to delete your account
+                  //123 implement a pop up to delete your account
                 },
                 child: Text('Delete wallet.',
                     style: TextStyle(

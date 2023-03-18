@@ -68,11 +68,10 @@ class SmartContract {
     try {
       myNonce = await client.getTransactionCount(ownAddress);
       returnEither = Right(myNonce);
-    } on Exception catch (e) {
+    } catch (e) {
       return Left(MyError(
           key: AppError.DetermineNonceFailed,
-          message: "Unable to determine the nonce",
-          exception: e));
+          message: "Unable to determine the nonce"));
     } finally {
       await client.dispose();
     }

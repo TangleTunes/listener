@@ -8,6 +8,8 @@ enum AppError {
   SendingTcpFailed,
   PlaybackError,
   IncorrectPrivateKeyPassword,
+  NonexistetOrCorruptedPrivateKeyFile,
+  NonexistetOrCorruptedSmartContractFile,
   // some errors codes
 }
 

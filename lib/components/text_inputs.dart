@@ -3,11 +3,19 @@ import 'package:listener13/utils/helper_widgets.dart';
 
 import '../theme/theme_constants.dart';
 
-Widget usernameTextInput(BuildContext context) {
+Widget usernameTextInput(
+    BuildContext context, TextEditingController controller) {
   return Container(
       width: 373,
       height: 56,
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required';
+          }
+          return null;
+        },
+        controller: controller,
         decoration: InputDecoration(
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),
@@ -27,7 +35,13 @@ Widget passwordTextInput(
   return Container(
       width: 372,
       height: 56,
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required';
+          }
+          return null;
+        },
         controller: controller,
         obscureText: true,
         decoration: InputDecoration(
@@ -44,11 +58,19 @@ Widget passwordTextInput(
       ));
 }
 
-Widget repeatPasswordTextInput(BuildContext context) {
+Widget repeatPasswordTextInput(
+    BuildContext context, TextEditingController controller) {
   return Container(
       width: 372,
       height: 56,
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required';
+          }
+          return null;
+        },
+        controller: controller,
         obscureText: true,
         decoration: InputDecoration(
             border: OutlineInputBorder(
@@ -64,11 +86,19 @@ Widget repeatPasswordTextInput(BuildContext context) {
       ));
 }
 
-Widget privateKeyTextInput(BuildContext context) {
+Widget privateKeyTextInput(
+    BuildContext context, TextEditingController controller) {
   return Container(
       width: 373,
       height: 56,
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required';
+          }
+          return null;
+        },
+        controller: controller,
         decoration: InputDecoration(
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),

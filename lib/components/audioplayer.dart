@@ -20,110 +20,117 @@ import 'package:web3dart/web3dart.dart';
 import 'dart:typed_data';
 import '../audio_player/playback.dart';
 import '../error_handling/app_error.dart';
-import '../error_handling/toast.dart';
+import '../utils/toast.dart';
 import '../providers/song_list_provider.dart';
 import '../screens/account.dart';
 
 @override
 Widget audioPlayer(BuildContext context) {
-  return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-    Padding(
-      padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.start,
+  if (context.watch<CurrentSongProvider>().getSong() == null) {
+    return Text("Currently no song selected");
+  } else {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
 
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(context.watch<CurrentSongProvider>().getSong().songName,
-              style: TextStyle(
-                  color: COLOR_SECONDARY,
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold)),
-          Text(
-              context
-                  .watch<CurrentSongProvider>()
-                  .getSong()
-                  .artist
-                  .toUpperCase(),
-              style: TextStyle(
-                color: Color(0xFFA5C0FF).withOpacity(0.7),
-                fontSize: 11,
-              )),
-        ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(context.watch<CurrentSongProvider>().getSong()!.songName,
+                style: TextStyle(
+                    color: COLOR_SECONDARY,
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold)),
+            Text(
+                context
+                    .watch<CurrentSongProvider>()
+                    .getSong()!
+                    .artist
+                    .toUpperCase(),
+                style: TextStyle(
+                  color: Color(0xFFA5C0FF).withOpacity(0.7),
+                  fontSize: 11,
+                )),
+          ],
+        ),
       ),
-    ),
-    Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: null,
-            iconSize: 35,
-            icon: Icon(
-              Icons.skip_previous,
-              color: COLOR_SECONDARY,
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+        child: Row(
+          children: [
+            IconButton(
+              onPressed: null,
+              iconSize: 35,
+              icon: Icon(
+                Icons.skip_previous,
+                color: COLOR_SECONDARY,
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: () async {
-              SmartContract sc =
-                  context.read<SmartContractProvider>().getSmartContract();
-              Song currentSong = context.read<CurrentSongProvider>().getSong();
-              toast("Finding a distributor");
-              Either<MyError, List<dynamic>> scDistributorAnswer =
-                  await sc.getRandDistributor(currentSong.songId);
-              if (scDistributorAnswer.isRight) {
-                String distributorHex = scDistributorAnswer.right[0].hex;
-                Uri uri = Uri.parse("tcp://" + scDistributorAnswer.right[1]);
-                Either<MyError, DistributorContact> dc =
-                    await DistributorContact.create(
-                        sc, distributorHex, uri.host, uri.port);
-                if (dc.isRight) {
-                  context.read<CurrentSongProvider>().setDistributor(dc.right);
-                } else {
-                  toast(dc.left.message);
-                }
-
-                Playback playback =
-                    context.read<PlaybackProvider>().getPlayback();
-
-                Uint8List songidBytes = currentSong.songId;
-                String songIdentifier = hex.encode(songidBytes);
-                if (currentSong.distributorContact != null) {
-                  Either<MyError, Null> setAudio = await playback.setAudio(
-                      songIdentifier,
-                      currentSong.byteSize,
-                      currentSong.distributorContact as DistributorContact);
-                  if (setAudio.isRight) {
+            IconButton(
+              onPressed: () async {
+                SmartContract sc =
+                    context.read<SmartContractProvider>().getSmartContract()!;
+                Song currentSong =
+                    context.read<CurrentSongProvider>().getSong()!;
+                toast("Finding a distributor");
+                Either<MyError, List<dynamic>> scDistributorAnswer =
+                    await sc.getRandDistributor(
+                        currentSong.songId); //FIXME could be null
+                if (scDistributorAnswer.isRight) {
+                  String distributorHex = scDistributorAnswer.right[0].hex;
+                  Uri uri = Uri.parse("tcp://" + scDistributorAnswer.right[1]);
+                  Either<MyError, DistributorContact> dc =
+                      await DistributorContact.create(
+                          sc, distributorHex, uri.host, uri.port);
+                  if (dc.isRight) {
+                    context
+                        .read<CurrentSongProvider>()
+                        .setDistributor(dc.right);
                   } else {
-                    toast(setAudio.left.message);
+                    toast(dc.left.message);
+                  }
+
+                  Playback playback =
+                      context.read<PlaybackProvider>().getPlayback();
+
+                  Uint8List songidBytes = currentSong.songId;
+                  String songIdentifier = hex.encode(songidBytes);
+                  if (currentSong.distributorContact != null) {
+                    Either<MyError, Null> setAudio = await playback.setAudio(
+                        songIdentifier,
+                        currentSong.byteSize,
+                        currentSong.distributorContact as DistributorContact);
+                    if (setAudio.isRight) {
+                    } else {
+                      toast(setAudio.left.message);
+                    }
+                  } else {
+                    toast("No node is distributing this song");
                   }
                 } else {
-                  toast("No node is distributing this song");
+                  toast(scDistributorAnswer.left.message);
+                  MaterialPageRoute(
+                      builder: (context) => AccountPage(tabSelected: 1));
                 }
-              } else {
-                toast(scDistributorAnswer.left.message);
-                MaterialPageRoute(
-                    builder: (context) => AccountPage(tabSelected: 1));
-                // Navigator.pushNamed(context, "/smart_contract_settings");
-              }
-            },
-            iconSize: 35,
-            icon: Icon(
-              Icons.play_arrow,
-              color: COLOR_SECONDARY,
+              },
+              iconSize: 35,
+              icon: Icon(
+                Icons.play_arrow,
+                color: COLOR_SECONDARY,
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: null,
-            iconSize: 35,
-            icon: Icon(
-              Icons.skip_next,
-              color: COLOR_SECONDARY,
-            ),
-          )
-        ],
+            IconButton(
+              onPressed: null,
+              iconSize: 35,
+              icon: Icon(
+                Icons.skip_next,
+                color: COLOR_SECONDARY,
+              ),
+            )
+          ],
+        ),
       ),
-    ),
-  ]);
+    ]);
+  }
 }

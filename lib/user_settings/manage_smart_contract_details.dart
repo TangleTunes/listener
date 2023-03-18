@@ -2,20 +2,51 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:either_dart/either.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toml/toml.dart';
 
+import '../error_handling/app_error.dart';
 import 'file_writer.dart';
 
 const String scTomlFileName = "sc.toml";
+
+class SC {
+  String nodeUrl;
+  String hexAdress;
+  int chainId;
+
+  SC({
+    required this.nodeUrl,
+    required this.hexAdress,
+    required this.chainId,
+  });
+}
+
+Future<Either<MyError, SC>> readSmartContractFromFile() async {
+  try {
+    String nodeUrl = await readNodeUrl();
+    print("read nodeUrl as $nodeUrl");
+    String hexAdress = await readContractAdress();
+    print("read hexadr as $hexAdress");
+    int chainId = await readChainId();
+    print("read chainid as $chainId");
+
+    return Right(SC(nodeUrl: nodeUrl, hexAdress: hexAdress, chainId: chainId));
+  } catch (e) {
+    return Left(MyError(
+        key: AppError.NonexistetOrCorruptedSmartContractFile,
+        message: "Unable to retrieve saved smart contract"));
+  }
+}
 
 Future<void> initilizeSmartContractIfNotSet() async {
   try {
     Map<String, dynamic> tomlMap = await readTomlFile();
     tomlMap["contract_address"];
     tomlMap["node_url"];
-    tomlMap["chaid_id"];
+    tomlMap["chain_id"];
   } catch (e) {
     ByteData smartContractSettingsByteData =
         await rootBundle.load('assets/SmartContract.toml');
@@ -33,7 +64,8 @@ Future<String> readAbiFromAssets() async {
 
 Future<void> setContractAdress(String contractAdress) async {
   Map<String, dynamic> tomlMap = await readTomlFile();
-  tomlMap["contract_adress"] = contractAdress;
+  tomlMap["contract_address"] = contractAdress;
+  print("the toml map is now $tomlMap");
   await writeToTomlFile(tomlMap);
 }
 
@@ -61,13 +93,14 @@ Future<void> setChainId(int chainId) async {
 
 Future<int> readChainId() async {
   Map<String, dynamic> tomlMap = await readTomlFile();
-  return tomlMap["chain_id"];
+  int chainIdAsInt = tomlMap["chain_id"];
+  return chainIdAsInt;
 }
 
 Future<Map<String, dynamic>> readTomlFile() async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/$scTomlFileName');
-  final tomlString = file.readAsStringSync();
+  final tomlString = await file.readAsString();
   Map<String, dynamic> tomlMap = TomlDocument.parse(tomlString).toMap();
   return tomlMap;
 }

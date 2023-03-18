@@ -5,9 +5,9 @@ import 'package:web3dart/credentials.dart';
 import '../distributor_connection/smart_contract.dart';
 
 class CurrentSongProvider with ChangeNotifier {
-  late Song _song;
+  Song? _song;
 
-  Song getSong() {
+  Song? getSong() {
     return _song;
   }
 
@@ -17,7 +17,7 @@ class CurrentSongProvider with ChangeNotifier {
   }
 
   void setDistributor(DistributorContact distributor) {
-    _song.distributorContact = distributor;
+    _song?.distributorContact = distributor;
     notifyListeners();
   }
 }

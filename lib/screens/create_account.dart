@@ -3,8 +3,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
+import 'package:listener13/providers/smart_contract_provider.dart';
 import 'package:listener13/theme/theme_constants.dart';
+import 'package:listener13/user_settings/manage_account.dart';
+import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener13/utils/toast.dart';
+import 'package:provider/provider.dart';
 
+import '../distributor_connection/smart_contract.dart';
+import '../providers/credentials_provider.dart';
 import 'couple_account.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -15,12 +22,16 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final passwordFieldController = TextEditingController();
+  final passwordController = TextEditingController();
+  final repeatPasswordController = TextEditingController();
+  final usernameController = TextEditingController();
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    passwordFieldController.dispose();
+    passwordController.dispose();
+    usernameController.dispose();
+    repeatPasswordController.dispose();
     super.dispose();
   }
 
@@ -67,7 +78,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             SizedBox(height: 6),
             Builder(
-                builder: (BuildContext context) => usernameTextInput(context)),
+                builder: (BuildContext context) =>
+                    usernameTextInput(context, usernameController)),
 
             //The second text input box for your password
             SizedBox(height: 20),
@@ -87,7 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(height: 6),
             Builder(
                 builder: (BuildContext context) =>
-                    passwordTextInput(context, passwordFieldController)),
+                    passwordTextInput(context, passwordController)),
 
             //The third text input box for repeating your password
             SizedBox(height: 20),
@@ -107,7 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(height: 6),
             Builder(
                 builder: (BuildContext context) =>
-                    repeatPasswordTextInput(context)),
+                    repeatPasswordTextInput(context, repeatPasswordController)),
 
             SizedBox(height: 25),
             //the register button, which redirects you to the discovery page iff you filled in all the boxes
@@ -117,7 +129,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: ElevatedButton(
                   style:
                       ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (passwordController.text !=
+                        repeatPasswordController.text) {
+                      toast("Passwords don't match");
+                    } else {
+                      createAccount(usernameController.text,
+                          passwordController.text, context);
+
+                      goToPage(context, "/load_create_account");
+                    }
+                  },
                   child: Text('Create account',
                       style: GoogleFonts.poppins(fontSize: 16)),
                 )),
@@ -133,10 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     )),
                 TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        "/couple_account",
-                      );
+                      goToPage(context, "/couple_account");
                     },
                     child: Text('Couple it.',
                         style: TextStyle(

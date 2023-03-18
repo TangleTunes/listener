@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:listener13/distributor_connection/distributer_contact.dart';
 
 class SongListProvider with ChangeNotifier {
-  List<Song> _songsList = [];
+  List<Song>? _songsList;
 
-  List<Song> getSongsList() {
+  List<Song>? getSongsList() {
     return _songsList;
   }
 
@@ -16,7 +16,8 @@ class SongListProvider with ChangeNotifier {
   }
 
   void updateSongListWithANewSong(Song song) {
-    _songsList.add(song);
+    _songsList ??= [];
+    _songsList?.add(song);
     notifyListeners();
   }
 }
@@ -28,7 +29,7 @@ class Song {
   int price;
   int byteSize;
   Uint8List songId;
-  late DistributorContact? distributorContact;
+  DistributorContact? distributorContact;
 
   Song({
     required this.songName,

@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:listener13/error_handling/toast.dart';
+import 'package:listener13/components/loading_screen.dart';
+import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener13/utils/toast.dart';
 import 'package:listener13/screens/account.dart';
 import 'package:listener13/screens/discovery.dart';
 import 'package:listener13/screens/load_songs.dart';
@@ -26,34 +28,37 @@ class LoadingSmartContractInfo extends StatefulWidget {
 }
 
 class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
-  String nodeUrl = "";
-  String contractAddr = "";
-  int chainId = 0;
-  String abi = "";
   bool shouldProceed = false;
-  late SmartContract smartContract;
-  late WidgetBuilder nextPage;
+
+  late String nextPage;
 
   _fetchPrefs(BuildContext context) async {
-    nextPage = (context) => LoadingSongs();
-    await writeToFile("sc.toml",
-        "making this toml file unreadbale so that initilizeSmartContractIfNotSet is always triggered and will contain what is set in asset's toml file"); //FIXME for development purposes only, remove this line
+    nextPage = "/discovery";
+    // await writeToFile("sc.toml",
+    //     "making this toml file unreadbale so that initilizeSmartContractIfNotSet is always triggered and will contain what is set in asset's toml file"); //FIXME for development purposes only, remove this line
     await initilizeSmartContractIfNotSet();
-    nodeUrl = await readNodeUrl();
-    contractAddr = await readContractAdress();
-    chainId = await readChainId();
-
-    abi = await readAbiFromAssets();
-    Credentials credentials =
-        context.read<CredentialsProvider>().getCredentials();
-    Either<MyError, SmartContract> potentialSc =
-        await SmartContract.create(nodeUrl, contractAddr, chainId, credentials);
-    if (potentialSc.isRight) {
-      smartContract = potentialSc.right;
-      context.read<SmartContractProvider>().setSmartContract(smartContract);
+    Either<MyError, SC> potentialScFromFile = await readSmartContractFromFile();
+    if (potentialScFromFile.isRight) {
+      String abi = await readAbiFromAssets();
+      Credentials credentials =
+          context.read<CredentialsProvider>().getCredentials()!;
+      Either<MyError, SmartContract> potentialSc = await SmartContract.create(
+          potentialScFromFile.right.nodeUrl,
+          potentialScFromFile.right.hexAdress,
+          potentialScFromFile.right.chainId,
+          credentials);
+      if (potentialSc.isRight) {
+        SmartContract smartContract = potentialSc.right;
+        context
+            .read<SmartContractProvider>()
+            .updateSmartContract(smartContract);
+      } else {
+        toast(potentialSc.left.message);
+        nextPage = "/smart_contract_settings";
+      }
     } else {
-      toast(potentialSc.left.message);
-      nextPage = (context) => AccountPage(tabSelected: 1);
+      toast(potentialScFromFile.left.message);
+      nextPage = "/smart_contract_settings";
     }
 
     setState(() {
@@ -69,22 +74,7 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
-        body: Center(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text("Load smart contract"),
-        shouldProceed
-            ? ElevatedButton(
-                onPressed: () {
-                  //move to next screen and pass the prefs if you want
-                  print("hereee");
-                  Navigator.push(context, MaterialPageRoute(builder: nextPage));
-                },
-                child: Text("Continue"),
-              )
-            : CircularProgressIndicator(), //show splash screen here instead of progress indicator
-      ]),
-    ));
+    return makeLoadingScreen(
+        context, "Loading smart contract", nextPage, shouldProceed);
   }
 }

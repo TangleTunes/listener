@@ -1,0 +1,28 @@
+import 'package:flutter/material.dart';
+import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener13/utils/helper_widgets.dart';
+
+import '../theme/theme_constants.dart';
+
+Widget makeLoadingScreen(BuildContext context, String loadingMsg,
+    String nextRoute, bool shouldProceed) {
+  return Scaffold(
+      body: Center(
+    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Text(loadingMsg),
+      shouldProceed
+          ? ElevatedButton(
+              onPressed: () {
+                //move to next screen and pass the prefs if you want
+                if (nextRoute == "pop") {
+                  goToPreviousPage(context);
+                } else {
+                  goToPage(context, nextRoute);
+                }
+              },
+              child: Text("Continue"),
+            )
+          : CircularProgressIndicator(), //show splash screen here instead of progress indicator
+    ]),
+  ));
+}

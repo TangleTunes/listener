@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
 import 'package:listener13/theme/theme_constants.dart';
+import 'package:listener13/user_settings/manage_account.dart';
+import 'package:listener13/utils/go_to_page.dart';
 
 class CoupleAccount extends StatefulWidget {
   const CoupleAccount({Key? key}) : super(key: key);
@@ -13,12 +15,15 @@ class CoupleAccount extends StatefulWidget {
 }
 
 class _CoupleAccountState extends State<CoupleAccount> {
-  final passwordFieldController = TextEditingController();
-
+  final passwordController = TextEditingController();
+  final repeatPasswordController = TextEditingController();
+  final privateKeyController = TextEditingController();
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    passwordFieldController.dispose();
+    passwordController.dispose();
+    repeatPasswordController.dispose();
+    privateKeyController.dispose();
     super.dispose();
   }
 
@@ -66,7 +71,7 @@ class _CoupleAccountState extends State<CoupleAccount> {
             SizedBox(height: 6),
             Builder(
                 builder: (BuildContext context) =>
-                    passwordTextInput(context, passwordFieldController)),
+                    passwordTextInput(context, passwordController)),
 
             //The second text input box for your password
             SizedBox(height: 20),
@@ -86,7 +91,7 @@ class _CoupleAccountState extends State<CoupleAccount> {
             SizedBox(height: 6),
             Builder(
                 builder: (BuildContext context) =>
-                    repeatPasswordTextInput(context)),
+                    repeatPasswordTextInput(context, repeatPasswordController)),
 
             //The third text input box for inserting your private key
             SizedBox(height: 20),
@@ -106,7 +111,7 @@ class _CoupleAccountState extends State<CoupleAccount> {
             SizedBox(height: 6),
             Builder(
                 builder: (BuildContext context) =>
-                    privateKeyTextInput(context)),
+                    privateKeyTextInput(context, privateKeyController)),
 
             SizedBox(height: 25),
             //the register button, which redirects you to the discovery page iff you filled in all the boxes
@@ -116,8 +121,10 @@ class _CoupleAccountState extends State<CoupleAccount> {
                 child: ElevatedButton(
                   style:
                       ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
-                  onPressed: () {
-                    Navigator.pop(context);
+                  onPressed: () async {
+                    await setPrivateKey(privateKeyController.text,
+                        passwordController.text, context);
+                    goToPage(context, "/load_credentials");
                   },
                   child: Text('Couple account',
                       style: GoogleFonts.poppins(fontSize: 16)),

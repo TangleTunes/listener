@@ -7,6 +7,7 @@ import 'package:listener13/components/audioplayer.dart';
 import 'package:listener13/providers/current_song_provider.dart';
 import 'package:listener13/providers/playback_provider.dart';
 import 'package:listener13/theme/theme_constants.dart';
+import 'package:listener13/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 
@@ -27,10 +28,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   double _value = 20;
   @override
   void initState() {
-    print("discovery init state called");
-    if (context.read<SongListProvider>().getSongsList().isEmpty) {
-      Navigator.pushNamed(context, "/load_songs");
-    }
     super.initState();
   }
 
@@ -73,12 +70,12 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             _selectedIndex = value;
             switch (_selectedIndex) {
               case 0:
-                Navigator.pushNamed(context, "/library");
+                goToPage(context, "/library");
                 break;
               case 1:
                 break;
               case 2:
-                Navigator.pushNamed(context, "/account");
+                goToPage(context, "/account");
                 break;
             }
           });

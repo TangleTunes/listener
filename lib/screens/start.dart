@@ -23,49 +23,15 @@ import '../user_settings/manage_smart_contract_details.dart';
 import '../distributor_connection/smart_contract.dart';
 import '../providers/credentials_provider.dart';
 
-class LoadingSongs extends StatefulWidget {
+class StartPage extends StatefulWidget {
   @override
-  _LoadingSongsState createState() => _LoadingSongsState();
+  _StartPageState createState() => _StartPageState();
 }
 
-class _LoadingSongsState extends State<LoadingSongs> {
+class _StartPageState extends State<StartPage> {
   bool shouldProceed = false;
 
   _fetchPrefs(BuildContext context) async {
-    SmartContract sc =
-        context.read<SmartContractProvider>().getSmartContract()!;
-    Either<MyError, List<dynamic>> potentialSongListLength =
-        (await sc.songListLength());
-    if (potentialSongListLength.isRight) {
-      Either<MyError, List> potentialSongList =
-          await sc.getSongs(BigInt.from(0), potentialSongListLength.right[0]);
-      if (potentialSongList.isRight) {
-        List<Song> songList = [];
-        for (List<dynamic> scSong in potentialSongList.right[0]) {
-          List<int> songId = scSong[0];
-          String songName = scSong[1];
-          String artist = scSong[2];
-          BigInt price = scSong[3];
-
-          BigInt byteLength = scSong[4];
-          BigInt duration = scSong[5];
-          songList.add(Song(
-              songId: Uint8List.fromList(songId),
-              byteSize: byteLength.toInt(),
-              songName: songName,
-              artist: artist,
-              duration: duration.toInt(),
-              price: price.toInt()));
-        }
-        context.read<SongListProvider>().setSongsList(songList);
-      } else {
-        toast(potentialSongList.left.message);
-        goToPage(context, "/load_smart_contract");
-      }
-    } else {
-      toast(potentialSongListLength.left.message);
-      goToPage(context, "/load_smart_contract");
-    }
     setState(() {
       shouldProceed = true; //got the prefs; set to some value if needed
     });
@@ -83,12 +49,12 @@ class _LoadingSongsState extends State<LoadingSongs> {
         //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
         body: Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text("Load songs"),
+        Text("Starting app..."),
         shouldProceed
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
-                  goToPreviousPage(context);
+                  goToPage(context, "/discovery");
                 },
                 child: Text("Continue"),
               )

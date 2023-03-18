@@ -11,9 +11,4 @@ class PlaybackProvider with ChangeNotifier {
   Playback getPlayback() {
     return _playback;
   }
-
-  void setPlayback(Playback playback) {
-    _playback = playback;
-    notifyListeners();
-  }
 }

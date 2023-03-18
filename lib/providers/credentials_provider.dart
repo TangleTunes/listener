@@ -3,9 +3,9 @@ import 'package:web3dart/credentials.dart';
 import '../distributor_connection/smart_contract.dart';
 
 class CredentialsProvider with ChangeNotifier {
-  late Credentials _credentials;
+  Credentials? _credentials;
 
-  Credentials getCredentials() {
+  Credentials? getCredentials() {
     return _credentials;
   }
 

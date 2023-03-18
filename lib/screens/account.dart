@@ -8,11 +8,12 @@ import 'package:listener13/distributor_connection/smart_contract.dart';
 import 'package:listener13/providers/playback_provider.dart';
 import 'package:listener13/providers/smart_contract_provider.dart';
 import 'package:listener13/user_settings/manage_account.dart';
+import 'package:listener13/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
 
 import '../Components/text_inputs.dart';
 import '../error_handling/app_error.dart';
-import '../error_handling/toast.dart';
+import '../utils/toast.dart';
 import '../providers/balance_provider.dart';
 import '../providers/credentials_provider.dart';
 import '../providers/song_list_provider.dart';
@@ -41,7 +42,8 @@ class _AccountPageState extends State<AccountPage> {
   _AccountPageState(this.tabSelected);
 
   _fetchPrefs(BuildContext context) async {
-    SmartContract sc = context.read<SmartContractProvider>().getSmartContract();
+    SmartContract sc =
+        context.read<SmartContractProvider>().getSmartContract()!;
     Either<MyError, List<dynamic>> potentialBalance =
         await sc.users(sc.ownAddress.hex);
     if (potentialBalance.isRight) {
@@ -77,11 +79,11 @@ class _AccountPageState extends State<AccountPage> {
       _selectedIndex = index;
       switch (_selectedIndex) {
         case 0:
-          Navigator.pushNamed(context, "/library");
+          goToPage(context, "/library");
 
           break;
         case 1:
-          Navigator.pushNamed(context, "/discovery");
+          goToPage(context, "/discovery");
           break;
         case 2:
           break;
@@ -141,7 +143,7 @@ class _AccountPageState extends State<AccountPage> {
                 Center(
                     child: Column(children: [
                   Text(
-                      "Your public key ${context.watch<CredentialsProvider>().getCredentials().address}"),
+                      "Your public key ${context.watch<CredentialsProvider>().getCredentials()!.address}"),
                   Text(
                       "Your balance ${context.watch<BalanceProvider>().getBalance()}"),
                   Form(
@@ -214,27 +216,26 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/couple_account");
+                        goToPage(context, "/couple_account");
                       },
                       child: Text("Couple a different account")),
                   ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/create_account");
+                        goToPage(context, "/create_account");
                       },
                       child: Text("Create a new acount"))
                 ])),
                 Center(
                     child: Column(children: [
                   Text(
-                      "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract().rpcUrl}"),
+                      "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}"), //fixme null check
                   Text(
-                      "Hex: ${context.watch<SmartContractProvider>().getSmartContract().contractAddr}"),
+                      "Hex: ${context.watch<SmartContractProvider>().getSmartContract()!.contractAddr}"),
                   Text(
-                      "Chain id: ${context.watch<SmartContractProvider>().getSmartContract().chainId}"),
+                      "Chain id: ${context.watch<SmartContractProvider>().getSmartContract()!.chainId}"),
                   ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(
-                            context, "/smart_contract_settings");
+                        goToPage(context, "/smart_contract_settings");
                       },
                       child: Text("Change details"))
                 ]))

@@ -5,8 +5,10 @@ import 'package:listener13/providers/balance_provider.dart';
 import 'package:listener13/providers/current_song_provider.dart';
 import 'package:listener13/providers/playback_provider.dart';
 import 'package:listener13/screens/create_account.dart';
+import 'package:listener13/screens/load_create_account.dart';
 import 'package:listener13/screens/load_songs.dart';
 import 'package:listener13/screens/smart_contract_settings.dart';
+import 'package:listener13/screens/start.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/user_settings/manage_smart_contract_details.dart';
 import 'package:listener13/distributor_connection/smart_contract.dart';
@@ -46,22 +48,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<SongListProvider>().setSongsList([
-      Song(
-          songName: "Spanish song",
-          artist: "Gonzales",
-          duration: 34,
-          price: 4,
-          byteSize: 45,
-          songId: Uint8List(0))
-    ]);
-
     return MaterialApp(
-      initialRoute: "/load_credentials",
+      initialRoute: "/start",
       routes: {
+        '/start': (context) => StartPage(),
         '/load_credentials': (context) => LoadingCredentials(),
         '/discovery': (context) => DiscoveryPage(),
-        '/unlock': (context) => UnlockPage(),
+        '/unlock_account': (context) => UnlockPage(),
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple_account': (context) => CoupleAccount(),
         '/account': (context) => AccountPage(tabSelected: 0),
@@ -69,6 +62,7 @@ class MyApp extends StatelessWidget {
         '/load_songs': (context) => LoadingSongs(),
         "/smart_contract_settings": (context) => SmartContractSettings(),
         "/create_account": (context) => RegisterPage(),
+        "/load_create_account": (context) => LoadCreateAccount(),
       },
     );
   }
