@@ -2,6 +2,7 @@
 
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
 import 'package:listener13/user_settings/file_writer.dart';
@@ -10,6 +11,7 @@ import 'package:listener13/utils/toast.dart';
 import 'package:listener13/user_settings/manage_smart_contract_details.dart';
 import 'package:listener13/providers/credentials_provider.dart';
 import 'package:listener13/theme/theme_constants.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../error_handling/app_error.dart';
@@ -17,6 +19,8 @@ import '../user_settings/manage_account.dart';
 import '../distributor_connection/smart_contract.dart';
 import '../providers/smart_contract_provider.dart';
 import 'couple_account.dart';
+
+final LocalAuthentication auth = LocalAuthentication();
 
 class UnlockPage extends StatefulWidget {
   const UnlockPage({Key? key}) : super(key: key);
@@ -130,12 +134,23 @@ class _UnlockPageState extends State<UnlockPage> {
                               color: COLOR_SECONDARY,
                             )),
                         TextButton(
-                            onPressed: () {
-                              writeToFile("pk.json",
-                                  "content"); //FIXME make more beautiful solution
+                            onPressed: () async {
+                              bool didAuthenticate = false;
+                              if (await auth.isDeviceSupported()) {
+                                didAuthenticate = await auth.authenticate(
+                                    localizedReason:
+                                        'Please authenticate to delete your private key from this phone.');
+                              } else {
+                                didAuthenticate = true;
+                              }
+
+                              if (didAuthenticate) {
+                                await writeToFile("pk.json",
+                                    "content"); //FIXME make more beautiful solution
+                              }
                               goToPage(context, "/load_credentials");
                             },
-                            child: Text('Delete wallet.',
+                            child: Text('Delete private key.',
                                 style: TextStyle(
                                   color: COLOR_SECONDARY,
                                   fontWeight: FontWeight.bold,

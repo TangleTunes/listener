@@ -135,7 +135,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                         height: 20,
                       ),
                       Text(
-                        'Error while fetching songs',
+                        'Error while displaying songs',
                         style: TextStyle(color: COLOR_SECONDARY),
                       )
                     ],

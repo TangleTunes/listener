@@ -22,6 +22,9 @@ import '../user_settings/file_writer.dart';
 import '../user_settings/manage_smart_contract_details.dart';
 import '../distributor_connection/smart_contract.dart';
 import '../providers/credentials_provider.dart';
+import 'package:local_auth/local_auth.dart';
+
+// ···
 
 class StartPage extends StatefulWidget {
   @override
@@ -55,8 +58,9 @@ class _StartPageState extends State<StartPage> {
         shouldProceed
             ? ElevatedButton(
                 onPressed: () {
-                  //move to next screen and pass the prefs if you want
                   goToPage(context, "/discovery");
+
+                  //move to next screen and pass the prefs if you want
                 },
                 child: Text("Continue"),
               )
