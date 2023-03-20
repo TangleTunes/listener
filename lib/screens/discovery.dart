@@ -236,27 +236,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
               color: Color(0xFF091227),
               child: Column(
                 children: [
-                  // ValueListenableBuilder<ProgressBarState>(
-                  //   valueListenable: context
-                  //       .read<PlaybackProvider>()
-                  //       .getPlayback()
-                  //       .progressNotifier,
-                  //   builder: (_, value, __) {
-                  //     return ProgressBar(
-                  //       thumbColor: COLOR_TERTIARY,
-                  //       // thumbGlowColor: COLOR_TERTIARY,
-                  //       progressBarColor: COLOR_TERTIARY,
-                  //       bufferedBarColor: COLOR_QUATERNARY,
-                  //       baseBarColor: COLOR_SECONDARY,
-                  //       thumbGlowRadius: 15,
-                  //       onSeek:
-                  //           context.read<PlaybackProvider>().getPlayback().seek,
-                  //       progress: value.current,
-                  //       buffered: value.buffered,
-                  //       total: value.total,
-                  //     );
-                  //   },
-                  // ),
                   Builder(
                       builder: (BuildContext context) => audioPlayer(context)),
                 ],

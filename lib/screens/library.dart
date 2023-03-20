@@ -168,23 +168,6 @@ class _LibraryPageState extends State<LibraryPage> {
               color: Color(0xFF091227),
               child: Column(
                 children: [
-                  SliderTheme(
-                    data: SliderThemeData(
-                      activeTrackColor: COLOR_TERTIARY,
-                      thumbColor: COLOR_TERTIARY,
-                      trackHeight: 0.5,
-                      thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
-                    ),
-                    child: Slider(
-                        min: 0,
-                        max: 100,
-                        value: _value,
-                        onChanged: (value) {
-                          setState(() {
-                            _value = value;
-                          });
-                        }),
-                  ),
                   Builder(
                       builder: (BuildContext context) => audioPlayer(context)),
                 ],
