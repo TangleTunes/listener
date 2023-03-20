@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
@@ -8,6 +9,9 @@ import 'package:listener13/theme/theme_constants.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
+
+import '../error_handling/app_error.dart';
+import '../utils/toast.dart';
 
 class CoupleAccount extends StatefulWidget {
   const CoupleAccount({Key? key}) : super(key: key);
@@ -129,12 +133,23 @@ class _CoupleAccountState extends State<CoupleAccount> {
                               backgroundColor: COLOR_TERTIARY),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              await setPrivateKey(privateKeyController.text,
-                                  passwordController.text, context);
-                              context
-                                  .read<CredentialsProvider>()
-                                  .setOwnCredentials(privateKeyController.text);
-                              goToPage(context, "/load_create_account");
+                              Either<MyError, Null> setPrivateKeyCall =
+                                  await setPrivateKey(privateKeyController.text,
+                                      passwordController.text, context);
+                              if (setPrivateKeyCall.isRight) {
+                                Either<MyError, Null> setOwnCredentialsCall =
+                                    context
+                                        .read<CredentialsProvider>()
+                                        .setOwnCredentials(
+                                            privateKeyController.text);
+                                if (setOwnCredentialsCall.isRight) {
+                                  goToPage(context, "/load_create_account");
+                                } else {
+                                  toast(setOwnCredentialsCall.left.message);
+                                }
+                              } else {
+                                toast(setPrivateKeyCall.left.message);
+                              }
                             }
                           },
                           child: Text('Couple account',

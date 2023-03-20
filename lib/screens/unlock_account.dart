@@ -4,6 +4,7 @@ import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
+import 'package:listener13/user_settings/file_writer.dart';
 import 'package:listener13/utils/go_to_page.dart';
 import 'package:listener13/utils/toast.dart';
 import 'package:listener13/user_settings/manage_smart_contract_details.dart';
@@ -94,12 +95,16 @@ class _UnlockPageState extends State<UnlockPage> {
                                   await unlockPrivateKey(
                                       passwordController.text);
                               if (potentialPrivateKey.isRight) {
-                                context
+                                var setOwnCredentialsCall = context
                                     .read<CredentialsProvider>()
                                     .setOwnCredentials(
                                         potentialPrivateKey.right);
+                                if (setOwnCredentialsCall.isRight) {
+                                  goToPage(context, "/discovery");
+                                } else {
+                                  toast(setOwnCredentialsCall.left.message);
+                                }
                                 // implement it to navigate to the discovery page
-                                goToPage(context, "/discovery");
                               } else if (potentialPrivateKey.left.key ==
                                   AppError.IncorrectPrivateKeyPassword) {
                                 toast(potentialPrivateKey.left.message);
@@ -126,7 +131,9 @@ class _UnlockPageState extends State<UnlockPage> {
                             )),
                         TextButton(
                             onPressed: () {
-                              //123 implement a pop up to delete your account
+                              writeToFile("pk.json",
+                                  "content"); //FIXME make more beautiful solution
+                              goToPage(context, "/load_credentials");
                             },
                             child: Text('Delete wallet.',
                                 style: TextStyle(

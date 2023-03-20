@@ -1,11 +1,14 @@
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:web3dart/credentials.dart';
 import '../distributor_connection/smart_contract.dart';
+import '../error_handling/app_error.dart';
+import "package:convert/src/hex.dart";
 
 class CredentialsProvider with ChangeNotifier {
-  Credentials? _credentials;
+  EthPrivateKey? _credentials;
 
-  Credentials? getCredentials() {
+  EthPrivateKey? getCredentials() {
     return _credentials;
   }
 
@@ -14,7 +17,14 @@ class CredentialsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setOwnCredentials(String privateKey) {
-    _credentials = EthPrivateKey.fromHex(privateKey);
+  Either<MyError, Null> setOwnCredentials(String privateKey) {
+    try {
+      _credentials = EthPrivateKey.fromHex(privateKey);
+      return Right(null);
+    } catch (e) {
+      return Left(MyError(
+          key: AppError.InvalidPrivateKey,
+          message: "Invalid private key format"));
+    }
   }
 }

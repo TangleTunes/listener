@@ -12,26 +12,43 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import '../error_handling/app_error.dart';
 import '../providers/credentials_provider.dart';
+import '../utils/toast.dart';
 import 'file_writer.dart';
 
-Credentials createAccount(
-    String username, String password, BuildContext context) {
+Future<Either<MyError, Credentials>> createAccount(
+    String username, String password, BuildContext context) async {
   EthPrivateKey credentials = EthPrivateKey.createRandom(Random.secure());
-  context
+  var setOwnCredentialsCall = context
       .read<CredentialsProvider>()
       .setOwnCredentials(hex.encode(credentials.privateKey));
-  setPrivateKey(hex.encode(credentials.privateKey), password, context);
-  return credentials;
+  if (setOwnCredentialsCall.isRight) {
+    Either<MyError, Null> setPKCall = await setPrivateKey(
+        hex.encode(credentials.privateKey), password, context);
+    if (setPKCall.isRight) {
+      return Right(credentials);
+    } else {
+      return Left(setPKCall.left);
+    }
+  } else {
+    return Left(setOwnCredentialsCall.left);
+  }
 }
 
-Future<void> setPrivateKey(
+Future<Either<MyError, Null>> setPrivateKey(
     String privateKey, String password, BuildContext context) async {
-  EthPrivateKey ethPrivateKey = EthPrivateKey.fromHex(privateKey);
-  Wallet wallet = Wallet.createNew(ethPrivateKey, password, Random.secure());
-  String v3walletEncrypted = wallet.toJson();
-  final data = {'privatekey': v3walletEncrypted};
-  await writeToFile("pk.json", jsonEncode(data));
-  context.read<CredentialsProvider>().updateOwnCredentials(privateKey);
+  try {
+    EthPrivateKey ethPrivateKey = EthPrivateKey.fromHex(privateKey);
+    Wallet wallet = Wallet.createNew(ethPrivateKey, password, Random.secure());
+    String v3walletEncrypted = wallet.toJson();
+    final data = {'privatekey': v3walletEncrypted};
+    await writeToFile("pk.json", jsonEncode(data));
+    context.read<CredentialsProvider>().updateOwnCredentials(privateKey);
+    return Right(null);
+  } catch (e) {
+    return Left(MyError(
+        key: AppError.InvalidPrivateKey,
+        message: "Invalid private key format"));
+  }
 }
 
 Future<Either<MyError, String>> unlockPrivateKey(String password) async {

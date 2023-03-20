@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
@@ -9,8 +10,10 @@ import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/utils/go_to_page.dart';
 import 'package:listener13/utils/toast.dart';
 import 'package:provider/provider.dart';
+import 'package:web3dart/credentials.dart';
 
 import '../distributor_connection/smart_contract.dart';
+import '../error_handling/app_error.dart';
 import '../providers/credentials_provider.dart';
 import 'couple_account.dart';
 
@@ -134,15 +137,20 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: COLOR_TERTIARY),
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               if (passwordController.text !=
                                   repeatPasswordController.text) {
                                 toast("Passwords don't match");
                               } else {
-                                createAccount(usernameController.text,
-                                    passwordController.text, context);
-                                goToPage(context, "/load_create_account");
+                                Either<MyError, Credentials> createAccountCall =
+                                    await createAccount(usernameController.text,
+                                        passwordController.text, context);
+                                if (createAccountCall.isRight) {
+                                  goToPage(context, "/load_create_account");
+                                } else {
+                                  toast(createAccountCall.left.message);
+                                }
                               }
                             }
                           },

@@ -142,6 +142,17 @@ class _AccountPageState extends State<AccountPage> {
                     child: Column(children: [
                   Text(
                       "Your public key ${context.watch<CredentialsProvider>().getCredentials()!.address}"),
+                  IconButton(
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(
+                          text: context
+                              .read<CredentialsProvider>()
+                              .getCredentials()!
+                              .address
+                              .toString()));
+                    },
+                    icon: Icon(Icons.content_copy),
+                  ),
                   Text(
                       "Your balance ${context.watch<BalanceProvider>().getBalance()}"),
                   Form(

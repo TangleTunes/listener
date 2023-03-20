@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:convert/convert.dart';
 
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:listener13/components/audioplayer.dart';
 import 'package:listener13/providers/current_song_provider.dart';
@@ -12,7 +15,12 @@ import 'package:provider/provider.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 
 import '../audio_player/playback.dart';
+import '../distributor_connection/distributer_contact.dart';
+import '../distributor_connection/smart_contract.dart';
+import '../error_handling/app_error.dart';
+import '../providers/smart_contract_provider.dart';
 import '../providers/song_list_provider.dart';
+import '../utils/toast.dart';
 import 'library.dart';
 import 'account.dart';
 
@@ -149,8 +157,57 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   },
                   emptyWidget: const EmptyView(),
                   onRefresh: () async {},
-                  onItemSelected: (Song item) {
+                  onItemSelected: (Song item) async {
                     context.read<CurrentSongProvider>().updateSong(item);
+
+                    SmartContract sc = context
+                        .read<SmartContractProvider>()
+                        .getSmartContract()!;
+                    Song currentSong =
+                        context.read<CurrentSongProvider>().getSong()!;
+                    toast("Finding a distributor");
+                    Either<MyError, List<dynamic>> scDistributorAnswer =
+                        await sc.getRandDistributor(
+                            currentSong.songId); //FIXME could be null
+                    if (scDistributorAnswer.isRight) {
+                      String distributorHex = scDistributorAnswer.right[0].hex;
+                      Uri uri =
+                          Uri.parse("tcp://" + scDistributorAnswer.right[1]);
+                      Either<MyError, DistributorContact> dc =
+                          await DistributorContact.create(
+                              sc, distributorHex, uri.host, uri.port);
+                      if (dc.isRight) {
+                        context
+                            .read<CurrentSongProvider>()
+                            .setDistributor(dc.right);
+                      } else {
+                        toast(dc.left.message);
+                      }
+
+                      Playback playback =
+                          context.read<PlaybackProvider>().getPlayback();
+
+                      Uint8List songidBytes = currentSong.songId;
+                      String songIdentifier = hex.encode(songidBytes);
+                      if (currentSong.distributorContact != null) {
+                        Either<MyError, Null> setAudio =
+                            await playback.setAudio(
+                                songIdentifier,
+                                currentSong.byteSize,
+                                currentSong.distributorContact
+                                    as DistributorContact);
+                        if (setAudio.isRight) {
+                        } else {
+                          toast(setAudio.left.message);
+                        }
+                      } else {
+                        toast("No node is distributing this song");
+                      }
+                    } else {
+                      toast(scDistributorAnswer.left.message);
+                      MaterialPageRoute(
+                          builder: (context) => AccountPage(tabSelected: 1));
+                    }
                   },
                   inputDecoration: InputDecoration(
                     isDense: true,
@@ -175,74 +232,35 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                 ),
               ),
             ),
-            ValueListenableBuilder<ProgressBarState>(
-              valueListenable: context
-                  .read<PlaybackProvider>()
-                  .getPlayback()
-                  .progressNotifier,
-              builder: (_, value, __) {
-                return ProgressBar(
-                  onSeek: context.read<PlaybackProvider>().getPlayback().seek,
-                  progress: value.current,
-                  buffered: value.buffered,
-                  total: value.total,
-                );
-              },
-            ),
             Container(
               color: Color(0xFF091227),
               child: Column(
                 children: [
-                  SliderTheme(
-                    data: SliderThemeData(
-                      activeTrackColor: COLOR_TERTIARY,
-                      thumbColor: COLOR_TERTIARY,
-                      trackHeight: 0.5,
-                      thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
-                    ),
-                    child: Slider(
-                        min: 0,
-                        max: 100,
-                        value: _value,
-                        onChanged: (value) {
-                          setState(() {
-                            _value = value;
-                          });
-                        }),
-                  ),
+                  // ValueListenableBuilder<ProgressBarState>(
+                  //   valueListenable: context
+                  //       .read<PlaybackProvider>()
+                  //       .getPlayback()
+                  //       .progressNotifier,
+                  //   builder: (_, value, __) {
+                  //     return ProgressBar(
+                  //       thumbColor: COLOR_TERTIARY,
+                  //       // thumbGlowColor: COLOR_TERTIARY,
+                  //       progressBarColor: COLOR_TERTIARY,
+                  //       bufferedBarColor: COLOR_QUATERNARY,
+                  //       baseBarColor: COLOR_SECONDARY,
+                  //       thumbGlowRadius: 15,
+                  //       onSeek:
+                  //           context.read<PlaybackProvider>().getPlayback().seek,
+                  //       progress: value.current,
+                  //       buffered: value.buffered,
+                  //       total: value.total,
+                  //     );
+                  //   },
+                  // ),
                   Builder(
                       builder: (BuildContext context) => audioPlayer(context)),
                 ],
               ),
-            ),
-            ValueListenableBuilder<ButtonState>(
-              valueListenable:
-                  context.read<PlaybackProvider>().getPlayback().buttonNotifier,
-              builder: (_, value, __) {
-                switch (value) {
-                  case ButtonState.loading:
-                    return Container(
-                      margin: const EdgeInsets.all(8.0),
-                      width: 32.0,
-                      height: 32.0,
-                      child: const CircularProgressIndicator(),
-                    );
-                  case ButtonState.paused:
-                    return IconButton(
-                      icon: const Icon(Icons.play_arrow),
-                      iconSize: 32.0,
-                      onPressed:
-                          context.read<PlaybackProvider>().getPlayback().play,
-                    );
-                  case ButtonState.playing:
-                    return IconButton(
-                      icon: const Icon(Icons.pause),
-                      iconSize: 32.0,
-                      onPressed:
-                          context.read<PlaybackProvider>().getPlayback().pause,
-                    );
-                }
-              },
             ),
           ],
         ),

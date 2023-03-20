@@ -7,6 +7,8 @@ import 'custom_audio_source.dart';
 
 class Playback {
   late AudioPlayer _audioPlayer;
+  final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
+
   Playback() {
     _audioPlayer = AudioPlayer();
     _audioPlayer.playerStateStream.listen((playerState) {
@@ -89,7 +91,6 @@ class Playback {
       total: Duration.zero,
     ),
   );
-  final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
 }
 
 class ProgressBarState {
