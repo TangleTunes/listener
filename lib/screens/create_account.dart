@@ -3,12 +3,12 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:listener13/components/text_inputs.dart';
-import 'package:listener13/providers/smart_contract_provider.dart';
-import 'package:listener13/theme/theme_constants.dart';
-import 'package:listener13/user_settings/manage_account.dart';
-import 'package:listener13/utils/go_to_page.dart';
-import 'package:listener13/utils/toast.dart';
+import 'package:listener/components/text_inputs.dart';
+import 'package:listener/providers/smart_contract_provider.dart';
+import 'package:listener/theme/theme_constants.dart';
+import 'package:listener/user_settings/manage_account.dart';
+import 'package:listener/utils/go_to_page.dart';
+import 'package:listener/utils/toast.dart';
 import 'package:provider/provider.dart';
 import 'package:web3dart/credentials.dart';
 

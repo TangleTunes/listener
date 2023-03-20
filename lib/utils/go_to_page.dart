@@ -1,10 +1,10 @@
 import "package:flutter/src/widgets/framework.dart";
 import "package:flutter/widgets.dart";
-import "package:listener13/distributor_connection/smart_contract.dart";
-import "package:listener13/providers/credentials_provider.dart";
-import "package:listener13/providers/smart_contract_provider.dart";
-import "package:listener13/providers/song_list_provider.dart";
-import "package:listener13/utils/toast.dart";
+import "package:listener/distributor_connection/smart_contract.dart";
+import "package:listener/providers/credentials_provider.dart";
+import "package:listener/providers/smart_contract_provider.dart";
+import "package:listener/providers/song_list_provider.dart";
+import "package:listener/utils/toast.dart";
 import "package:provider/provider.dart";
 
 void goToPage(BuildContext context, String page) {

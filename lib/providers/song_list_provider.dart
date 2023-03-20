@@ -2,7 +2,7 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:listener13/distributor_connection/distributer_contact.dart';
+import 'package:listener/distributor_connection/distributer_contact.dart';
 
 class SongListProvider with ChangeNotifier {
   List<Song>? _songsList;

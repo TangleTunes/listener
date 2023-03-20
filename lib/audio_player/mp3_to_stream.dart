@@ -2,10 +2,10 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:just_audio/just_audio.dart';
-import 'package:listener13/audio_player/custom_audio_source.dart';
+import 'package:listener/audio_player/custom_audio_source.dart';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:listener13/distributor_connection/distributer_contact.dart';
+import 'package:listener/distributor_connection/distributer_contact.dart';
 import 'package:tuple/tuple.dart';
 
 //used to be 32766

@@ -6,11 +6,11 @@ import 'dart:typed_data';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
-import 'package:listener13/components/audioplayer.dart';
-import 'package:listener13/providers/current_song_provider.dart';
-import 'package:listener13/providers/playback_provider.dart';
-import 'package:listener13/theme/theme_constants.dart';
-import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener/components/audioplayer.dart';
+import 'package:listener/providers/current_song_provider.dart';
+import 'package:listener/providers/playback_provider.dart';
+import 'package:listener/theme/theme_constants.dart';
+import 'package:listener/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 

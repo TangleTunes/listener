@@ -57,7 +57,7 @@ void main(List<String> args) async {
   //     EthereumAddress.fromHex('0xb5F7F76bbdE176AC0A45EA1125F17784d8247aF4');
   // // String privateKey = await loadPrivateKey();
   // File file = File(
-  //     '/Users/paul/Documents/UniversityOfTwente/Module11/Listener13/listener13/listener/lib/distributor_connection/smartcontract.abi.json');
+  //     '/Users/paul/Documents/UniversityOfTwente/Module11/listener/listener/listener/lib/distributor_connection/smartcontract.abi.json');
   // String content = await file.readAsString();
   // SmartContract smartContract = SmartContract(rpcUrl, contractAddr,
   //     EthPrivateKey.fromHex("fillprivatekeyhere"), content);

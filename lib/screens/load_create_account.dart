@@ -1,9 +1,9 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
-import 'package:listener13/distributor_connection/smart_contract.dart';
+import 'package:listener/distributor_connection/smart_contract.dart';
 
-import 'package:listener13/utils/go_to_page.dart';
-import 'package:listener13/utils/toast.dart';
+import 'package:listener/utils/go_to_page.dart';
+import 'package:listener/utils/toast.dart';
 import 'package:provider/provider.dart';
 import 'package:web3dart/web3dart.dart';
 

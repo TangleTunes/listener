@@ -3,12 +3,12 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:listener13/audio_player/playback.dart';
-import 'package:listener13/distributor_connection/smart_contract.dart';
-import 'package:listener13/providers/playback_provider.dart';
-import 'package:listener13/providers/smart_contract_provider.dart';
-import 'package:listener13/user_settings/manage_account.dart';
-import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener/audio_player/playback.dart';
+import 'package:listener/distributor_connection/smart_contract.dart';
+import 'package:listener/providers/playback_provider.dart';
+import 'package:listener/providers/smart_contract_provider.dart';
+import 'package:listener/user_settings/manage_account.dart';
+import 'package:listener/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
 
 import '../Components/text_inputs.dart';

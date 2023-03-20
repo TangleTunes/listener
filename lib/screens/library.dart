@@ -2,9 +2,9 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:listener13/components/audioplayer.dart';
-import 'package:listener13/theme/theme_constants.dart';
-import 'package:listener13/utils/go_to_page.dart';
+import 'package:listener/components/audioplayer.dart';
+import 'package:listener/theme/theme_constants.dart';
+import 'package:listener/utils/go_to_page.dart';
 import 'package:searchable_listview/searchable_listview.dart';
 
 import '../providers/song_list_provider.dart';

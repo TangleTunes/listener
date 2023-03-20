@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:listener13/components/loading_screen.dart';
-import 'package:listener13/user_settings/manage_account.dart';
-import 'package:listener13/providers/credentials_provider.dart';
+import 'package:listener/components/loading_screen.dart';
+import 'package:listener/user_settings/manage_account.dart';
+import 'package:listener/providers/credentials_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../distributor_connection/smart_contract.dart';

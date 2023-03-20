@@ -1,7 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:listener13/distributor_connection/distributer_contact.dart';
+import 'package:listener/distributor_connection/distributer_contact.dart';
 import '../error_handling/app_error.dart';
 import 'custom_audio_source.dart';
 
