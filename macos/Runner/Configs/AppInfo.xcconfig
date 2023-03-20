@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = listener13
+PRODUCT_NAME = TangleTunes;
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.listener13
+PRODUCT_BUNDLE_IDENTIFIER = com.tangletunes.listener;
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.
