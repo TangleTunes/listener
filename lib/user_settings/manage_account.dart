@@ -17,6 +17,9 @@ import 'file_writer.dart';
 Credentials createAccount(
     String username, String password, BuildContext context) {
   EthPrivateKey credentials = EthPrivateKey.createRandom(Random.secure());
+  context
+      .read<CredentialsProvider>()
+      .setOwnCredentials(hex.encode(credentials.privateKey));
   setPrivateKey(hex.encode(credentials.privateKey), password, context);
   return credentials;
 }

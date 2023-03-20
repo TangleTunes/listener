@@ -31,12 +31,10 @@ class _AccountPageState extends State<AccountPage> {
   final rpcUrlController = TextEditingController();
   final contractAddrController = TextEditingController();
   final chainIdController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   String privateKey = "unlock to view";
   final passwordController = TextEditingController();
   late bool _privateKeyVisible = false;
   final _formKeyForPasswordForm = GlobalKey<FormState>();
-  final _formKeyForPrivateKeyForm = GlobalKey<FormState>();
   int tabSelected;
 
   _AccountPageState(this.tabSelected);

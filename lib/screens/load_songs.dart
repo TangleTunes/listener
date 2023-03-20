@@ -60,11 +60,11 @@ class _LoadingSongsState extends State<LoadingSongs> {
         context.read<SongListProvider>().setSongsList(songList);
       } else {
         toast(potentialSongList.left.message);
-        goToPage(context, "/load_smart_contract");
+        goToPage(context, "/discovery");
       }
     } else {
       toast(potentialSongListLength.left.message);
-      goToPage(context, "/load_smart_contract");
+      goToPage(context, "/discovery");
     }
     setState(() {
       shouldProceed = true; //got the prefs; set to some value if needed
@@ -88,7 +88,7 @@ class _LoadingSongsState extends State<LoadingSongs> {
             ? ElevatedButton(
                 onPressed: () {
                   //move to next screen and pass the prefs if you want
-                  goToPreviousPage(context);
+                  goToPage(context, "/discovery");
                 },
                 child: Text("Continue"),
               )

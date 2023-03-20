@@ -22,6 +22,8 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
   final usernameController = TextEditingController();
@@ -44,129 +46,133 @@ class _RegisterPageState extends State<RegisterPage> {
           elevation: 0,
         ),
         body: Center(
-            child: SingleChildScrollView(
-                child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            //the logo of Tangle Tunes and Tangle Tunes text
-            Container(
-                height: 82,
-                width: 82,
-                child: Center(
-                  child: Image.asset('assets/logo_tangletunes.png'),
-                )),
-            SizedBox(height: 5),
-            Text('Tangle Tunes',
-                style: GoogleFonts.francoisOne(
-                    fontSize: 30, color: COLOR_SECONDARY)),
-            SizedBox(height: 20),
+            child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //the logo of Tangle Tunes and Tangle Tunes text
+                    Container(
+                        height: 82,
+                        width: 82,
+                        child: Center(
+                          child: Image.asset('assets/logo_tangletunes.png'),
+                        )),
+                    SizedBox(height: 5),
+                    Text('Tangle Tunes',
+                        style: GoogleFonts.francoisOne(
+                            fontSize: 30, color: COLOR_SECONDARY)),
+                    SizedBox(height: 20),
 
-            //The first text input box for your Username
-            SizedBox(
-              child: Container(
-                width: 373,
-                child: Text(
-                  'Username*',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: COLOR_SECONDARY,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6),
-            Builder(
-                builder: (BuildContext context) =>
-                    usernameTextInput(context, usernameController)),
+                    //The first text input box for your Username
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Username*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            usernameTextInput(context, usernameController)),
 
-            //The second text input box for your password
-            SizedBox(height: 20),
-            SizedBox(
-              child: Container(
-                width: 373,
-                child: Text(
-                  'Password*',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: COLOR_SECONDARY,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6),
-            Builder(
-                builder: (BuildContext context) =>
-                    passwordTextInput(context, passwordController)),
+                    //The second text input box for your password
+                    SizedBox(height: 20),
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Password*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            passwordTextInput(context, passwordController)),
 
-            //The third text input box for repeating your password
-            SizedBox(height: 20),
-            SizedBox(
-              child: Container(
-                width: 373,
-                child: Text(
-                  'Repeat your password*',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: COLOR_SECONDARY,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6),
-            Builder(
-                builder: (BuildContext context) =>
-                    repeatPasswordTextInput(context, repeatPasswordController)),
+                    //The third text input box for repeating your password
+                    SizedBox(height: 20),
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Repeat your password*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            repeatPasswordTextInput(
+                                context, repeatPasswordController)),
 
-            SizedBox(height: 25),
-            //the register button, which redirects you to the discovery page iff you filled in all the boxes
-            SizedBox(
-                width: 372,
-                height: 56,
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
-                  onPressed: () {
-                    if (passwordController.text !=
-                        repeatPasswordController.text) {
-                      toast("Passwords don't match");
-                    } else {
-                      createAccount(usernameController.text,
-                          passwordController.text, context);
+                    SizedBox(height: 25),
+                    //the register button, which redirects you to the discovery page iff you filled in all the boxes
+                    SizedBox(
+                        width: 372,
+                        height: 56,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: COLOR_TERTIARY),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              if (passwordController.text !=
+                                  repeatPasswordController.text) {
+                                toast("Passwords don't match");
+                              } else {
+                                createAccount(usernameController.text,
+                                    passwordController.text, context);
+                                goToPage(context, "/load_create_account");
+                              }
+                            }
+                          },
+                          child: Text('Create account',
+                              style: GoogleFonts.poppins(fontSize: 16)),
+                        )),
 
-                      goToPage(context, "/load_create_account");
-                    }
-                  },
-                  child: Text('Create account',
-                      style: GoogleFonts.poppins(fontSize: 16)),
-                )),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text('Already have a wallet?',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: COLOR_SECONDARY,
-                    )),
-                TextButton(
-                    onPressed: () {
-                      goToPage(context, "/couple_account");
-                    },
-                    child: Text('Couple it.',
-                        style: TextStyle(
-                          color: COLOR_SECONDARY,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                        )))
-              ],
-            )
-          ],
-        ))));
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('Already have a wallet?',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: COLOR_SECONDARY,
+                            )),
+                        TextButton(
+                            onPressed: () {
+                              goToPage(context, "/couple_account");
+                            },
+                            child: Text('Couple it.',
+                                style: TextStyle(
+                                  color: COLOR_SECONDARY,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                )))
+                      ],
+                    )
+                  ],
+                )))));
   }
 }
 

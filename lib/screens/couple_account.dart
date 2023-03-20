@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener13/components/text_inputs.dart';
+import 'package:listener13/providers/credentials_provider.dart';
 import 'package:listener13/theme/theme_constants.dart';
 import 'package:listener13/user_settings/manage_account.dart';
 import 'package:listener13/utils/go_to_page.dart';
+import 'package:provider/provider.dart';
 
 class CoupleAccount extends StatefulWidget {
   const CoupleAccount({Key? key}) : super(key: key);
@@ -15,6 +17,7 @@ class CoupleAccount extends StatefulWidget {
 }
 
 class _CoupleAccountState extends State<CoupleAccount> {
+  final _formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
   final privateKeyController = TextEditingController();
@@ -36,100 +39,108 @@ class _CoupleAccountState extends State<CoupleAccount> {
           elevation: 0,
         ),
         body: Center(
-            child: SingleChildScrollView(
-                child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            //the logo of Tangle Tunes and Tangle Tunes text
-            Container(
-                height: 82,
-                width: 82,
-                child: Center(
-                  child: Image.asset('assets/logo_tangletunes.png'),
-                )),
-            SizedBox(height: 5),
-            Text('Tangle Tunes',
-                style: GoogleFonts.francoisOne(
-                    fontSize: 30, color: COLOR_SECONDARY)),
-            SizedBox(height: 20),
+            child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //the logo of Tangle Tunes and Tangle Tunes text
+                    Container(
+                        height: 82,
+                        width: 82,
+                        child: Center(
+                          child: Image.asset('assets/logo_tangletunes.png'),
+                        )),
+                    SizedBox(height: 5),
+                    Text('Tangle Tunes',
+                        style: GoogleFonts.francoisOne(
+                            fontSize: 30, color: COLOR_SECONDARY)),
+                    SizedBox(height: 20),
 
-            //The first text input box for your Username
-            SizedBox(
-              child: Container(
-                width: 373,
-                child: Text(
-                  'Password*',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: COLOR_SECONDARY,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6),
-            Builder(
-                builder: (BuildContext context) =>
-                    passwordTextInput(context, passwordController)),
+                    //The first text input box for your Username
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Password*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            passwordTextInput(context, passwordController)),
 
-            //The second text input box for your password
-            SizedBox(height: 20),
-            SizedBox(
-              child: Container(
-                width: 373,
-                child: Text(
-                  'Repeat password*',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: COLOR_SECONDARY,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6),
-            Builder(
-                builder: (BuildContext context) =>
-                    repeatPasswordTextInput(context, repeatPasswordController)),
+                    //The second text input box for your password
+                    SizedBox(height: 20),
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Repeat password*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            repeatPasswordTextInput(
+                                context, repeatPasswordController)),
 
-            //The third text input box for inserting your private key
-            SizedBox(height: 20),
-            SizedBox(
-              child: Container(
-                width: 373,
-                child: Text(
-                  'Your private key*',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: COLOR_SECONDARY,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6),
-            Builder(
-                builder: (BuildContext context) =>
-                    privateKeyTextInput(context, privateKeyController)),
+                    //The third text input box for inserting your private key
+                    SizedBox(height: 20),
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Your private key*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            privateKeyTextInput(context, privateKeyController)),
 
-            SizedBox(height: 25),
-            //the register button, which redirects you to the discovery page iff you filled in all the boxes
-            SizedBox(
-                width: 372,
-                height: 56,
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
-                  onPressed: () async {
-                    await setPrivateKey(privateKeyController.text,
-                        passwordController.text, context);
-                    goToPage(context, "/load_credentials");
-                  },
-                  child: Text('Couple account',
-                      style: GoogleFonts.poppins(fontSize: 16)),
-                )),
-          ],
-        ))));
+                    SizedBox(height: 25),
+                    //the register button, which redirects you to the discovery page iff you filled in all the boxes
+                    SizedBox(
+                        width: 372,
+                        height: 56,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: COLOR_TERTIARY),
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              await setPrivateKey(privateKeyController.text,
+                                  passwordController.text, context);
+                              context
+                                  .read<CredentialsProvider>()
+                                  .setOwnCredentials(privateKeyController.text);
+                              goToPage(context, "/load_create_account");
+                            }
+                          },
+                          child: Text('Couple account',
+                              style: GoogleFonts.poppins(fontSize: 16)),
+                        )),
+                  ],
+                )))));
   }
 }

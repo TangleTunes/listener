@@ -37,6 +37,8 @@ Widget passwordTextInput(
       height: 56,
       child: TextFormField(
         validator: (value) {
+          print(
+              "password is $value which is null or empty? ${value == null || value.isEmpty}");
           if (value == null || value.isEmpty) {
             return 'Required';
           }

@@ -32,6 +32,8 @@ class _StartPageState extends State<StartPage> {
   bool shouldProceed = false;
 
   _fetchPrefs(BuildContext context) async {
+    // writeToFile(
+    //     "pk.json", "destroyed"); //TODO remove this line. for dev purposes only
     setState(() {
       shouldProceed = true; //got the prefs; set to some value if needed
     });

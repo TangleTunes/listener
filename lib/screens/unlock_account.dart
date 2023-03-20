@@ -25,6 +25,7 @@ class UnlockPage extends StatefulWidget {
 }
 
 class _UnlockPageState extends State<UnlockPage> {
+  final _formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
 
   @override
@@ -39,94 +40,103 @@ class _UnlockPageState extends State<UnlockPage> {
     return Scaffold(
         //extendBodyBehindAppBar: true,
         body: Center(
-            child: SingleChildScrollView(
-                child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        //the logo of Tangle Tunes and Tangle Tunes text
-        Container(
-            height: 82,
-            width: 82,
-            child: Center(
-              child: Image.asset('assets/logo_tangletunes.png'),
-            )),
-        SizedBox(height: 5),
-        Text('Tangle Tunes',
-            style:
-                GoogleFonts.francoisOne(fontSize: 30, color: COLOR_SECONDARY)),
-        SizedBox(height: 20),
+            child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //the logo of Tangle Tunes and Tangle Tunes text
+                    Container(
+                        height: 82,
+                        width: 82,
+                        child: Center(
+                          child: Image.asset('assets/logo_tangletunes.png'),
+                        )),
+                    SizedBox(height: 5),
+                    Text('Tangle Tunes',
+                        style: GoogleFonts.francoisOne(
+                            fontSize: 30, color: COLOR_SECONDARY)),
+                    SizedBox(height: 20),
 
-        //The text input box for your password to unlock your account
-        SizedBox(height: 20),
-        SizedBox(
-          child: Container(
-            width: 373,
-            child: Text(
-              'Your password*',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                color: COLOR_SECONDARY,
-                fontSize: 18,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 6),
-        Builder(
-            builder: (BuildContext context) =>
-                passwordTextInput(context, passwordController)),
+                    //The text input box for your password to unlock your account
+                    SizedBox(height: 20),
+                    SizedBox(
+                      child: Container(
+                        width: 373,
+                        child: Text(
+                          'Your password*',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: COLOR_SECONDARY,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Builder(
+                        builder: (BuildContext context) =>
+                            passwordTextInput(context, passwordController)),
 
-        SizedBox(height: 25),
-        //the register button, which redirects you to the discovery page iff you filled in all the boxes
-        SizedBox(
-            width: 372,
-            height: 56,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
-              onPressed: () async {
-                Either<MyError, String> potentialPrivateKey =
-                    await unlockPrivateKey(passwordController.text);
-                if (potentialPrivateKey.isRight) {
-                  context
-                      .read<CredentialsProvider>()
-                      .setOwnCredentials(potentialPrivateKey.right);
-                  // implement it to navigate to the discovery page
-                  goToPage(context, "/discovery");
-                } else if (potentialPrivateKey.left.key ==
-                    AppError.IncorrectPrivateKeyPassword) {
-                  toast(potentialPrivateKey.left.message);
-                } else if (potentialPrivateKey.left.key ==
-                    AppError.NonexistetOrCorruptedPrivateKeyFile) {
-                  toast(potentialPrivateKey.left.message);
-                  goToPage(context, "/couple_account");
-                }
-              },
-              child: Text('Unlock', style: GoogleFonts.poppins(fontSize: 16)),
-            )),
+                    SizedBox(height: 25),
+                    //the register button, which redirects you to the discovery page iff you filled in all the boxes
+                    SizedBox(
+                        width: 372,
+                        height: 56,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: COLOR_TERTIARY),
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              Either<MyError, String> potentialPrivateKey =
+                                  await unlockPrivateKey(
+                                      passwordController.text);
+                              if (potentialPrivateKey.isRight) {
+                                context
+                                    .read<CredentialsProvider>()
+                                    .setOwnCredentials(
+                                        potentialPrivateKey.right);
+                                // implement it to navigate to the discovery page
+                                goToPage(context, "/discovery");
+                              } else if (potentialPrivateKey.left.key ==
+                                  AppError.IncorrectPrivateKeyPassword) {
+                                toast(potentialPrivateKey.left.message);
+                              } else if (potentialPrivateKey.left.key ==
+                                  AppError
+                                      .NonexistetOrCorruptedPrivateKeyFile) {
+                                toast(potentialPrivateKey.left.message);
+                                goToPage(context, "/couple_account");
+                              }
+                            }
+                          },
+                          child: Text('Unlock',
+                              style: GoogleFonts.poppins(fontSize: 16)),
+                        )),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text('Use another account?',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: COLOR_SECONDARY,
-                )),
-            TextButton(
-                onPressed: () {
-                  //123 implement a pop up to delete your account
-                },
-                child: Text('Delete wallet.',
-                    style: TextStyle(
-                      color: COLOR_SECONDARY,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline,
-                    )))
-          ],
-        )
-      ],
-    ))));
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('Use another account?',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: COLOR_SECONDARY,
+                            )),
+                        TextButton(
+                            onPressed: () {
+                              //123 implement a pop up to delete your account
+                            },
+                            child: Text('Delete wallet.',
+                                style: TextStyle(
+                                  color: COLOR_SECONDARY,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                )))
+                      ],
+                    )
+                  ],
+                )))));
   }
 }

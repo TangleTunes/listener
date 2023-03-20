@@ -39,9 +39,8 @@ void goToPage(BuildContext context, String page) {
 
     case "/discovery":
       {
-        print(
-            "is context.read<SmartContractProvider>().getSmartContract() == null? ${context.read<SmartContractProvider>().getSmartContract() == null}");
         if (context.read<SmartContractProvider>().getSmartContract() == null) {
+          print("smart contract is null!!!");
           goToPage(context, "/load_smart_contract");
         } else if (context.read<SongListProvider>().getSongsList() == null) {
           goToPage(context, "/load_songs");
@@ -97,7 +96,7 @@ void goToPage(BuildContext context, String page) {
       }
       break;
 
-    case "/couple_account":
+    case "/couple_account": //TODO create account on SC when coupleing account
       {
         Navigator.pushNamed(context, page);
       }
