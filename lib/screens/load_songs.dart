@@ -55,7 +55,7 @@ class _LoadingSongsState extends State<LoadingSongs> {
               songName: songName,
               artist: artist,
               duration: duration.toInt(),
-              price: price.toInt()));
+              price: price));
         }
         context.read<SongListProvider>().setSongsList(songList);
       } else {

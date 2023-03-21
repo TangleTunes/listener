@@ -416,7 +416,7 @@ class SmartContract {
     Either<MyError, Uint8List> returnEither = Right(signedTx);
     try {
       print(
-          "createChunkGetTransaction index $index amount $amount with nonce $nonce");
+          "uuu createChunkGetTransaction index $index amount $amount with nonce $nonce");
       // client.signTransaction(credentials, )
       Uint8List data = deployedContract.function('get_chunks').encodeCall([
         song,

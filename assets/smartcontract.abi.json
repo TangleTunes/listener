@@ -130,7 +130,7 @@
 	  "inputs": [
 		{
 		  "internalType": "bytes32",
-		  "name": "",
+		  "name": "_distribution",
 		  "type": "bytes32"
 		}
 	  ],
@@ -138,17 +138,17 @@
 	  "outputs": [
 		{
 		  "internalType": "bool",
-		  "name": "exists",
+		  "name": "",
 		  "type": "bool"
 		},
 		{
 		  "internalType": "uint256",
-		  "name": "index",
+		  "name": "",
 		  "type": "uint256"
 		},
 		{
 		  "internalType": "uint256",
-		  "name": "fee",
+		  "name": "",
 		  "type": "uint256"
 		}
 	  ],
@@ -390,7 +390,7 @@
 	  "inputs": [
 		{
 		  "internalType": "uint256",
-		  "name": "",
+		  "name": "_index",
 		  "type": "uint256"
 		}
 	  ],
@@ -422,7 +422,7 @@
 	  "inputs": [
 		{
 		  "internalType": "bytes32",
-		  "name": "",
+		  "name": "_song",
 		  "type": "bytes32"
 		}
 	  ],
@@ -430,32 +430,32 @@
 	  "outputs": [
 		{
 		  "internalType": "bool",
-		  "name": "exists",
+		  "name": "",
 		  "type": "bool"
 		},
 		{
 		  "internalType": "address",
-		  "name": "author",
+		  "name": "",
 		  "type": "address"
 		},
 		{
 		  "internalType": "string",
-		  "name": "name",
+		  "name": "",
 		  "type": "string"
 		},
 		{
 		  "internalType": "uint256",
-		  "name": "price",
+		  "name": "",
 		  "type": "uint256"
 		},
 		{
 		  "internalType": "uint256",
-		  "name": "length",
+		  "name": "",
 		  "type": "uint256"
 		},
 		{
 		  "internalType": "uint256",
-		  "name": "duration",
+		  "name": "",
 		  "type": "uint256"
 		}
 	  ],
@@ -517,7 +517,7 @@
 	  "inputs": [
 		{
 		  "internalType": "address",
-		  "name": "",
+		  "name": "_user",
 		  "type": "address"
 		}
 	  ],
@@ -525,49 +525,36 @@
 	  "outputs": [
 		{
 		  "internalType": "bool",
-		  "name": "exists",
+		  "name": "",
 		  "type": "bool"
 		},
 		{
 		  "internalType": "string",
-		  "name": "username",
+		  "name": "",
 		  "type": "string"
 		},
 		{
 		  "internalType": "string",
-		  "name": "description",
+		  "name": "",
 		  "type": "string"
 		},
 		{
 		  "internalType": "string",
-		  "name": "server",
+		  "name": "",
 		  "type": "string"
 		},
 		{
 		  "internalType": "uint256",
-		  "name": "balance",
+		  "name": "",
 		  "type": "uint256"
 		},
 		{
 		  "internalType": "bool",
-		  "name": "is_validator",
+		  "name": "",
 		  "type": "bool"
 		}
 	  ],
 	  "stateMutability": "view",
-	  "type": "function"
-	},
-	{
-	  "inputs": [
-		{
-		  "internalType": "uint256",
-		  "name": "amount",
-		  "type": "uint256"
-		}
-	  ],
-	  "name": "withdraw",
-	  "outputs": [],
-	  "stateMutability": "nonpayable",
 	  "type": "function"
 	},
 	{
@@ -596,3 +583,4 @@
 	  "type": "function"
 	}
   ]
+  

@@ -53,9 +53,9 @@ class Playback {
     });
   }
   Future<Either<MyError, Null>> setAudio(String songIdentifier, int sizeInBytes,
-      DistributorContact distributorContact) async {
-    final streamAudioSource = MyCustomSource(
-        songIdentifier, _audioPlayer, sizeInBytes, distributorContact);
+      DistributorContact distributorContact, Duration songDuration) async {
+    final streamAudioSource = MyCustomSource(songIdentifier, _audioPlayer,
+        sizeInBytes, distributorContact, songDuration);
     try {
       await _audioPlayer.setAudioSource(streamAudioSource);
       return Right(null);

@@ -90,6 +90,9 @@ void goToPage(BuildContext context, String page) {
       {
         if (context.read<CredentialsProvider>().getCredentials() == null) {
           goToPage(context, "/load_credentials");
+        } else if (context.read<SmartContractProvider>().getSmartContract() ==
+            null) {
+          goToPage(context, "/load_smart_contract");
         } else {
           Navigator.pushNamed(context, page);
         }

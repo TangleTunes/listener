@@ -21,6 +21,7 @@ import '../error_handling/app_error.dart';
 import '../providers/smart_contract_provider.dart';
 import '../providers/song_list_provider.dart';
 import '../utils/toast.dart';
+import '../utils/price_conversions.dart';
 import 'library.dart';
 import 'account.dart';
 
@@ -42,6 +43,12 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: COLOR_PRIMARY,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 20,
+        elevation: 0,
+      ),
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
@@ -92,17 +99,20 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       body: Center(
         child: Column(
           children: [
-            const Text('Search for a song',
-                style: TextStyle(
-                  color: COLOR_SECONDARY,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                )),
+            // const Text('Search for a song',
+            //     style: TextStyle(
+            //       color: COLOR_SECONDARY,
+            //       fontSize: 25,
+            //       fontWeight: FontWeight.bold,
+            //     )),
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: SearchableList<Song>(
-                  //style: const TextStyle(fontSize: 25),
+                  cursorColor: COLOR_PRIMARY,
+                  autoFocusOnSearch: false,
+                  displayClearIcon: false,
                   onPaginate: () async {
                     await Future.delayed(const Duration(milliseconds: 1000));
                     setState(() {});
@@ -195,7 +205,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                                 songIdentifier,
                                 currentSong.byteSize,
                                 currentSong.distributorContact
-                                    as DistributorContact);
+                                    as DistributorContact,
+                                Duration(seconds: currentSong.duration));
                         if (setAudio.isRight) {
                         } else {
                           toast(setAudio.left.message);
@@ -307,7 +318,7 @@ class _SongItemState extends State<SongItem> {
                         ),
                       ),
                       Text(
-                        'Price: ${widget.song.price} MIOTA',
+                        'Price: ${priceInMiotaPerMinute(widget.song.price, widget.song.duration, widget.song.byteSize)} MIOTA/min',
                         style: const TextStyle(
                           color: COLOR_PRIMARY,
                         ),

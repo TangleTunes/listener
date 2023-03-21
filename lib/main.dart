@@ -26,6 +26,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:provider/provider.dart';
 import 'audio_player/playback.dart';
 import 'distributor_connection/distributer_contact.dart';
+import 'package:listener/theme/theme_constants.dart';
 
 void main() async {
   runApp(
@@ -64,6 +65,8 @@ class MyApp extends StatelessWidget {
         "/create_account": (context) => RegisterPage(),
         "/load_create_account": (context) => LoadCreateAccount(),
       },
+      debugShowCheckedModeBanner: false,
+      theme: themeData,
     );
   }
 }

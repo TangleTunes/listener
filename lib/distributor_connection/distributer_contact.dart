@@ -51,8 +51,10 @@ class DistributorContact {
 
         if (queue.length >= 8) {
           int chunkId = readInt32(queue, 0);
-          int contentLength = readInt32(queue, 4);
 
+          int contentLength = readInt32(queue, 4);
+          print(
+              "just recieved a tcp message! with header: chunkId $chunkId length ${contentLength}");
           if (queue.length >= contentLength) {
             //oentire response from distributor in queue!
             for (int i = 0; i < 8; i++) {
@@ -92,6 +94,7 @@ class DistributorContact {
 
   Future<Either<MyError, Null>> requestChunks(
       String songIdentifier, int from, int amount) async {
+    print("called method requestChunks from $from and amount $amount");
     Uint8List songId = hexToBytes(songIdentifier);
     var potentialChunkTransaction = await smartContract
         .createChunkGetTransaction(songId, from, amount, distributorHex);

@@ -52,6 +52,7 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
         context
             .read<SmartContractProvider>()
             .updateSmartContract(smartContract);
+        // smartContract.deposit(10);
       } else {
         toast(potentialSc.left.message);
         nextPage = "/smart_contract_settings";

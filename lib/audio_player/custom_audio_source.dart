@@ -18,9 +18,10 @@ class MyCustomSource extends StreamAudioSource {
   late ChunkStreamCreator chunkStream;
   AudioPlayer audioPlayer;
   late List<bool> isChunkRequested;
+  Duration songDuration;
 
   MyCustomSource(this.songIdentifier, this.audioPlayer, this.fileSize,
-      this.distributorContact) {
+      this.distributorContact, this.songDuration) {
     chunkStream = ChunkStreamCreator(distributorContact, songIdentifier,
         fileSize, chunkSize, numberOfStreams);
     storedChunks = List.filled((fileSize / chunkSize).ceil(),
@@ -37,7 +38,7 @@ class MyCustomSource extends StreamAudioSource {
     print("request method called with start $start and end $end");
     Stream<Uint8List> stream = chunkStream
         .createStream(start, storedChunks, isChunkCached, isChunkRequested,
-            numberOfStreams.i, audioPlayer)
+            numberOfStreams.i, audioPlayer, songDuration)
         .asBroadcastStream();
     return StreamAudioResponse(
       sourceLength: fileSize,

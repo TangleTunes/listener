@@ -18,6 +18,7 @@ import '../providers/balance_provider.dart';
 import '../providers/credentials_provider.dart';
 import '../providers/song_list_provider.dart';
 import '../theme/theme_constants.dart';
+import '../utils/price_conversions.dart';
 
 class AccountPage extends StatefulWidget {
   final int tabSelected;
@@ -33,8 +34,10 @@ class _AccountPageState extends State<AccountPage> {
   final chainIdController = TextEditingController();
   String privateKey = "unlock to view";
   final passwordController = TextEditingController();
+  final balanceController = TextEditingController();
   late bool _privateKeyVisible = false;
   final _formKeyForPasswordForm = GlobalKey<FormState>();
+  final _formKeyForBalanceForm = GlobalKey<FormState>();
   int tabSelected;
 
   _AccountPageState(this.tabSelected);
@@ -96,7 +99,14 @@ class _AccountPageState extends State<AccountPage> {
         length: 2,
         child: Scaffold(
             appBar: AppBar(
+              centerTitle: true,
+              title: Text('Profile',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+              backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: false,
+              toolbarHeight: 20,
               bottom: const TabBar(
+                indicatorColor: COLOR_TERTIARY,
                 tabs: [
                   Tab(icon: Icon(Icons.account_circle)),
                   Tab(icon: Icon(Icons.settings)),
@@ -154,7 +164,74 @@ class _AccountPageState extends State<AccountPage> {
                     icon: Icon(Icons.content_copy),
                   ),
                   Text(
-                      "Your balance ${context.watch<BalanceProvider>().getBalance()}"),
+                      "Your balance: ${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA"),
+                  Form(
+                      key: _formKeyForBalanceForm,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Balance',
+                            ),
+                            // The validator receives the text that the user has entered.
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Required';
+                              }
+                              return null;
+                            },
+                            controller: balanceController,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                // Validate returns true if the form is valid, or false otherwise.
+                                if (_formKeyForBalanceForm.currentState!
+                                    .validate()) {
+                                  // If the form is valid, display a snackbar. In the real world,
+                                  // you'd often call a server or save the information in a database.
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Processing Data')),
+                                  );
+                                  SmartContract sc = context
+                                      .read<SmartContractProvider>()
+                                      .getSmartContract()!;
+
+                                  ///temporary
+                                  Either<MyError, Null> potentialDeposit =
+                                      await sc.deposit(
+                                          int.parse(balanceController.text));
+                                  if (potentialDeposit.isLeft) {
+                                    toast("Deposit transaction failed!");
+                                  } else {
+                                    toast("Deposit successful!");
+                                  }
+                                  Either<MyError, List<dynamic>>
+                                      potentialUserCall = await sc.users(
+                                          (CredentialsProvider()
+                                                  .getCredentials()!
+                                                  .address)
+                                              .toString());
+                                  if (potentialUserCall.isLeft) {
+                                    toast("Update balance failed!");
+                                  } else {
+                                    BigInt newBalance =
+                                        potentialUserCall.right[4];
+                                    context
+                                        .read<BalanceProvider>()
+                                        .updateBalance(newBalance);
+                                  }
+                                }
+                              },
+                              child: const Text('Deposit'),
+                            ),
+                          ),
+                        ],
+                      )),
                   Form(
                     //the password form
                     key: _formKeyForPasswordForm,
@@ -237,7 +314,7 @@ class _AccountPageState extends State<AccountPage> {
                 Center(
                     child: Column(children: [
                   Text(
-                      "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}"), //fixme null check
+                      "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}"),
                   Text(
                       "Hex: ${context.watch<SmartContractProvider>().getSmartContract()!.contractAddr}"),
                   Text(

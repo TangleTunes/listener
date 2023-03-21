@@ -26,7 +26,7 @@ class Song {
   String songName;
   String artist;
   int duration;
-  int price;
+  BigInt price;
   int byteSize;
   Uint8List songId;
   DistributorContact? distributorContact;

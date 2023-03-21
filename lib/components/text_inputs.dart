@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:listener/utils/helper_widgets.dart';
 
 import '../theme/theme_constants.dart';
@@ -7,7 +8,7 @@ Widget usernameTextInput(
     BuildContext context, TextEditingController controller) {
   return Container(
       width: 373,
-      height: 56,
+      //height: 56,
       child: TextFormField(
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -17,16 +18,22 @@ Widget usernameTextInput(
         },
         controller: controller,
         decoration: InputDecoration(
+            errorStyle: TextStyle(
+              color: COLOR_TERTIARY,
+            ),
+            errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: COLOR_TERTIARY)),
+            focusedErrorBorder: new OutlineInputBorder(
+              borderSide: new BorderSide(color: COLOR_TERTIARY, width: 1.9),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),
                 borderSide: const BorderSide(color: COLOR_PRIMARY, width: 1)),
             filled: true,
             fillColor: COLOR_SECONDARY,
             hintText: 'Your username',
-            hintStyle: TextStyle(
-              color: COLOR_PRIMARY,
-              fontSize: 16,
-            )),
+            hintStyle: TextStyle(color: COLOR_PRIMARY, fontSize: 16)),
       ));
 }
 
@@ -34,7 +41,7 @@ Widget passwordTextInput(
     BuildContext context, TextEditingController controller) {
   return Container(
       width: 372,
-      height: 56,
+      //height: 56,
       child: TextFormField(
         validator: (value) {
           print(
@@ -47,6 +54,15 @@ Widget passwordTextInput(
         controller: controller,
         obscureText: true,
         decoration: InputDecoration(
+            errorStyle: TextStyle(
+              color: COLOR_TERTIARY,
+            ),
+            errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: COLOR_TERTIARY)),
+            focusedErrorBorder: new OutlineInputBorder(
+              borderSide: new BorderSide(color: COLOR_TERTIARY, width: 1.9),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),
                 borderSide: const BorderSide(color: COLOR_PRIMARY, width: 1)),
@@ -64,7 +80,7 @@ Widget repeatPasswordTextInput(
     BuildContext context, TextEditingController controller) {
   return Container(
       width: 372,
-      height: 56,
+      //height: 56,
       child: TextFormField(
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -75,6 +91,15 @@ Widget repeatPasswordTextInput(
         controller: controller,
         obscureText: true,
         decoration: InputDecoration(
+            errorStyle: TextStyle(
+              color: COLOR_TERTIARY,
+            ),
+            errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: COLOR_TERTIARY)),
+            focusedErrorBorder: new OutlineInputBorder(
+              borderSide: new BorderSide(color: COLOR_TERTIARY, width: 1.9),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),
                 borderSide: const BorderSide(color: COLOR_PRIMARY, width: 1)),
@@ -92,7 +117,7 @@ Widget privateKeyTextInput(
     BuildContext context, TextEditingController controller) {
   return Container(
       width: 373,
-      height: 56,
+      //height: 56,
       child: TextFormField(
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -102,6 +127,15 @@ Widget privateKeyTextInput(
         },
         controller: controller,
         decoration: InputDecoration(
+            errorStyle: TextStyle(
+              color: COLOR_TERTIARY,
+            ),
+            errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: COLOR_TERTIARY)),
+            focusedErrorBorder: new OutlineInputBorder(
+              borderSide: new BorderSide(color: COLOR_TERTIARY, width: 1.9),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),
                 borderSide: const BorderSide(color: COLOR_PRIMARY, width: 1)),

@@ -43,6 +43,12 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: COLOR_PRIMARY,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 20,
+        elevation: 0,
+      ),
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,

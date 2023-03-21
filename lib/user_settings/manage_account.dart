@@ -62,7 +62,6 @@ Future<Either<MyError, String>> unlockPrivateKey(String password) async {
       Wallet wallet = Wallet.fromJson(encoded, password);
       Uint8List pk = wallet.privateKey.privateKey;
       String privateKey = hex.encode(pk);
-      print("uuu read from file ${privateKey}");
       return Right(privateKey);
     } on ArgumentError catch (e) {
       return Left(MyError(
