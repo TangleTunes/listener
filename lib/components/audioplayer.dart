@@ -28,7 +28,7 @@ import '../screens/account.dart';
 @override
 Widget audioPlayer(BuildContext context) {
   if (context.watch<CurrentSongProvider>().getSong() == null) {
-    return Text("Currently no song selected");
+    return SizedBox.shrink();
   } else {
     return Column(children: [
       ValueListenableBuilder<ProgressBarState>(

@@ -79,8 +79,11 @@ class _CoupleAccountState extends State<CoupleAccount> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            passwordTextInput(context, passwordController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            passwordController,
+                            "Your password",
+                            true)),
 
                     //The second text input box for your password
                     SizedBox(height: 20),
@@ -99,9 +102,11 @@ class _CoupleAccountState extends State<CoupleAccount> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            repeatPasswordTextInput(
-                                context, repeatPasswordController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            repeatPasswordController,
+                            "Repeat your password",
+                            true)),
 
                     //The third text input box for inserting your private key
                     SizedBox(height: 20),
@@ -120,8 +125,11 @@ class _CoupleAccountState extends State<CoupleAccount> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            privateKeyTextInput(context, privateKeyController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            privateKeyController,
+                            "Your private key",
+                            false)),
 
                     SizedBox(height: 25),
                     //the register button, which redirects you to the discovery page iff you filled in all the boxes
@@ -133,22 +141,30 @@ class _CoupleAccountState extends State<CoupleAccount> {
                               backgroundColor: COLOR_TERTIARY),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              Either<MyError, Null> setPrivateKeyCall =
-                                  await setPrivateKey(privateKeyController.text,
-                                      passwordController.text, context);
-                              if (setPrivateKeyCall.isRight) {
-                                Either<MyError, Null> setOwnCredentialsCall =
-                                    context
-                                        .read<CredentialsProvider>()
-                                        .setOwnCredentials(
-                                            privateKeyController.text);
-                                if (setOwnCredentialsCall.isRight) {
-                                  goToPage(context, "/load_create_account");
-                                } else {
-                                  toast(setOwnCredentialsCall.left.message);
-                                }
+                              if (passwordController.text !=
+                                  repeatPasswordController.text) {
+                                toast("Passwords don't match");
                               } else {
-                                toast(setPrivateKeyCall.left.message);
+                                Either<MyError, Null> setPrivateKeyCall =
+                                    await setPrivateKey(
+                                        privateKeyController.text,
+                                        passwordController.text,
+                                        context);
+
+                                if (setPrivateKeyCall.isRight) {
+                                  Either<MyError, Null> setOwnCredentialsCall =
+                                      context
+                                          .read<CredentialsProvider>()
+                                          .setOwnCredentials(
+                                              privateKeyController.text);
+                                  if (setOwnCredentialsCall.isRight) {
+                                    goToPage(context, "/load_create_account");
+                                  } else {
+                                    toast(setOwnCredentialsCall.left.message);
+                                  }
+                                } else {
+                                  toast(setPrivateKeyCall.left.message);
+                                }
                               }
                             }
                           },

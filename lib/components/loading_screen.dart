@@ -9,7 +9,7 @@ Widget makeLoadingScreen(BuildContext context, String loadingMsg,
   return Scaffold(
       body: Center(
     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Text(loadingMsg),
+      Text(loadingMsg, style: TextStyle(color: COLOR_SECONDARY)),
       shouldProceed
           ? ElevatedButton(
               onPressed: () {

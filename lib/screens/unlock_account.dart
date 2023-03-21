@@ -82,8 +82,11 @@ class _UnlockPageState extends State<UnlockPage> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            passwordTextInput(context, passwordController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            passwordController,
+                            "Your password",
+                            true)),
 
                     SizedBox(height: 25),
                     //the register button, which redirects you to the discovery page iff you filled in all the boxes

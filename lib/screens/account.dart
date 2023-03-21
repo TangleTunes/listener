@@ -212,7 +212,8 @@ class _AccountPageState extends State<AccountPage> {
                                   }
                                   Either<MyError, List<dynamic>>
                                       potentialUserCall = await sc.users(
-                                          (CredentialsProvider()
+                                          (context
+                                                  .read<CredentialsProvider>()
                                                   .getCredentials()!
                                                   .address)
                                               .toString());

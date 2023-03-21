@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:listener/audio_player/playback.dart';
+import 'package:listener/components/loading_screen.dart';
 import 'package:listener/error_handling/app_error.dart';
 import 'package:listener/utils/go_to_page.dart';
 import 'package:listener/utils/toast.dart';
@@ -50,22 +51,7 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        //TODO replace this scafftold with a method call that returns a nice looking loading page with a given parameter "initialState" that specifies where the app should go once the user presses "contine"
-        body: Center(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Text("Starting app..."),
-        shouldProceed
-            ? ElevatedButton(
-                onPressed: () {
-                  goToPage(context, "/discovery");
-
-                  //move to next screen and pass the prefs if you want
-                },
-                child: Text("Continue"),
-              )
-            : CircularProgressIndicator(), //show splash screen here instead of progress indicator
-      ]),
-    ));
+    return makeLoadingScreen(
+        context, "Starting app...", "/discovery", shouldProceed);
   }
 }

@@ -85,8 +85,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            usernameTextInput(context, usernameController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            usernameController,
+                            "Your username",
+                            false)),
 
                     //The second text input box for your password
                     SizedBox(height: 20),
@@ -105,8 +108,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            passwordTextInput(context, passwordController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            passwordController,
+                            "Your password",
+                            true)),
 
                     //The third text input box for repeating your password
                     SizedBox(height: 20),
@@ -114,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Container(
                         width: 373,
                         child: Text(
-                          'Repeat your password*',
+                          'Repeat password*',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             color: COLOR_SECONDARY,
@@ -125,9 +131,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: 6),
                     Builder(
-                        builder: (BuildContext context) =>
-                            repeatPasswordTextInput(
-                                context, repeatPasswordController)),
+                        builder: (BuildContext context) => createTextInput(
+                            context,
+                            repeatPasswordController,
+                            "Repeat your password",
+                            true)),
 
                     SizedBox(height: 25),
                     //the register button, which redirects you to the discovery page iff you filled in all the boxes
