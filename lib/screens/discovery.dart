@@ -99,13 +99,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       body: Center(
         child: Column(
           children: [
-            // const Text('Search for a song',
-            //     style: TextStyle(
-            //       color: COLOR_SECONDARY,
-            //       fontSize: 25,
-            //       fontWeight: FontWeight.bold,
-            //     )),
-
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(15),
