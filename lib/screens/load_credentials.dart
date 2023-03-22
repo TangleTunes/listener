@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:listener/components/loading_screen.dart';
 import 'package:listener/user_settings/manage_account.dart';
 import 'package:listener/providers/credentials_provider.dart';
+import 'package:listener/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
 
 import '../distributor_connection/smart_contract.dart';
@@ -19,7 +20,7 @@ class LoadingCredentials extends StatefulWidget {
 class _LoadingCredentialsState extends State<LoadingCredentials> {
   bool shouldProceed = false;
   String nextRoute = "/";
-  _fetchPrefs() async {
+  Future<String> _fetchPrefs(BuildContext context) async {
     //FIXME the following block of code should be removed
     //----------------------------------------------------------------------
     // ByteData byteData = await rootBundle.load("assets/privatekey.json");
@@ -36,20 +37,16 @@ class _LoadingCredentialsState extends State<LoadingCredentials> {
       nextRoute = "/create_account";
       print("not coupled");
     }
-    setState(() {
-      shouldProceed = true; //got the prefs; set to some value if needed
-    });
+    return nextRoute;
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchPrefs(); //running initialisation code; getting prefs etc.
   }
 
   @override
   Widget build(BuildContext context) {
-    return makeLoadingScreen(
-        context, "Loading credentials", nextRoute, shouldProceed);
+    return LoadingScreen(_fetchPrefs);
   }
 }

@@ -42,7 +42,7 @@ class _AccountPageState extends State<AccountPage> {
 
   _AccountPageState(this.tabSelected);
 
-  _fetchPrefs(BuildContext context) async {
+  Future<void> _fetchPrefs(BuildContext context) async {
     SmartContract sc =
         context.read<SmartContractProvider>().getSmartContract()!;
     Either<MyError, List<dynamic>> potentialBalance =
@@ -54,6 +54,7 @@ class _AccountPageState extends State<AccountPage> {
     } else {
       toast(potentialBalance.left.message);
     }
+    return;
   }
 
   @override
@@ -61,7 +62,7 @@ class _AccountPageState extends State<AccountPage> {
     _privateKeyVisible = false;
 
     super.initState();
-    _fetchPrefs(context); //running initialisation code; getting prefs etc.
+    // _fetchPrefs(context); //running initialisation code; getting prefs etc.
   }
 
   @override
@@ -173,12 +174,18 @@ class _AccountPageState extends State<AccountPage> {
                           TextFormField(
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'Balance',
+                              labelText: 'Amount',
                             ),
                             // The validator receives the text that the user has entered.
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Required';
+                              } else {
+                                BigInt? numValue = BigInt.tryParse(value!);
+                                if (numValue == null ||
+                                    (numValue <= BigInt.from(0))) {
+                                  return 'Must be a positive integer number';
+                                }
                               }
                               return null;
                             },
@@ -203,8 +210,8 @@ class _AccountPageState extends State<AccountPage> {
 
                                   ///temporary
                                   Either<MyError, Null> potentialDeposit =
-                                      await sc.deposit(
-                                          int.parse(balanceController.text));
+                                      await sc.deposit(miotaToWei(BigInt.parse(
+                                          balanceController.text)));
                                   if (potentialDeposit.isLeft) {
                                     toast("Deposit transaction failed!");
                                   } else {

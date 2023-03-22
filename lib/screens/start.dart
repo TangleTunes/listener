@@ -35,12 +35,8 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> {
   bool shouldProceed = false;
 
-  _fetchPrefs(BuildContext context) async {
-    // writeToFile(
-    //     "pk.json", "destroyed"); //TODO remove this line. for dev purposes only
-    setState(() {
-      shouldProceed = true; //got the prefs; set to some value if needed
-    });
+  Future<String> _fetchPrefs(BuildContext context) async {
+    return "/discovery";
   }
 
   @override
@@ -51,7 +47,6 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) {
-    return makeLoadingScreen(
-        context, "Starting app...", "/discovery", shouldProceed);
+    return LoadingScreen(_fetchPrefs);
   }
 }

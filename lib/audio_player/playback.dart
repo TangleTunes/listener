@@ -59,11 +59,10 @@ class Playback {
     try {
       await _audioPlayer.setAudioSource(streamAudioSource);
       return Right(null);
-    } on PlayerException catch (e) {
+    } catch (e) {
       return Left(MyError(
           key: AppError.PlaybackError,
-          message: "Unable to set playback source",
-          exception: e));
+          message: "Unable to set playback source"));
     }
   }
 

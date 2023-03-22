@@ -32,7 +32,7 @@ class LoadingSongs extends StatefulWidget {
 class _LoadingSongsState extends State<LoadingSongs> {
   bool shouldProceed = false;
 
-  _fetchPrefs(BuildContext context) async {
+  Future<String> _fetchPrefs(BuildContext context) async {
     SmartContract sc =
         context.read<SmartContractProvider>().getSmartContract()!;
     Either<MyError, List<dynamic>> potentialSongListLength =
@@ -61,26 +61,20 @@ class _LoadingSongsState extends State<LoadingSongs> {
         context.read<SongListProvider>().setSongsList(songList);
       } else {
         toast(potentialSongList.left.message);
-        goToPage(context, "/discovery");
       }
     } else {
       toast(potentialSongListLength.left.message);
-      goToPage(context, "/discovery");
     }
-    setState(() {
-      shouldProceed = true; //got the prefs; set to some value if needed
-    });
+    return "/discovery";
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchPrefs(context); //running initialisation code; getting prefs etc.
   }
 
   @override
   Widget build(BuildContext context) {
-    return makeLoadingScreen(
-        context, "Loading songs", "/discovery", shouldProceed);
+    return LoadingScreen(_fetchPrefs);
   }
 }

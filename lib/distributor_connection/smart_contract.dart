@@ -78,7 +78,7 @@ class SmartContract {
     return returnEither;
   }
 
-  Future<Either<MyError, Null>> deposit(int amount) async {
+  Future<Either<MyError, Null>> deposit(BigInt amount) async {
     Either<MyError, Null> returnEither = Right(null);
     try {
       String tx_hash = await client.sendTransaction(
@@ -87,7 +87,7 @@ class SmartContract {
               contract: deployedContract,
               function: deployedContract.function('deposit'),
               parameters: [],
-              value: EtherAmount.fromInt(EtherUnit.ether, amount)),
+              value: EtherAmount.fromBigInt(EtherUnit.wei, amount)),
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
@@ -176,7 +176,7 @@ class SmartContract {
     return returnEither;
   }
 
-  Future<Either<MyError, Null>> withdraw(int amount) async {
+  Future<Either<MyError, Null>> withdraw(BigInt amount) async {
     Either<MyError, Null> returnEither = Right(null);
     try {
       String tx_hash = await client.sendTransaction(

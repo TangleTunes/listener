@@ -18,9 +18,8 @@ class LoadCreateAccount extends StatefulWidget {
 }
 
 class _LoadCreateAccountState extends State<LoadCreateAccount> {
-  bool shouldProceed = false;
-
-  _fetchPrefs(BuildContext context) async {
+  Future<String> _fetchPrefs(BuildContext context) async {
+    String nextPage = "/discovery";
     SmartContract sc =
         context.read<SmartContractProvider>().getSmartContract()!;
     EthereumAddress publicKey =
@@ -38,22 +37,18 @@ class _LoadCreateAccountState extends State<LoadCreateAccount> {
       }
     } else {
       toast(usersCall.left.message);
-      goToPage(context, "/smart_contract_settings");
+      nextPage = "/smart_contract_settings";
     }
-    setState(() {
-      shouldProceed = true; //got the prefs; set to some value if needed
-    });
+    return nextPage;
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchPrefs(context); //running initialisation code; getting prefs etc.
   }
 
   @override
   Widget build(BuildContext context) {
-    return makeLoadingScreen(context, "Creating an account on smart contract",
-        "/discovery", shouldProceed);
+    return LoadingScreen(_fetchPrefs);
   }
 }

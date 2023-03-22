@@ -89,7 +89,7 @@ class _SmartContractSettingsState extends State<SmartContractSettings> {
                 controller: chainIdController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    num? numValue = num.tryParse(value!);
+                    int? numValue = int.tryParse(value!);
                     if (numValue == null) {
                       return 'Must be a number';
                     } else {

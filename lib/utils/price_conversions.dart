@@ -10,6 +10,11 @@ double weiToMiota(BigInt wei) {
   return miota;
 }
 
+BigInt miotaToWei(BigInt miota) {
+  BigInt wei = miota * BigInt.from(pow(10, 18)); //multiply with 10^18
+  return wei;
+}
+
 double priceInMiotaPerMinute(BigInt wei, int seconds, int byteLength) {
   BigInt weiPerMinute =
       ((wei * BigInt.from(byteLength / chunkSize)) ~/ BigInt.from(seconds)) *

@@ -32,7 +32,7 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
 
   late String nextPage;
 
-  _fetchPrefs(BuildContext context) async {
+  Future<String> _fetchPrefs(BuildContext context) async {
     nextPage = "/discovery";
     // await writeToFile("sc.toml",
     //     "making this toml file unreadbale so that initilizeSmartContractIfNotSet is always triggered and will contain what is set in asset's toml file"); //FIXME for development purposes only, remove this line
@@ -52,7 +52,6 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
         context
             .read<SmartContractProvider>()
             .updateSmartContract(smartContract);
-        // smartContract.deposit(10);
       } else {
         toast(potentialSc.left.message);
         nextPage = "/smart_contract_settings";
@@ -62,20 +61,16 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
       nextPage = "/smart_contract_settings";
     }
 
-    setState(() {
-      shouldProceed = true; //got the prefs; set to some value if needed
-    });
+    return nextPage;
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchPrefs(context); //running initialisation code; getting prefs etc.
   }
 
   @override
   Widget build(BuildContext context) {
-    return makeLoadingScreen(
-        context, "Loading smart contract", nextPage, shouldProceed);
+    return LoadingScreen(_fetchPrefs);
   }
 }
