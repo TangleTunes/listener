@@ -7,6 +7,5 @@ const COLOR_TERTIARY = Color(0xFFFF741E);
 const COLOR_QUATERNARY = Color.fromRGBO(238, 191, 162, 1);
 
 ThemeData themeData = ThemeData(
-  scaffoldBackgroundColor: COLOR_PRIMARY,
-  textTheme: GoogleFonts.poppinsTextTheme(),
-);
+    scaffoldBackgroundColor: COLOR_PRIMARY,
+    textTheme: GoogleFonts.poppinsTextTheme());

@@ -152,7 +152,8 @@ class _AccountPageState extends State<AccountPage> {
                 Center(
                     child: Column(children: [
                   Text(
-                      "Your public key ${context.watch<CredentialsProvider>().getCredentials()!.address}"),
+                      "Your public key ${context.watch<CredentialsProvider>().getCredentials()!.address}",
+                      style: TextStyle(color: COLOR_SECONDARY)),
                   IconButton(
                     onPressed: () async {
                       await Clipboard.setData(ClipboardData(
@@ -165,7 +166,8 @@ class _AccountPageState extends State<AccountPage> {
                     icon: Icon(Icons.content_copy),
                   ),
                   Text(
-                      "Your balance: ${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA"),
+                      "Your balance: ${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA",
+                      style: TextStyle(color: COLOR_SECONDARY)),
                   Form(
                       key: _formKeyForBalanceForm,
                       child: Column(
@@ -173,8 +175,10 @@ class _AccountPageState extends State<AccountPage> {
                         children: [
                           TextFormField(
                             keyboardType: TextInputType.number,
+                            style: TextStyle(color: COLOR_SECONDARY),
                             decoration: InputDecoration(
-                              labelText: 'Amount',
+                              labelText: 'Amount (in MIOTA)',
+                              labelStyle: TextStyle(color: COLOR_SECONDARY),
                             ),
                             // The validator receives the text that the user has entered.
                             validator: (value) {
@@ -247,8 +251,10 @@ class _AccountPageState extends State<AccountPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: COLOR_SECONDARY),
                           decoration: InputDecoration(
                             labelText: 'Password',
+                            labelStyle: TextStyle(color: COLOR_SECONDARY),
                           ),
                           // The validator receives the text that the user has entered.
                           validator: (value) {
@@ -298,7 +304,8 @@ class _AccountPageState extends State<AccountPage> {
                       ],
                     ),
                   ),
-                  Text("Your private key: $privateKey"),
+                  Text("Your private key: $privateKey",
+                      style: TextStyle(color: COLOR_SECONDARY)),
                   IconButton(
                     onPressed: _privateKeyVisible
                         ? () async {
