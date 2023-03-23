@@ -14,6 +14,7 @@ import 'package:tuple/tuple.dart';
 import '../error_handling/app_error.dart';
 
 //used to be 32766
+int paulsDummyTotal = 0;
 
 class ChunkStreamCreator {
   // How many chunks should be buffered as outgoing requests
@@ -25,7 +26,7 @@ class ChunkStreamCreator {
   // The song-id as a hex-string
   String songIdentifier;
   // Stores whether this stream is still relevant for the audio player. It will be irrelevant eg when the user skips forward in the song and the .request method is called with a new start
-  bool isFinished = false;
+  // bool isFinished = false;
   // The audio source
   Wrapper forWhatSource;
   // The next chunk number this stream should yield
@@ -51,6 +52,17 @@ class ChunkStreamCreator {
       //determine the next chunk that has not been requested
       chunkToBeRequested++;
     }
+    // print(
+    //     "6666 I am stream $yourNum and chunkToBeRequested is $chunkToBeRequested");
+
+    // int currentBufferInPlayback = 0;
+
+    // print(
+    //     "vvv filesize: $fileSize, chunkToBeRequested $chunkToBeRequested currentChunkPosition: $currentBytePositionInPlayback, bufferSize $bufferSize");
+
+    //is chukToBerequested in front of audioplayer.posiutin?
+    // print(
+    //     "I am stream $yourNum and is  $chunkToBeRequested >= $currentChunkPositionInPlayback? ${chunkToBeRequested >= currentChunkPositionInPlayback}");
     if ((chunkToBeRequested - currentChunkPositionInPlayback) < bufferSize &&
         chunkToBeRequested >= currentChunkPositionInPlayback) {
       fileSize;
@@ -88,11 +100,11 @@ class ChunkStreamCreator {
       int yourNum,
       AudioPlayer audioPlayer,
       Duration songDuration) async* {
+    bool isFinished = false;
     chunkNum = (startByte / chunkSize).floor();
     print("set chunkNum to be $chunkNum");
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
-
     Stream<Duration> dummyStream = Stream<Duration>.periodic(
         Duration(milliseconds: 200), (x) => audioPlayer.position);
 
@@ -107,6 +119,10 @@ class ChunkStreamCreator {
         storedChunks[chunkId] = chunkData;
         isChunkCached[chunkId] = true;
       }
+      if (forWhatSource.i == yourNum) {
+        print(
+            "okkk I am stream $yourNum, isFInished $isFinished, and is chunk  #$chunkNum cached? ${isChunkCached[chunkNum]}");
+      }
       if (forWhatSource.i == yourNum && !isFinished) {
         if (isChunkCached[chunkNum]) {
           //why is this not a while loop?
@@ -117,18 +133,19 @@ class ChunkStreamCreator {
           } else {
             chunk = storedChunks[chunkNum];
           }
+          paulsDummyTotal += chunk.length;
           // print(
-          //     "I am stream $yourNum and yielding chunk $chunkNum which has size ${chunk.length}");
+          //     "I am stream $yourNum and yielding chunk $chunkNum which has size ${chunk.length} and paulsDummyTotal is $paulsDummyTotal");
 
           if (chunkNum < isChunkCached.length - 1) {
             chunkNum++;
           } else {
-            int totalLength = 0;
-            for (Uint8List cachedChunk in storedChunks) {
-              totalLength += cachedChunk.length;
-            }
+            // int totalLength = 0;
+            // for (Uint8List cachedChunk in storedChunks) {
+            //   totalLength += cachedChunk.length;
+            // }
             // print(
-            //     "we are finished, the total size of the stored chnuks is ${totalLength} ");
+            //     "we are finished, the total size of the stored chnuks is ${totalLength} and just audio thinks have ${audioPlayer.bufferedPosition} ${audioPlayer.duration}");
             isFinished = true;
           }
           // print(
