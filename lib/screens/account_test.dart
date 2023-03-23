@@ -96,7 +96,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 2,
+        length: 3,
         initialIndex: tabSelected,
         child: Scaffold(
           //extendBodyBehindAppBar: true,
@@ -115,6 +115,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
               tabs: [
                 Tab(icon: Icon(Icons.account_circle)),
                 Tab(icon: Icon(Icons.settings)),
+                Tab(icon: Icon(Icons.heart_broken)),
               ],
             ),
           ),
@@ -156,93 +157,348 @@ class _AccountPageStateTest extends State<AccountPageTest> {
             SingleChildScrollView(
                 child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        height: 220,
-                        width: 200,
-                        color: COLOR_SECONDARY,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Balance",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      color: COLOR_PRIMARY))
-                            ],
-                          ),
-                        )),
-                    Column(
-                      children: [
-                        Container(
-                            height: 100,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                        child: Container(
+                            height: 220,
                             width: 200,
-                            color: COLOR_SECONDARY,
+                            decoration: BoxDecoration(
+                                color: COLOR_SECONDARY,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Your public key",
+                                  Text("Balance",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
                                           color: COLOR_PRIMARY)),
                                   Text(
-                                    "${context.watch<CredentialsProvider>().getCredentials()!.address}",
-                                    style: TextStyle(
-                                        color: COLOR_PRIMARY, fontSize: 18),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      await Clipboard.setData(ClipboardData(
-                                          text: context
-                                              .read<CredentialsProvider>()
-                                              .getCredentials()!
-                                              .address
-                                              .toString()));
-                                    },
-                                    icon: Icon(Icons.content_copy),
-                                    iconSize: 30,
-                                    color: COLOR_TERTIARY,
-                                  
-                                  ),
+                                      "${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA",
+                                      style: TextStyle(color: COLOR_PRIMARY)),
+                                  Form(
+                                      key: _formKeyForBalanceForm,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            style:
+                                                TextStyle(color: COLOR_PRIMARY),
+                                            decoration: InputDecoration(
+                                              labelText: 'Amount (in MIOTA)',
+                                              labelStyle: TextStyle(
+                                                  color: COLOR_PRIMARY),
+                                            ),
+                                            // The validator receives the text that the user has entered.
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Required';
+                                              } else {
+                                                BigInt? numValue =
+                                                    BigInt.tryParse(value!);
+                                                if (numValue == null ||
+                                                    (numValue <=
+                                                        BigInt.from(0))) {
+                                                  return 'Must be a positive integer number';
+                                                }
+                                              }
+                                              return null;
+                                            },
+                                            controller: balanceController,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 16.0),
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                // Validate returns true if the form is valid, or false otherwise.
+                                                if (_formKeyForBalanceForm
+                                                    .currentState!
+                                                    .validate()) {
+                                                  // If the form is valid, display a snackbar. In the real world,
+                                                  // you'd often call a server or save the information in a database.
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                        content: Text(
+                                                            'Processing Data')),
+                                                  );
+                                                  SmartContract sc = context
+                                                      .read<
+                                                          SmartContractProvider>()
+                                                      .getSmartContract()!;
+
+                                                  ///temporary
+                                                  Either<MyError, Null>
+                                                      potentialDeposit =
+                                                      await sc.deposit(miotaToWei(
+                                                          BigInt.parse(
+                                                              balanceController
+                                                                  .text)));
+                                                  if (potentialDeposit.isLeft) {
+                                                    toast(
+                                                        "Deposit transaction failed!");
+                                                  } else {
+                                                    toast(
+                                                        "Deposit successful!");
+                                                  }
+                                                  Either<MyError, List<dynamic>>
+                                                      potentialUserCall =
+                                                      await sc.users((context
+                                                              .read<
+                                                                  CredentialsProvider>()
+                                                              .getCredentials()!
+                                                              .address)
+                                                          .toString());
+                                                  if (potentialUserCall
+                                                      .isLeft) {
+                                                    toast(
+                                                        "Update balance failed!");
+                                                  } else {
+                                                    BigInt newBalance =
+                                                        potentialUserCall
+                                                            .right[4];
+                                                    context
+                                                        .read<BalanceProvider>()
+                                                        .updateBalance(
+                                                            newBalance);
+                                                  }
+                                                }
+                                              },
+                                              child: const Text('Deposit'),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
                                 ],
                               ),
                             )),
-                        //SizedBox(height: 20),
-                        Container(
-                            height: 100,
-                            width: 200,
-                            color: COLOR_SECONDARY,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Your private key",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                          color: COLOR_PRIMARY))
-                                ],
-                              ),
-                            )),
-                      ],
-                    )
-                  ],
+                      ),
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(4, 0, 0, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  decoration: BoxDecoration(
+                                      color: COLOR_SECONDARY,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Your public key",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                color: COLOR_PRIMARY)),
+                                        Text(
+                                          "${context.watch<CredentialsProvider>().getCredentials()!.address}",
+                                          style: TextStyle(
+                                              color: COLOR_PRIMARY,
+                                              fontSize: 18),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        IconButton(
+                                          onPressed: () async {
+                                            print("button clicked");
+                                            await Clipboard.setData(ClipboardData(
+                                                text: context
+                                                    .read<CredentialsProvider>()
+                                                    .getCredentials()!
+                                                    .address
+                                                    .toString()));
+                                          },
+                                          icon: Icon(Icons.content_copy),
+                                          color: COLOR_TERTIARY,
+                                          tooltip: "Copy the public key",
+                                          iconSize: 30,
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                              SizedBox(height: 8),
+                              Container(
+                                  // height: 100,
+                                  // width: 200,
+
+                                  decoration: BoxDecoration(
+                                      color: COLOR_SECONDARY,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      //mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Your private key",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                color: COLOR_PRIMARY)),
+                                        Text(
+                                          "$privateKey",
+                                          style: TextStyle(
+                                              color: COLOR_PRIMARY,
+                                              fontSize: 18),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Form(
+                                          //the password form
+                                          key: _formKeyForPasswordForm,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              TextFormField(
+                                                style: TextStyle(
+                                                    color: COLOR_PRIMARY),
+                                                decoration: InputDecoration(
+                                                  labelText: 'Password',
+                                                  labelStyle: TextStyle(
+                                                      color: COLOR_PRIMARY),
+                                                ),
+                                                // The validator receives the text that the user has entered.
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Required';
+                                                  }
+                                                  return null;
+                                                },
+                                                controller: passwordController,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 16.0),
+                                                child: ElevatedButton(
+                                                  onPressed: !_privateKeyVisible
+                                                      ? () async {
+                                                          // Validate returns true if the form is valid, or false otherwise.
+                                                          if (_formKeyForPasswordForm
+                                                              .currentState!
+                                                              .validate()) {
+                                                            // If the form is valid, display a snackbar. In the real world,
+                                                            // you'd often call a server or save the information in a database.
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                  content: Text(
+                                                                      'Processing Data')),
+                                                            );
+                                                            Either<MyError,
+                                                                    String>
+                                                                potentialPrivateKey =
+                                                                await unlockPrivateKey(
+                                                                    passwordController
+                                                                        .text);
+                                                            if (potentialPrivateKey
+                                                                .isRight) {
+                                                              //Make private key visible since the pasword is correct
+                                                              setState(() {
+                                                                _privateKeyVisible =
+                                                                    true;
+                                                              });
+
+                                                              privateKey =
+                                                                  potentialPrivateKey
+                                                                      .right;
+                                                            } else {
+                                                              //Display error message
+                                                              toast(
+                                                                  potentialPrivateKey
+                                                                      .left
+                                                                      .message);
+                                                            }
+                                                          }
+                                                        }
+                                                      : null,
+                                                  child: const Text('Unlock'),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: _privateKeyVisible
+                                              ? () async {
+                                                  await Clipboard.setData(
+                                                      ClipboardData(
+                                                          text: privateKey));
+                                                }
+                                              : null,
+                                          icon: Icon(Icons.content_copy),
+                                          color:
+                                              COLOR_TERTIARY, //why is it not orange?
+                                          iconSize: 30,
+                                          tooltip: "Copy the private key",
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             )),
             SingleChildScrollView(
-              child: Text('hello', style: TextStyle(fontSize: 100)),
-            )
+                child: Column(children: [
+              Text('hello', style: TextStyle(fontSize: 100)),
+              ElevatedButton(
+                  onPressed: () {
+                    goToPage(context, "/couple_account");
+                  },
+                  child: Text("Couple a different account")),
+              ElevatedButton(
+                  onPressed: () {
+                    goToPage(context, "/create_account");
+                  },
+                  child: Text("Create a new acount"))
+            ])),
+            Center(
+                child: Column(children: [
+              Text(
+                "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}",
+                style: TextStyle(color: COLOR_SECONDARY),
+              ),
+              Text(
+                "Hex: ${context.watch<SmartContractProvider>().getSmartContract()!.contractAddr}",
+                style: TextStyle(color: COLOR_SECONDARY),
+              ),
+              Text(
+                "Chain id: ${context.watch<SmartContractProvider>().getSmartContract()!.chainId}",
+                style: TextStyle(color: COLOR_SECONDARY),
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    goToPage(context, "/smart_contract_settings");
+                  },
+                  child: Text("Change details"))
+            ]))
           ]),
         ));
   }
