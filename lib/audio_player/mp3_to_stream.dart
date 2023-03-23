@@ -13,9 +13,6 @@ import 'package:tuple/tuple.dart';
 
 import '../error_handling/app_error.dart';
 
-//used to be 32766
-int paulsDummyTotal = 0;
-
 class ChunkStreamCreator {
   // How many chunks should be buffered as outgoing requests
   static int requestAmount = 10;
@@ -63,8 +60,9 @@ class ChunkStreamCreator {
     //is chukToBerequested in front of audioplayer.posiutin?
     // print(
     //     "I am stream $yourNum and is  $chunkToBeRequested >= $currentChunkPositionInPlayback? ${chunkToBeRequested >= currentChunkPositionInPlayback}");
-    if ((chunkToBeRequested - currentChunkPositionInPlayback) < bufferSize &&
-        chunkToBeRequested >= currentChunkPositionInPlayback) {
+    if ((chunkToBeRequested - currentChunkPositionInPlayback) < bufferSize
+        // && chunkToBeRequested >= currentChunkPositionInPlayback
+        ) {
       fileSize;
       int requestRangeStart = chunkToBeRequested;
       int amount = 0;
@@ -120,10 +118,15 @@ class ChunkStreamCreator {
         isChunkCached[chunkId] = true;
       }
       if (forWhatSource.i == yourNum) {
-        print(
-            "okkk I am stream $yourNum, isFInished $isFinished, and is chunk  #$chunkNum cached? ${isChunkCached[chunkNum]}");
+        // print(
+        //     "okkk I am stream $yourNum, isFInished $isFinished, and is chunk  #$chunkNum cached? ${isChunkCached[chunkNum]}");
       }
       if (forWhatSource.i == yourNum && !isFinished) {
+        bool iAmBehind = chunkNum <
+            ((audioPlayer.position.inMilliseconds /
+                        songDuration.inMilliseconds) *
+                    fileSize) ~/
+                chunkSize;
         if (isChunkCached[chunkNum]) {
           //why is this not a while loop?
           Uint8List chunk;
@@ -133,31 +136,35 @@ class ChunkStreamCreator {
           } else {
             chunk = storedChunks[chunkNum];
           }
-          paulsDummyTotal += chunk.length;
-          // print(
-          //     "I am stream $yourNum and yielding chunk $chunkNum which has size ${chunk.length} and paulsDummyTotal is $paulsDummyTotal");
+          print(
+              "I am stream $yourNum and yielding chunk $chunkNum which has size ${chunk.length}");
 
           if (chunkNum < isChunkCached.length - 1) {
             chunkNum++;
           } else {
-            // int totalLength = 0;
-            // for (Uint8List cachedChunk in storedChunks) {
-            //   totalLength += cachedChunk.length;
-            // }
-            // print(
-            //     "we are finished, the total size of the stored chnuks is ${totalLength} and just audio thinks have ${audioPlayer.bufferedPosition} ${audioPlayer.duration}");
             isFinished = true;
           }
           // print(
           //     "yyyy just yielded chunk of size ${chunk.length} in storedChunks finished?: $isFinished chunkNum: $chunkNum");
 
           yield chunk;
+        } else if (iAmBehind) {
+          print("I am stream $yourNum and yielding an empty dummy chunk");
+          //if just_audio thinks that we don't support range requests and tries to fetch audio that is in the past
+          if (chunkNum < isChunkCached.length - 1) {
+            chunkNum++;
+          } else {
+            isFinished = true;
+          }
+          yield Uint8List(chunkSize); //give it an empty array
         }
 
         if (val.runtimeType == Duration) {
           int milisec = (val as Duration).inMilliseconds;
-          requestIfNotRequested(
-              isChunkRequested, songDuration, audioPlayer, yourNum);
+          if (!iAmBehind) {
+            requestIfNotRequested(
+                isChunkRequested, songDuration, audioPlayer, yourNum);
+          }
         }
       }
     }

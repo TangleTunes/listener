@@ -56,8 +56,8 @@ class DistributorContact {
           int contentLength = readInt32(queue, 4);
 
           if (queue.length >= contentLength) {
-            print(
-                "just recieved a complete tcp message! with header: chunkId $chunkId length ${contentLength}");
+            // print(
+            //     "just recieved a complete tcp message! with header: chunkId $chunkId length ${contentLength}");
             for (int i = 0; i < 8; i++) {
               //remove  header of tcp messsage
               queue.removeFirst();
@@ -83,8 +83,8 @@ class DistributorContact {
               }
               bytesLeftInTcpMsg = bytesLeftInTcpMsg - chunkLength;
               // log("Just received chunk $chunkId with content $chunk");
-              print(
-                  "ttttt just yielded $chunkId chunk that i yield has size ${chunk.length}");
+              // print(
+              //     "ttttt just yielded $chunkId chunk that i yield has size ${chunk.length}");
               yield Tuple2(chunkId, chunk);
               chunkId++;
             }
@@ -98,7 +98,7 @@ class DistributorContact {
 
   Future<Either<MyError, Null>> requestChunks(
       String songIdentifier, int from, int amount) async {
-    print("called method requestChunks from $from and amount $amount");
+    // print("called method requestChunks from $from and amount $amount");
     Uint8List songId = hexToBytes(songIdentifier);
     var potentialChunkTransaction = await smartContract
         .createChunkGetTransaction(songId, from, amount, distributorHex);

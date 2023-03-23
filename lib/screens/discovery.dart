@@ -58,7 +58,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         iconSize: 38,
         backgroundColor: Color(0xFF091227),
         items: const <BottomNavigationBarItem>[
-          
           BottomNavigationBarItem(
             label: 'search',
             icon: Icon(
@@ -175,9 +174,10 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                         context
                             .read<CurrentSongProvider>()
                             .setDistributor(dc.right);
-                      } else {
-                        toast(dc.left.message);
                       }
+                      // else {
+                      //   toast(dc.left.message);
+                      // }
 
                       Playback playback =
                           context.read<PlaybackProvider>().getPlayback();
@@ -267,7 +267,6 @@ class _SongItemState extends State<SongItem> {
         child: Container(
           decoration: BoxDecoration(
             color: COLOR_SECONDARY,
-            
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -285,7 +284,6 @@ class _SongItemState extends State<SongItem> {
                         color: COLOR_PRIMARY,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                              
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -308,7 +306,7 @@ class _SongItemState extends State<SongItem> {
                       ),
                     ),
                   ],
-                ),                
+                ),
               ),
             ],
           ),
