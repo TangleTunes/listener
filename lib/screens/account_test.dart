@@ -111,7 +111,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
             toolbarHeight: 20,
             bottom: const TabBar(
               indicatorColor: COLOR_TERTIARY,
-              isScrollable: true,
+              //isScrollable: true,
               tabs: [
                 Tab(icon: Icon(Icons.account_circle)),
                 Tab(icon: Icon(Icons.settings)),
@@ -164,15 +164,18 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                         height: 220,
                         width: 200,
                         color: COLOR_SECONDARY,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Balance",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: COLOR_PRIMARY))
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Balance",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: COLOR_PRIMARY))
+                            ],
+                          ),
                         )),
                     Column(
                       children: [
@@ -180,35 +183,56 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                             height: 100,
                             width: 200,
                             color: COLOR_SECONDARY,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Your public key",
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Your public key",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          color: COLOR_PRIMARY)),
+                                  Text(
+                                    "${context.watch<CredentialsProvider>().getCredentials()!.address}",
                                     style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: COLOR_PRIMARY)),
-                                Text(
-                                  "${context.watch<CredentialsProvider>().getCredentials()!.address}",
-                                  style: TextStyle(color: COLOR_PRIMARY),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                                        color: COLOR_PRIMARY, fontSize: 18),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      await Clipboard.setData(ClipboardData(
+                                          text: context
+                                              .read<CredentialsProvider>()
+                                              .getCredentials()!
+                                              .address
+                                              .toString()));
+                                    },
+                                    icon: Icon(Icons.content_copy),
+                                    iconSize: 30,
+                                    color: COLOR_TERTIARY,
+                                  
+                                  ),
+                                ],
+                              ),
                             )),
-                        SizedBox(height: 20),
+                        //SizedBox(height: 20),
                         Container(
                             height: 100,
                             width: 200,
                             color: COLOR_SECONDARY,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Your private key",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: COLOR_PRIMARY))
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Your private key",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          color: COLOR_PRIMARY))
+                                ],
+                              ),
                             )),
                       ],
                     )

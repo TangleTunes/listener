@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
         '/unlock_account': (context) => UnlockPage(),
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple_account': (context) => CoupleAccount(),
-        // '/account': (context) => AccountPage(tabSelected: 0),
+        //'/account': (context) => AccountPage(tabSelected: 0),
         '/account': (context) => AccountPageTest(tabSelected: 0),
         '/library': (context) => LibraryPage(),
         '/load_songs': (context) => LoadingSongs(),
