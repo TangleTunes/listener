@@ -81,12 +81,9 @@ class _AccountPageState extends State<AccountPage> {
       _selectedIndex = index;
       switch (_selectedIndex) {
         case 0:
-          goToPage(context, "/library");
-          break;
-        case 1:
           goToPage(context, "/discovery");
           break;
-        case 2:
+        case 1:
           break;
       }
     });
@@ -123,12 +120,6 @@ class _AccountPageState extends State<AccountPage> {
               iconSize: 38,
               backgroundColor: Color(0xFF091227),
               items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  label: 'library',
-                  icon: Icon(
-                    Icons.favorite_border_outlined,
-                  ),
-                ),
                 BottomNavigationBarItem(
                   label: 'search',
                   icon: Icon(

@@ -76,18 +76,15 @@ class _AccountPageStateTest extends State<AccountPageTest> {
     super.dispose();
   }
 
-  int _selectedIndex = 2;
+  int _selectedIndex = 1;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       switch (_selectedIndex) {
         case 0:
-          goToPage(context, "/library");
-          break;
-        case 1:
           goToPage(context, "/discovery");
           break;
-        case 2:
+        case 1:
           break;
       }
     });
@@ -127,13 +124,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
             unselectedFontSize: 0,
             iconSize: 38,
             backgroundColor: Color(0xFF091227),
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                label: 'library',
-                icon: Icon(
-                  Icons.favorite_border_outlined,
-                ),
-              ),
+            items: const <BottomNavigationBarItem>[              
               BottomNavigationBarItem(
                 label: 'search',
                 icon: Icon(

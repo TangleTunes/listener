@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         '/couple_account': (context) => CoupleAccount(),
         //'/account': (context) => AccountPage(tabSelected: 0),
         '/account': (context) => AccountPageTest(tabSelected: 0),
-        '/library': (context) => LibraryPage(),
+        //'/library': (context) => LibraryPage(),
         '/load_songs': (context) => LoadingSongs(),
         "/smart_contract_settings": (context) => SmartContractSettings(),
         "/create_account": (context) => RegisterPage(),

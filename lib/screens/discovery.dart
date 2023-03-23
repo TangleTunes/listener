@@ -33,7 +33,7 @@ class DiscoveryPage extends StatefulWidget {
 }
 
 class _DiscoveryPageState extends State<DiscoveryPage> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   double _value = 20;
   @override
   void initState() {
@@ -58,12 +58,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         iconSize: 38,
         backgroundColor: Color(0xFF091227),
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            label: 'library',
-            icon: Icon(
-              Icons.favorite_border_outlined,
-            ),
-          ),
+          
           BottomNavigationBarItem(
             label: 'search',
             icon: Icon(
@@ -85,11 +80,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             _selectedIndex = value;
             switch (_selectedIndex) {
               case 0:
-                goToPage(context, "/library");
                 break;
               case 1:
-                break;
-              case 2:
                 goToPage(context, "/account");
                 break;
             }
