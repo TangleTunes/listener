@@ -23,7 +23,6 @@ class Playback {
         buttonNotifier.value = ButtonState.playing;
       } else {
         // completed
-        _audioPlayer.seek(Duration.zero);
         _audioPlayer.pause();
       }
     });
