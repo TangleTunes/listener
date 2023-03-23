@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tangletunes.listener">
+      <uses-permission android:name="android.permission.INTERNET"/> 
+      <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+
    <application
-        android:label="TangleTunes"
+        android:label="Tangle Tunes"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

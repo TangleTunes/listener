@@ -31,7 +31,22 @@ class _SmartContractSettingsState extends State<SmartContractSettings> {
   final chainIdController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  _fetchPrefs(BuildContext context) async {}
+  _fetchPrefs(BuildContext context) async {
+    if (context.read<SmartContractProvider>().getSmartContract() != null) {
+      chainIdController.text = context
+          .read<SmartContractProvider>()
+          .getSmartContract()!
+          .chainId
+          .toString();
+      contractAddrController.text = context
+          .read<SmartContractProvider>()
+          .getSmartContract()!
+          .contractAddr
+          .hex;
+      rpcUrlController.text =
+          context.read<SmartContractProvider>().getSmartContract()!.rpcUrl;
+    }
+  }
 
   @override
   void initState() {
