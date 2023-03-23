@@ -49,7 +49,7 @@ class _AccountPageState extends State<AccountPage> {
         await sc.users(sc.ownAddress.hex);
     if (potentialBalance.isRight) {
       BigInt balance = potentialBalance.right[4];
-      print("yur balance is $balance");
+      print("your balance is $balance");
       context.read<BalanceProvider>().updateBalance(balance);
     } else {
       toast(potentialBalance.left.message);
@@ -81,13 +81,9 @@ class _AccountPageState extends State<AccountPage> {
       _selectedIndex = index;
       switch (_selectedIndex) {
         case 0:
-          goToPage(context, "/library");
-
-          break;
-        case 1:
           goToPage(context, "/discovery");
           break;
-        case 2:
+        case 1:
           break;
       }
     });
@@ -99,6 +95,7 @@ class _AccountPageState extends State<AccountPage> {
         initialIndex: tabSelected,
         length: 2,
         child: Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               centerTitle: true,
               title: Text('Profile',
@@ -108,13 +105,13 @@ class _AccountPageState extends State<AccountPage> {
               toolbarHeight: 20,
               bottom: const TabBar(
                 indicatorColor: COLOR_TERTIARY,
+                isScrollable: true,
                 tabs: [
                   Tab(icon: Icon(Icons.account_circle)),
                   Tab(icon: Icon(Icons.settings)),
                 ],
               ),
             ),
-            resizeToAvoidBottomInset: false,
             bottomNavigationBar: BottomNavigationBar(
               showSelectedLabels: false,
               showUnselectedLabels: false,
@@ -123,12 +120,6 @@ class _AccountPageState extends State<AccountPage> {
               iconSize: 38,
               backgroundColor: Color(0xFF091227),
               items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  label: 'library',
-                  icon: Icon(
-                    Icons.favorite_border_outlined,
-                  ),
-                ),
                 BottomNavigationBarItem(
                   label: 'search',
                   icon: Icon(

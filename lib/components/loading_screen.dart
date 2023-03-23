@@ -26,7 +26,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
               child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Text("Loading"), CircularProgressIndicator()],
+        children: [
+          Text("Loading",
+              style: TextStyle(color: COLOR_SECONDARY, fontSize: 20)),
+          CircularProgressIndicator()
+        ],
       )));
     }
   }
