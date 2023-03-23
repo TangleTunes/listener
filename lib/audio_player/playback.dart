@@ -2,7 +2,9 @@ import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:listener/distributor_connection/distributer_contact.dart';
+import 'package:listener/utils/toast.dart';
 import '../error_handling/app_error.dart';
+import '../providers/song_list_provider.dart';
 import 'custom_audio_source.dart';
 
 class Playback {
@@ -51,10 +53,9 @@ class Playback {
       );
     });
   }
-  Future<Either<MyError, Null>> setAudio(String songIdentifier, int sizeInBytes,
-      DistributorContact distributorContact, Duration songDuration) async {
-    final streamAudioSource = MyCustomSource(songIdentifier, _audioPlayer,
-        sizeInBytes, distributorContact, songDuration);
+  Future<Either<MyError, Null>> setAudio(Song song) async {
+    final streamAudioSource = MyCustomSource(song, _audioPlayer);
+
     try {
       await _audioPlayer.setAudioSource(streamAudioSource);
       return Right(null);

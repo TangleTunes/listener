@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:listener/providers/balance_provider.dart';
 import 'package:listener/providers/current_song_provider.dart';
 import 'package:listener/providers/playback_provider.dart';
-import 'package:listener/screens/account_test.dart';
+import 'package:listener/screens/account.dart';
 import 'package:listener/screens/create_account.dart';
 import 'package:listener/screens/load_create_account.dart';
 import 'package:listener/screens/load_songs.dart';
@@ -30,6 +31,11 @@ import 'distributor_connection/distributer_contact.dart';
 import 'package:listener/theme/theme_constants.dart';
 
 void main() async {
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(
     MultiProvider(
       providers: [
@@ -60,7 +66,7 @@ class MyApp extends StatelessWidget {
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple_account': (context) => CoupleAccount(),
         //'/account': (context) => AccountPage(tabSelected: 0),
-        '/account': (context) => AccountPageTest(tabSelected: 0),
+        '/account': (context) => AccountPage(tabSelected: 0),
         //'/library': (context) => LibraryPage(),
         '/load_songs': (context) => LoadingSongs(),
         "/smart_contract_settings": (context) => SmartContractSettings(),

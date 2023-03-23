@@ -22,8 +22,8 @@ import '../providers/smart_contract_provider.dart';
 import '../providers/song_list_provider.dart';
 import '../utils/toast.dart';
 import '../utils/price_conversions.dart';
-import 'library.dart';
 import 'account.dart';
+import 'library.dart';
 
 class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({Key? key}) : super(key: key);
@@ -186,12 +186,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                       String songIdentifier = hex.encode(songidBytes);
                       if (currentSong.distributorContact != null) {
                         Either<MyError, Null> setAudio =
-                            await playback.setAudio(
-                                songIdentifier,
-                                currentSong.byteSize,
-                                currentSong.distributorContact
-                                    as DistributorContact,
-                                Duration(seconds: currentSong.duration));
+                            await playback.setAudio(currentSong);
                         if (setAudio.isRight) {
                         } else {
                           toast(setAudio.left.message);

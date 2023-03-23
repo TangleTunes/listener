@@ -23,7 +23,6 @@ import '../audio_player/playback.dart';
 import '../error_handling/app_error.dart';
 import '../utils/toast.dart';
 import '../providers/song_list_provider.dart';
-import '../screens/account.dart';
 
 @override
 Widget audioPlayer(BuildContext context) {
