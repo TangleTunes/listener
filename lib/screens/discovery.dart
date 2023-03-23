@@ -46,7 +46,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       appBar: AppBar(
         backgroundColor: COLOR_PRIMARY,
         automaticallyImplyLeading: false,
-        toolbarHeight: 20,
+        toolbarHeight: 10,
         elevation: 0,
       ),
       resizeToAvoidBottomInset: false,
@@ -263,79 +263,55 @@ class _SongItemState extends State<SongItem> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 110,
-        width: 380,
-        decoration: BoxDecoration(
-          color: COLOR_SECONDARY,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        widget.song.songName,
-                        style: const TextStyle(
-                          color: COLOR_PRIMARY,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+      child: Flexible(
+        child: Container(
+          decoration: BoxDecoration(
+            color: COLOR_SECONDARY,
+            
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.song.songName,
+                      style: const TextStyle(
+                        color: COLOR_PRIMARY,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                              
                       ),
-                      Text(
-                        'Artist: ${widget.song.artist}',
-                        style: const TextStyle(
-                          color: COLOR_PRIMARY,
-                        ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'Artist: ${widget.song.artist}',
+                      style: const TextStyle(
+                        color: COLOR_PRIMARY,
                       ),
-                      Text(
-                        'Duration: ${formatedTime(widget.song.duration)}',
-                        style: const TextStyle(
-                          color: COLOR_PRIMARY,
-                        ),
+                    ),
+                    Text(
+                      'Duration: ${formatedTime(widget.song.duration)}',
+                      style: const TextStyle(
+                        color: COLOR_PRIMARY,
                       ),
-                      Text(
-                        'Price: ${priceInMiotaPerMinute(widget.song.price, widget.song.duration, widget.song.byteSize)} MIOTA/min',
-                        style: const TextStyle(
-                          color: COLOR_PRIMARY,
-                        ),
+                    ),
+                    Text(
+                      'Price: ${priceInMiotaPerMinute(widget.song.price, widget.song.duration, widget.song.byteSize)} MIOTA/min',
+                      style: const TextStyle(
+                        color: COLOR_PRIMARY,
                       ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        iconSize: 35,
-                        icon: (isPressed)
-                            ? Icon(Icons.favorite_border_outlined,
-                                color: COLOR_TERTIARY)
-                            : Icon(Icons.favorite, color: COLOR_TERTIARY),
-                        onPressed: () {
-                          setState(() {
-                            //changes the button from a full heart to a border heart
-                            //TODO add that it adds the song to favorites
-                            if (!isPressed) {
-                              isPressed = true;
-                            } else {
-                              isPressed = false;
-                            }
-                          });
-                        },
-                      ),
-                    ],
-                  )
-                ],
+                    ),
+                  ],
+                ),                
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

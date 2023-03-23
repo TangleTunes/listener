@@ -39,6 +39,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
   late bool _privateKeyVisible = false;
   final _formKeyForPasswordForm = GlobalKey<FormState>();
   final _formKeyForBalanceForm = GlobalKey<FormState>();
+  bool _showPrivateKey = false;
   int tabSelected;
 
   _AccountPageStateTest(this.tabSelected);
@@ -112,7 +113,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
               tabs: [
                 Tab(icon: Icon(Icons.account_circle)),
                 Tab(icon: Icon(Icons.settings)),
-                Tab(icon: Icon(Icons.heart_broken)),
+                Tab(icon: Icon(Icons.music_note)),
               ],
             ),
           ),
@@ -124,7 +125,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
             unselectedFontSize: 0,
             iconSize: 38,
             backgroundColor: Color(0xFF091227),
-            items: const <BottomNavigationBarItem>[              
+            items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 label: 'search',
                 icon: Icon(
@@ -149,136 +150,221 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                 child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                        child: Container(
-                            height: 220,
-                            width: 200,
-                            decoration: BoxDecoration(
-                                color: COLOR_SECONDARY,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Balance",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                          color: COLOR_PRIMARY)),
-                                  Text(
-                                      "${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA",
-                                      style: TextStyle(color: COLOR_PRIMARY)),
-                                  Form(
-                                      key: _formKeyForBalanceForm,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          TextFormField(
-                                            keyboardType: TextInputType.number,
-                                            style:
-                                                TextStyle(color: COLOR_PRIMARY),
-                                            decoration: InputDecoration(
-                                              labelText: 'Amount (in MIOTA)',
-                                              labelStyle: TextStyle(
-                                                  color: COLOR_PRIMARY),
-                                            ),
-                                            // The validator receives the text that the user has entered.
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return 'Required';
-                                              } else {
-                                                BigInt? numValue =
-                                                    BigInt.tryParse(value!);
-                                                if (numValue == null ||
-                                                    (numValue <=
-                                                        BigInt.from(0))) {
-                                                  return 'Must be a positive integer number';
-                                                }
-                                              }
-                                              return null;
-                                            },
-                                            controller: balanceController,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 16.0),
-                                            child: ElevatedButton(
-                                              onPressed: () async {
-                                                // Validate returns true if the form is valid, or false otherwise.
-                                                if (_formKeyForBalanceForm
-                                                    .currentState!
-                                                    .validate()) {
-                                                  // If the form is valid, display a snackbar. In the real world,
-                                                  // you'd often call a server or save the information in a database.
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                        content: Text(
-                                                            'Processing Data')),
-                                                  );
-                                                  SmartContract sc = context
-                                                      .read<
-                                                          SmartContractProvider>()
-                                                      .getSmartContract()!;
-
-                                                  ///temporary
-                                                  Either<MyError, Null>
-                                                      potentialDeposit =
-                                                      await sc.deposit(miotaToWei(
-                                                          BigInt.parse(
-                                                              balanceController
-                                                                  .text)));
-                                                  if (potentialDeposit.isLeft) {
-                                                    toast(
-                                                        "Deposit transaction failed!");
-                                                  } else {
-                                                    toast(
-                                                        "Deposit successful!");
-                                                  }
-                                                  Either<MyError, List<dynamic>>
-                                                      potentialUserCall =
-                                                      await sc.users((context
-                                                              .read<
-                                                                  CredentialsProvider>()
-                                                              .getCredentials()!
-                                                              .address)
-                                                          .toString());
-                                                  if (potentialUserCall
-                                                      .isLeft) {
-                                                    toast(
-                                                        "Update balance failed!");
-                                                  } else {
-                                                    BigInt newBalance =
-                                                        potentialUserCall
-                                                            .right[4];
-                                                    context
-                                                        .read<BalanceProvider>()
-                                                        .updateBalance(
-                                                            newBalance);
-                                                  }
-                                                }
-                                              },
-                                              child: const Text('Deposit'),
-                                            ),
-                                          ),
-                                        ],
-                                      )),
-                                ],
+                        padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 190,
+                              decoration: BoxDecoration(
+                                  color: COLOR_SECONDARY,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Balance",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                            color: COLOR_PRIMARY)),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(2, 4, 0, 4),
+                                      child: Text(
+                                          "${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA",
+                                          style: TextStyle(
+                                              color: COLOR_PRIMARY,
+                                              fontSize: 16)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )),
+                            ),
+                            SizedBox(height: 10),
+                            //Deposit money container
+                            Container(
+                              width: 190,
+                              decoration: BoxDecoration(
+                                  color: COLOR_SECONDARY,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Deposit money",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                            color: COLOR_PRIMARY)),
+                                    Form(
+                                        key: _formKeyForBalanceForm,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      2, 4, 0, 4),
+                                              child: Text(
+                                                'Amount (in MIOTA):',
+                                                style: TextStyle(fontSize: 15),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 180,
+                                              child: TextFormField(
+                                                cursorColor: COLOR_PRIMARY,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                style: TextStyle(
+                                                    color: COLOR_PRIMARY),
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          vertical: 0,
+                                                          horizontal: 4),
+                                                  errorStyle: TextStyle(
+                                                    color: COLOR_TERTIARY,
+                                                  ),
+                                                  errorBorder: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              COLOR_TERTIARY)),
+                                                  focusedErrorBorder:
+                                                      OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: COLOR_TERTIARY,
+                                                        width: 1.5),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  COLOR_PRIMARY)),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color:
+                                                                  COLOR_PRIMARY)),
+                                                  // labelText: 'Amount (in MIOTA)',
+                                                  // labelStyle: TextStyle(
+                                                  //     color: COLOR_PRIMARY),
+                                                ),
+                                                // The validator receives the text that the user has entered.
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Required';
+                                                  } else {
+                                                    BigInt? numValue =
+                                                        BigInt.tryParse(value!);
+                                                    if (numValue == null ||
+                                                        (numValue <=
+                                                            BigInt.from(0))) {
+                                                      return 'Must be a positive integer number';
+                                                    }
+                                                  }
+                                                  return null;
+                                                },
+                                                controller: balanceController,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      0, 4, 0, 4),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        COLOR_TERTIARY),
+                                                onPressed: () async {
+                                                  // Validate returns true if the form is valid, or false otherwise.
+                                                  if (_formKeyForBalanceForm
+                                                      .currentState!
+                                                      .validate()) {
+                                                    // If the form is valid, display a snackbar. In the real world,
+                                                    // you'd often call a server or save the information in a database.
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                          content: Text(
+                                                              'Processing Data')),
+                                                    );
+                                                    SmartContract sc = context
+                                                        .read<
+                                                            SmartContractProvider>()
+                                                        .getSmartContract()!;
+
+                                                    ///temporary
+                                                    Either<MyError, Null>
+                                                        potentialDeposit =
+                                                        await sc.deposit(miotaToWei(
+                                                            BigInt.parse(
+                                                                balanceController
+                                                                    .text)));
+                                                    if (potentialDeposit
+                                                        .isLeft) {
+                                                      toast(
+                                                          "Deposit transaction failed!");
+                                                    } else {
+                                                      toast(
+                                                          "Deposit successful!");
+                                                    }
+                                                    Either<MyError,
+                                                            List<dynamic>>
+                                                        potentialUserCall =
+                                                        await sc.users((context
+                                                                .read<
+                                                                    CredentialsProvider>()
+                                                                .getCredentials()!
+                                                                .address)
+                                                            .toString());
+                                                    if (potentialUserCall
+                                                        .isLeft) {
+                                                      toast(
+                                                          "Update balance failed!");
+                                                    } else {
+                                                      BigInt newBalance =
+                                                          potentialUserCall
+                                                              .right[4];
+                                                      context
+                                                          .read<
+                                                              BalanceProvider>()
+                                                          .updateBalance(
+                                                              newBalance);
+                                                    }
+                                                  }
+                                                },
+                                                child: const Text(
+                                                  'Deposit',
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Flexible(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(4, 0, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -299,36 +385,12 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 18,
                                                 color: COLOR_PRIMARY)),
-                                        Text(
-                                          "${context.watch<CredentialsProvider>().getCredentials()!.address}",
-                                          style: TextStyle(
-                                              color: COLOR_PRIMARY,
-                                              fontSize: 18),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        IconButton(
-                                          onPressed: () async {
-                                            print("button clicked");
-                                            await Clipboard.setData(ClipboardData(
-                                                text: context
-                                                    .read<CredentialsProvider>()
-                                                    .getCredentials()!
-                                                    .address
-                                                    .toString()));
-                                          },
-                                          icon: Icon(Icons.content_copy),
-                                          color: COLOR_TERTIARY,
-                                          tooltip: "Copy the public key",
-                                          iconSize: 30,
-                                        ),
+                                        copyPublicKey(),                                        
                                       ],
                                     ),
                                   )),
                               SizedBox(height: 8),
                               Container(
-                                  // height: 100,
-                                  // width: 200,
-
                                   decoration: BoxDecoration(
                                       color: COLOR_SECONDARY,
                                       borderRadius: BorderRadius.all(
@@ -345,104 +407,10 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 18,
                                                 color: COLOR_PRIMARY)),
-                                        Text(
-                                          "$privateKey",
-                                          style: TextStyle(
-                                              color: COLOR_PRIMARY,
-                                              fontSize: 18),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Form(
-                                          //the password form
-                                          key: _formKeyForPasswordForm,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              TextFormField(
-                                                style: TextStyle(
-                                                    color: COLOR_PRIMARY),
-                                                decoration: InputDecoration(
-                                                  labelText: 'Password',
-                                                  labelStyle: TextStyle(
-                                                      color: COLOR_PRIMARY),
-                                                ),
-                                                // The validator receives the text that the user has entered.
-                                                validator: (value) {
-                                                  if (value == null ||
-                                                      value.isEmpty) {
-                                                    return 'Required';
-                                                  }
-                                                  return null;
-                                                },
-                                                controller: passwordController,
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 16.0),
-                                                child: ElevatedButton(
-                                                  onPressed: !_privateKeyVisible
-                                                      ? () async {
-                                                          // Validate returns true if the form is valid, or false otherwise.
-                                                          if (_formKeyForPasswordForm
-                                                              .currentState!
-                                                              .validate()) {
-                                                            // If the form is valid, display a snackbar. In the real world,
-                                                            // you'd often call a server or save the information in a database.
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              const SnackBar(
-                                                                  content: Text(
-                                                                      'Processing Data')),
-                                                            );
-                                                            Either<MyError,
-                                                                    String>
-                                                                potentialPrivateKey =
-                                                                await unlockPrivateKey(
-                                                                    passwordController
-                                                                        .text);
-                                                            if (potentialPrivateKey
-                                                                .isRight) {
-                                                              //Make private key visible since the pasword is correct
-                                                              setState(() {
-                                                                _privateKeyVisible =
-                                                                    true;
-                                                              });
-
-                                                              privateKey =
-                                                                  potentialPrivateKey
-                                                                      .right;
-                                                            } else {
-                                                              //Display error message
-                                                              toast(
-                                                                  potentialPrivateKey
-                                                                      .left
-                                                                      .message);
-                                                            }
-                                                          }
-                                                        }
-                                                      : null,
-                                                  child: const Text('Unlock'),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: _privateKeyVisible
-                                              ? () async {
-                                                  await Clipboard.setData(
-                                                      ClipboardData(
-                                                          text: privateKey));
-                                                }
-                                              : null,
-                                          icon: Icon(Icons.content_copy),
-                                          color:
-                                              COLOR_TERTIARY, //why is it not orange?
-                                          iconSize: 30,
-                                          tooltip: "Copy the private key",
+                                        Container(
+                                          child: _showPrivateKey
+                                              ? copyPrivateKey()
+                                              : formUnlockPrivateKey(),
                                         ),
                                       ],
                                     ),
@@ -458,17 +426,21 @@ class _AccountPageStateTest extends State<AccountPageTest> {
             )),
             SingleChildScrollView(
                 child: Column(children: [
-              Text('hello', style: TextStyle(fontSize: 100)),
               ElevatedButton(
                   onPressed: () {
                     goToPage(context, "/couple_account");
                   },
-                  child: Text("Couple a different account")),
+                child: Text("Couple a different account",
+                    style: TextStyle(fontSize: 16)),
+              ),
               ElevatedButton(
                   onPressed: () {
                     goToPage(context, "/create_account");
                   },
-                  child: Text("Create a new acount"))
+                  child: Text(
+                    "Create a new acount",
+                    style: TextStyle(fontSize: 16),
+                  ))
             ])),
             Center(
                 child: Column(children: [
@@ -492,5 +464,145 @@ class _AccountPageStateTest extends State<AccountPageTest> {
             ]))
           ]),
         ));
+  }
+
+  Widget copyPublicKey() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
+          child: Text(
+            "${context.watch<CredentialsProvider>().getCredentials()!.address}",
+            style: TextStyle(color: COLOR_PRIMARY, fontSize: 17),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        IconButton(
+          onPressed: () async {
+            await Clipboard.setData(ClipboardData(
+                text: context
+                    .read<CredentialsProvider>()
+                    .getCredentials()!
+                    .address
+                    .toString()));
+          },
+          icon: Icon(Icons.content_copy),
+          color: COLOR_TERTIARY,
+          tooltip: "Copy the public key",
+          iconSize: 28,
+        ),
+      ],
+    );
+  }
+
+  Widget copyPrivateKey() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
+          child: Text(
+            "$privateKey",
+            style: TextStyle(color: COLOR_PRIMARY, fontSize: 17),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        IconButton(
+          onPressed: _privateKeyVisible
+              ? () async {
+                  await Clipboard.setData(ClipboardData(text: privateKey));
+                }
+              : null,
+          icon: Icon(Icons.content_copy),
+          color: COLOR_TERTIARY,
+          iconSize: 28,
+          tooltip: "Copy the private key",
+        ),
+      ],
+    );
+  }
+
+  Widget formUnlockPrivateKey() {
+    return Form(
+      //the password form
+      key: _formKeyForPasswordForm,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
+            child: Text(
+              'Password',
+              style: TextStyle(fontSize: 15),
+            ),
+          ),
+          TextFormField(
+            style: TextStyle(color: COLOR_PRIMARY),
+            cursorColor: COLOR_PRIMARY,
+            obscureText: true,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+              errorStyle: TextStyle(
+                color: COLOR_TERTIARY,
+              ),
+              errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: COLOR_TERTIARY)),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: COLOR_TERTIARY, width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: COLOR_PRIMARY)),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: COLOR_PRIMARY)),
+            ),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Required';
+              }
+              return null;
+            },
+            controller: passwordController,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: COLOR_TERTIARY),
+              onPressed: !_privateKeyVisible
+                  ? () async {
+                      // Validate returns true if the form is valid, or false otherwise.
+                      if (_formKeyForPasswordForm.currentState!.validate()) {
+                        // If the form is valid, display a snackbar. In the real world,
+                        // you'd often call a server or save the information in a database.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Processing Data')),
+                        );
+                        Either<MyError, String> potentialPrivateKey =
+                            await unlockPrivateKey(passwordController.text);
+                        if (potentialPrivateKey.isRight) {
+                          //Make private key visible since the pasword is correct
+                          setState(() {
+                            _privateKeyVisible = true;
+                            _showPrivateKey = true;
+                          });
+
+                          privateKey = potentialPrivateKey.right;
+                        } else {
+                          //Display error message
+                          toast(potentialPrivateKey.left.message);
+                        }
+                      }
+                    }
+                  : null,
+              child: const Text(
+                'Unlock',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
