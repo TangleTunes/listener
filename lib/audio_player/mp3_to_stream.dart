@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:async/async.dart';
+import 'package:either_dart/either.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:just_audio/just_audio.dart';
 import 'package:listener/audio_player/custom_audio_source.dart';
@@ -7,7 +8,10 @@ import 'package:listener/components/audioplayer.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:listener/distributor_connection/distributer_contact.dart';
+import 'package:listener/utils/toast.dart';
 import 'package:tuple/tuple.dart';
+
+import '../error_handling/app_error.dart';
 
 //used to be 32766
 
@@ -33,37 +37,45 @@ class ChunkStreamCreator {
       this.fileSize, this.chunkSize, this.forWhatSource) {}
 
   Future<void> requestIfNotRequested(List<bool> isChunkRequested,
-      Duration songDuration, AudioPlayer audioPlayer) async {
+      Duration songDuration, AudioPlayer audioPlayer, int yourNum) async {
     // print(
     //     "called requestifnotrquested and isChunkRequested is $isChunkRequested ");
-    //v3
-
     int chunkToBeRequested = chunkNum;
+    int currentChunkPositionInPlayback =
+        ((audioPlayer.position.inMilliseconds / songDuration.inMilliseconds) *
+                fileSize) ~/
+            chunkSize;
+
     while (chunkToBeRequested < isChunkRequested.length &&
         isChunkRequested[chunkToBeRequested]) {
       //determine the next chunk that has not been requested
       chunkToBeRequested++;
     }
-    int currentBytePositionInPlayback = 0;
-    // int currentBufferInPlayback = 0;
-    currentBytePositionInPlayback =
-        ((audioPlayer.position.inMilliseconds / songDuration.inMilliseconds) *
-                fileSize) ~/
-            chunkSize;
-    if ((chunkToBeRequested - currentBytePositionInPlayback) < bufferSize) {
+    if ((chunkToBeRequested - currentChunkPositionInPlayback) < bufferSize &&
+        chunkToBeRequested >= currentChunkPositionInPlayback) {
       fileSize;
       int requestRangeStart = chunkToBeRequested;
       int amount = 0;
       while (chunkToBeRequested < isChunkRequested.length &&
           !isChunkRequested[chunkToBeRequested] &&
           amount < requestAmount) {
+        // print(
+        //     "ppppp chunkToBeRequested $chunkToBeRequested , isChunkRequested.length ${isChunkRequested.length}, amount: $amount");
+
         amount++;
         isChunkRequested[chunkToBeRequested] = true;
         chunkToBeRequested++;
       }
+      // print("pppp amount is $amount");
       if (amount != 0) {
-        await distributorContact.requestChunks(songIdentifier,
-            requestRangeStart, amount); //FIXME no error handling at the moment
+        Either<MyError, Null> chunkReqCall = await distributorContact
+            .requestChunks(songIdentifier, requestRangeStart, amount);
+
+        // print(
+        //     "7777 I am stream $yourNum and I am requesting $requestRangeStart, amouunt $amount");
+        if (chunkReqCall.isLeft) {
+          toast(chunkReqCall.left.message);
+        }
       }
     }
   }
@@ -76,8 +88,8 @@ class ChunkStreamCreator {
       int yourNum,
       AudioPlayer audioPlayer,
       Duration songDuration) async* {
-    bool isFinished = false;
-    chunkNum = (startByte - 1) ~/ chunkSize;
+    chunkNum = (startByte / chunkSize).floor();
+    print("set chunkNum to be $chunkNum");
     int offsetWithinChunk = startByte % chunkSize;
     bool isFirst = true;
 
@@ -107,19 +119,28 @@ class ChunkStreamCreator {
           }
           // print(
           //     "I am stream $yourNum and yielding chunk $chunkNum which has size ${chunk.length}");
+
           if (chunkNum < isChunkCached.length - 1) {
             chunkNum++;
           } else {
+            int totalLength = 0;
+            for (Uint8List cachedChunk in storedChunks) {
+              totalLength += cachedChunk.length;
+            }
+            // print(
+            //     "we are finished, the total size of the stored chnuks is ${totalLength} ");
             isFinished = true;
           }
+          // print(
+          //     "yyyy just yielded chunk of size ${chunk.length} in storedChunks finished?: $isFinished chunkNum: $chunkNum");
 
           yield chunk;
         }
 
         if (val.runtimeType == Duration) {
           int milisec = (val as Duration).inMilliseconds;
-
-          requestIfNotRequested(isChunkRequested, songDuration, audioPlayer);
+          requestIfNotRequested(
+              isChunkRequested, songDuration, audioPlayer, yourNum);
         }
       }
     }

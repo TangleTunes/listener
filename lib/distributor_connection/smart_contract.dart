@@ -53,23 +53,21 @@ class SmartContract {
     contract.deployedContract = DeployedContract(
         ContractAbi.fromJson(contract.abiCode, 'TangleTunes'),
         contract.contractAddr);
-    Either<MyError, int> potentialNonce = await contract.getNonce();
+    Either<MyError, Null> potentialNonce = await contract.updateNonce();
     if (potentialNonce.isRight) {
-      contract.nonce = potentialNonce.right;
       return Right(contract);
     } else {
       return Left(potentialNonce.left);
     }
   }
 
-  Future<Either<MyError, int>> getNonce() async {
-    int myNonce = 0;
-    Either<MyError, int> returnEither = Right(myNonce);
+  Future<Either<MyError, Null>> updateNonce() async {
+    Either<MyError, Null> returnEither = Right(null);
     try {
-      myNonce = await client.getTransactionCount(ownAddress);
-      returnEither = Right(myNonce);
+      nonce = await client.getTransactionCount(ownAddress);
+      return Right(null);
     } catch (e) {
-      return Left(MyError(
+      returnEither = Left(MyError(
           key: AppError.DetermineNonceFailed,
           message: "Unable to determine the nonce"));
     } finally {
@@ -87,15 +85,17 @@ class SmartContract {
               contract: deployedContract,
               function: deployedContract.function('deposit'),
               parameters: [],
-              value: EtherAmount.fromBigInt(EtherUnit.wei, amount)),
+              value: EtherAmount.fromBigInt(EtherUnit.wei, amount),
+              nonce: nonce),
           chainId: chainId);
+      nonce++;
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-    } on Exception catch (e) {
+    } catch (e) {
       returnEither = Left(MyError(
-          key: AppError.SmartContractTransactionFailed,
-          message: "The deposit transaction failed",
-          exception: e));
+        key: AppError.SmartContractTransactionFailed,
+        message: "The deposit transaction failed",
+      ));
     } finally {
       await client.dispose();
     }
@@ -115,11 +115,11 @@ class SmartContract {
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
-    } on Exception catch (e) {
+    } catch (e) {
       returnEither = Left(MyError(
           key: AppError.SmartContractTransactionFailed,
-          message: "The create_user transaction failed",
-          exception: e));
+          message: "The create_user transaction failed"));
+      updateNonce(); //FIXME error handling
     } finally {
       await client.dispose();
     }
@@ -436,11 +436,11 @@ class SmartContract {
       signedTx =
           await client.signTransaction(ownCredentials, tx, chainId: chainId);
       returnEither = Right(signedTx);
-    } on Exception catch (e) {
+    } catch (e) {
       returnEither = Left(MyError(
           key: AppError.SmartContractSignTransactionFailed,
-          message: "Failed encoding and/or signing the get_chunks transaction",
-          exception: e));
+          message:
+              "Failed encoding and/or signing the get_chunks transaction"));
     }
     return returnEither;
   }

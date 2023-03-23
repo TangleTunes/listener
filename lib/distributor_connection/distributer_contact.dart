@@ -9,6 +9,7 @@ import 'package:listener/error_handling/app_error.dart';
 import 'package:tuple/tuple.dart';
 import 'package:web3dart/crypto.dart';
 import 'smart_contract.dart';
+import 'dart:developer';
 
 const int chunkSize = 32500;
 
@@ -33,8 +34,8 @@ class DistributorContact {
     // Do initialization that requires async
 
     try {
-      thisObj.socket = await Socket.connect(thisObj.distributorIP,
-          thisObj.distributorPort); //FIXME error handling if this fails
+      thisObj.socket =
+          await Socket.connect(thisObj.distributorIP, thisObj.distributorPort);
     } on Exception catch (e) {
       return Left(MyError(
           key: AppError.SocketConnectionFailed,
@@ -53,10 +54,10 @@ class DistributorContact {
           int chunkId = readInt32(queue, 0);
 
           int contentLength = readInt32(queue, 4);
-          print(
-              "just recieved a tcp message! with header: chunkId $chunkId length ${contentLength}");
+
           if (queue.length >= contentLength) {
-            //oentire response from distributor in queue!
+            print(
+                "just recieved a complete tcp message! with header: chunkId $chunkId length ${contentLength}");
             for (int i = 0; i < 8; i++) {
               //remove  header of tcp messsage
               queue.removeFirst();
@@ -81,6 +82,9 @@ class DistributorContact {
                 queue.removeFirst();
               }
               bytesLeftInTcpMsg = bytesLeftInTcpMsg - chunkLength;
+              // log("Just received chunk $chunkId with content $chunk");
+              print(
+                  "ttttt just yielded $chunkId chunk that i yield has size ${chunk.length}");
               yield Tuple2(chunkId, chunk);
               chunkId++;
             }
@@ -110,12 +114,11 @@ class DistributorContact {
         socket.add(PAYLOAD);
         await socket.flush();
         return Right(null);
-      } on Exception catch (e) {
+      } catch (e) {
         return Left(MyError(
             key: AppError.SendingTcpFailed,
-            exception: e,
             message:
-                "Unable to send a chunk request to socket ${socket.address}:${socket.port}"));
+                "Unable to send a chunk request to ${socket.address}:${socket.port}"));
       }
     } else {
       return Left(potentialChunkTransaction.left);
