@@ -34,36 +34,42 @@ Widget audioPlayer(BuildContext context) {
         valueListenable:
             context.read<PlaybackProvider>().getPlayback().progressNotifier,
         builder: (_, value, __) {
-          return ProgressBar(
-            thumbColor: COLOR_TERTIARY,
-            // thumbGlowColor: COLOR_TERTIARY,
-            progressBarColor: COLOR_TERTIARY,
-            bufferedBarColor: COLOR_QUATERNARY,
-            baseBarColor: COLOR_SECONDARY,
-            thumbGlowRadius: 15,
-            onSeek: context.read<PlaybackProvider>().getPlayback().seek,
-            progress: value.current,
-            buffered: value.buffered,
-            total: value.total,
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(15, 0, 15, 5),
+            child: ProgressBar(
+              timeLabelTextStyle: TextStyle(color: COLOR_SECONDARY),
+              thumbColor: COLOR_TERTIARY,
+              // thumbGlowColor: COLOR_TERTIARY,
+              barHeight: 3,
+              progressBarColor: COLOR_TERTIARY,
+              bufferedBarColor: COLOR_QUATERNARY,
+              baseBarColor: COLOR_SECONDARY,
+              thumbGlowRadius: 15,
+              onSeek: context.read<PlaybackProvider>().getPlayback().seek,
+              progress: value.current,
+              buffered: value.buffered,
+              total: value.total,
+            ),
           );
         },
       ),
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-          child: Center(
-              child: Column(children: [
-            Column(
-              // mainAxisAlignment: MainAxisAlignment.start,
-
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(context.watch<CurrentSongProvider>().getSong()!.songName,
+        Flexible(
+          child: Container(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.watch<CurrentSongProvider>().getSong()!.songName,
                     style: TextStyle(
                         color: COLOR_SECONDARY,
                         fontSize: 19,
-                        fontWeight: FontWeight.bold)),
-                Text(
+                        fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
                     context
                         .watch<CurrentSongProvider>()
                         .getSong()!
@@ -72,10 +78,12 @@ Widget audioPlayer(BuildContext context) {
                     style: TextStyle(
                       color: Color(0xFFA5C0FF).withOpacity(0.7),
                       fontSize: 11,
-                    )),
-              ],
-            )
-          ])),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
