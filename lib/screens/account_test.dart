@@ -151,7 +151,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                 child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -443,29 +443,7 @@ class _AccountPageStateTest extends State<AccountPageTest> {
                     style: TextStyle(fontSize: 16),
                   ))
             ])),
-            Center(
-              child: Column(
-                children: [
-                  Text(
-                    "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}",
-                    style: TextStyle(color: COLOR_SECONDARY),
-                  ),
-                  Text(
-                    "Hex: ${context.watch<SmartContractProvider>().getSmartContract()!.contractAddr}",
-                    style: TextStyle(color: COLOR_SECONDARY),
-                  ),
-                  Text(
-                    "Chain id: ${context.watch<SmartContractProvider>().getSmartContract()!.chainId}",
-                    style: TextStyle(color: COLOR_SECONDARY),
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        goToPage(context, "/smart_contract_settings");
-                      },
-                      child: Text("Change details"))
-                ],
-              ),
-            ),
+            detailsWidget(),
           ],
         ),
       ),
@@ -613,11 +591,58 @@ class _AccountPageStateTest extends State<AccountPageTest> {
   }
 
   Widget detailsWidget() {
-    return Column(
-      children: [
-        Container(),
-        Container(),
-      ],
+    return SingleChildScrollView(
+      child: Expanded(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+              child: Column(
+                children: [
+                  Container(
+                    //width: 190,
+                    decoration: BoxDecoration(
+                        color: COLOR_SECONDARY,
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Account details",
+                            style: TextStyle(
+                                color: COLOR_PRIMARY,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}",
+                            style: TextStyle(color: COLOR_PRIMARY),
+                          ),
+                          Text(
+                            "Hex: ${context.watch<SmartContractProvider>().getSmartContract()!.contractAddr}",
+                            style: TextStyle(color: COLOR_PRIMARY),
+                          ),
+                          Text(
+                            "Chain id: ${context.watch<SmartContractProvider>().getSmartContract()!.chainId}",
+                            style: TextStyle(color: COLOR_PRIMARY),
+                          ),
+                          ElevatedButton(
+                              onPressed: () {
+                                goToPage(context, "/smart_contract_settings");
+                              },
+                              child: Text("Change details"))
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

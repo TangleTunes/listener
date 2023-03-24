@@ -6,6 +6,7 @@ import 'package:listener/providers/balance_provider.dart';
 import 'package:listener/providers/current_song_provider.dart';
 import 'package:listener/providers/playback_provider.dart';
 import 'package:listener/screens/account.dart';
+import 'package:listener/screens/account_test.dart';
 import 'package:listener/screens/create_account.dart';
 import 'package:listener/screens/load_create_account.dart';
 import 'package:listener/screens/load_songs.dart';
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget {
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple_account': (context) => CoupleAccount(),
         //'/account': (context) => AccountPage(tabSelected: 0),
-        '/account': (context) => AccountPage(tabSelected: 0),
+        '/account': (context) => AccountPageTest(tabSelected: 0),
         //'/library': (context) => LibraryPage(),
         '/load_songs': (context) => LoadingSongs(),
         "/smart_contract_settings": (context) => SmartContractSettings(),
