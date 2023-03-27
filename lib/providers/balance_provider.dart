@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class BalanceProvider with ChangeNotifier {
-  BigInt _balance = BigInt.from(0);
+  BigInt? _balance;
 
-  BigInt getBalance() {
+  BigInt? getBalance() {
     return _balance;
   }
 
@@ -12,7 +12,7 @@ class BalanceProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setBalance(BigInt balance) {
+  void setBalance(BigInt? balance) {
     _balance = balance;
   }
 }

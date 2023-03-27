@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener/components/text_inputs.dart';
 import 'package:listener/providers/credentials_provider.dart';
+import 'package:listener/providers/smart_contract_provider.dart';
 import 'package:listener/theme/theme_constants.dart';
 import 'package:listener/user_settings/manage_account.dart';
 import 'package:listener/utils/go_to_page.dart';
@@ -157,8 +158,13 @@ class _CoupleAccountState extends State<CoupleAccount> {
                                           .read<CredentialsProvider>()
                                           .setOwnCredentials(
                                               privateKeyController.text);
+
                                   if (setOwnCredentialsCall.isRight) {
-                                    goToPage(context, "/load_create_account");
+                                    // if (userexists) {
+                                    // goToPage(context, "/discovery");
+                                    // } else {
+                                    goToPage(context, "/load_couple_account");
+                                    // }
                                   } else {
                                     toast(setOwnCredentialsCall.left.message);
                                   }

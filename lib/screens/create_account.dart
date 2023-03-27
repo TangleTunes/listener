@@ -29,13 +29,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final passwordController = TextEditingController();
   final repeatPasswordController = TextEditingController();
-  final usernameController = TextEditingController();
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     passwordController.dispose();
-    usernameController.dispose();
     repeatPasswordController.dispose();
     super.dispose();
   }
@@ -68,28 +66,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         style: GoogleFonts.francoisOne(
                             fontSize: 30, color: COLOR_SECONDARY)),
                     SizedBox(height: 20),
-
-                    //The first text input box for your Username
-                    SizedBox(
-                      child: Container(
-                        width: 373,
-                        child: Text(
-                          'Username*',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: COLOR_SECONDARY,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Builder(
-                        builder: (BuildContext context) => createTextInput(
-                            context,
-                            usernameController,
-                            "Your username",
-                            false)),
 
                     //The second text input box for your password
                     SizedBox(height: 20),
@@ -151,13 +127,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                   repeatPasswordController.text) {
                                 toast("Passwords don't match");
                               } else {
-                                Either<MyError, Credentials> createAccountCall =
-                                    await createAccount(usernameController.text,
+                                Either<MyError, Credentials>
+                                    createNewCredentials =
+                                    await createNewAccountCredentials(
                                         passwordController.text, context);
-                                if (createAccountCall.isRight) {
+                                if (createNewCredentials.isRight) {
                                   goToPage(context, "/load_create_account");
                                 } else {
-                                  toast(createAccountCall.left.message);
+                                  toast(createNewCredentials.left.message);
                                 }
                               }
                             }

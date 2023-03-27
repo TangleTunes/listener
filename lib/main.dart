@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:listener/providers/account_created_provider.dart';
 import 'package:listener/providers/balance_provider.dart';
 import 'package:listener/providers/current_song_provider.dart';
 import 'package:listener/providers/playback_provider.dart';
+import 'package:listener/providers/username_provider.dart';
 import 'package:listener/screens/account.dart';
 import 'package:listener/screens/create_account.dart';
+import 'package:listener/screens/load_couple_account.dart';
 import 'package:listener/screens/load_create_account.dart';
 import 'package:listener/screens/load_songs.dart';
+import 'package:listener/screens/please_deposit.dart';
+import 'package:listener/screens/provide_username.dart';
 import 'package:listener/screens/smart_contract_settings.dart';
 import 'package:listener/screens/start.dart';
 import 'package:listener/user_settings/manage_account.dart';
@@ -45,6 +50,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CurrentSongProvider()),
         ChangeNotifierProvider(create: (_) => PlaybackProvider()),
         ChangeNotifierProvider(create: (_) => BalanceProvider()),
+        ChangeNotifierProvider(create: (_) => UsernameProvider()),
+        ChangeNotifierProvider(create: (_) => AccountCreatedProvider()),
       ],
       child: MyApp(),
     ),
@@ -65,13 +72,14 @@ class MyApp extends StatelessWidget {
         '/unlock_account': (context) => UnlockPage(),
         '/load_smart_contract': (context) => LoadingSmartContractInfo(),
         '/couple_account': (context) => CoupleAccount(),
-        //'/account': (context) => AccountPage(tabSelected: 0),
         '/account': (context) => AccountPage(tabSelected: 0),
-        //'/library': (context) => LibraryPage(),
         '/load_songs': (context) => LoadingSongs(),
         "/smart_contract_settings": (context) => SmartContractSettings(),
         "/create_account": (context) => RegisterPage(),
         "/load_create_account": (context) => LoadCreateAccount(),
+        "/provide_username": (context) => ProvideUsername(),
+        "/please_deposit": (context) => PleaseDeposit(),
+        "/load_couple_account": (context) => LoadCoupleAccount(),
       },
       debugShowCheckedModeBanner: false,
       theme: themeData,

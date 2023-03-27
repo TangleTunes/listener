@@ -14,12 +14,12 @@ import '../error_handling/app_error.dart';
 import '../providers/credentials_provider.dart';
 import '../providers/smart_contract_provider.dart';
 
-class LoadCreateAccount extends StatefulWidget {
+class LoadCoupleAccount extends StatefulWidget {
   @override
-  _LoadCreateAccountState createState() => _LoadCreateAccountState();
+  _LoadCoupleAccountState createState() => _LoadCoupleAccountState();
 }
 
-class _LoadCreateAccountState extends State<LoadCreateAccount> {
+class _LoadCoupleAccountState extends State<LoadCoupleAccount> {
   Future<String> _fetchPrefs(BuildContext context) async {
     String nextPage = "/discovery";
     SmartContract sc =
@@ -32,18 +32,12 @@ class _LoadCreateAccountState extends State<LoadCreateAccount> {
     bool userExists = false;
     if (usersCall.isRight) {
       userExists = usersCall.right[0];
+      print(userExists);
       if (!userExists) {
-        String username = context.read<UsernameProvider>().getUsername()!;
-        Either<MyError, Null> createUserCall =
-            await sc.createUser(username, "descriptionless");
-        if (createUserCall.isRight) {
-          context.read<AccountCreatedProvider>().updateAccountCreated(true);
-        } else {
-          toast(createUserCall.left.message);
-          nextPage = "/please_deposit";
-        }
+        nextPage = "/load_create_account";
       } else {
         context.read<AccountCreatedProvider>().updateAccountCreated(true);
+        nextPage = "/discovery";
         toast("Logged in as ${usersCall.right[1]}");
       }
     } else {

@@ -5,6 +5,9 @@ import 'dart:typed_data';
 import 'package:either_dart/either.dart';
 import 'package:flutter/widgets.dart';
 import 'package:listener/distributor_connection/smart_contract.dart';
+import 'package:listener/providers/account_created_provider.dart';
+import 'package:listener/providers/balance_provider.dart';
+import 'package:listener/providers/smart_contract_provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:web3dart/web3dart.dart';
@@ -12,16 +15,18 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import '../error_handling/app_error.dart';
 import '../providers/credentials_provider.dart';
+import '../providers/username_provider.dart';
 import '../utils/toast.dart';
 import 'file_writer.dart';
 
-Future<Either<MyError, Credentials>> createAccount(
-    String username, String password, BuildContext context) async {
+Future<Either<MyError, Credentials>> createNewAccountCredentials(
+    String password, BuildContext context) async {
   EthPrivateKey credentials = EthPrivateKey.createRandom(Random.secure());
   var setOwnCredentialsCall = context
       .read<CredentialsProvider>()
       .setOwnCredentials(hex.encode(credentials.privateKey));
   if (setOwnCredentialsCall.isRight) {
+    print("setting private key to generated credentials.privateKey");
     Either<MyError, Null> setPKCall = await setPrivateKey(
         hex.encode(credentials.privateKey), password, context);
     if (setPKCall.isRight) {
@@ -42,7 +47,12 @@ Future<Either<MyError, Null>> setPrivateKey(
     String v3walletEncrypted = wallet.toJson();
     final data = {'privatekey': v3walletEncrypted};
     await writeToFile("pk.json", jsonEncode(data));
-    context.read<CredentialsProvider>().updateOwnCredentials(privateKey);
+    context.read<CredentialsProvider>().setOwnCredentials(privateKey);
+    context.read<SmartContractProvider>().setSmartContract(null);
+    context.read<BalanceProvider>().setBalance(null);
+    context.read<UsernameProvider>().setUsername(null);
+    context.read<AccountCreatedProvider>().setAccountCreated(false);
+
     return Right(null);
   } catch (e) {
     return Left(MyError(

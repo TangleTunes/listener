@@ -36,12 +36,15 @@ class DistributorContact {
     try {
       thisObj.socket =
           await Socket.connect(thisObj.distributorIP, thisObj.distributorPort);
-    } on Exception catch (e) {
+      thisObj.socket.handleError((e) {
+        print(e);
+      });
+    } catch (e) {
       return Left(MyError(
-          key: AppError.SocketConnectionFailed,
-          message:
-              "Could not connect to distributor at ${thisObj.distributorIP}:${thisObj.distributorPort}",
-          exception: e));
+        key: AppError.SocketConnectionFailed,
+        message:
+            "Could not connect to distributor at ${thisObj.distributorIP}:${thisObj.distributorPort}",
+      ));
     }
     thisObj.stream =
         thisObj.socket.transform(StreamTransformer.fromBind((tcpStream) async* {
@@ -98,6 +101,7 @@ class DistributorContact {
 
   Future<Either<MyError, Null>> requestChunks(
       String songIdentifier, int from, int amount) async {
+    print("is socket done? ${socket.done}");
     // print("called method requestChunks from $from and amount $amount");
     Uint8List songId = hexToBytes(songIdentifier);
     var potentialChunkTransaction = await smartContract

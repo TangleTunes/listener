@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listener/components/text_inputs.dart';
+import 'package:listener/providers/account_created_provider.dart';
 import 'package:listener/user_settings/file_writer.dart';
 import 'package:listener/utils/go_to_page.dart';
 import 'package:listener/utils/toast.dart';
@@ -107,6 +108,9 @@ class _UnlockPageState extends State<UnlockPage> {
                                     .setOwnCredentials(
                                         potentialPrivateKey.right);
                                 if (setOwnCredentialsCall.isRight) {
+                                  context
+                                      .read<AccountCreatedProvider>()
+                                      .setAccountCreated(true);
                                   goToPage(context, "/discovery");
                                 } else {
                                   toast(setOwnCredentialsCall.left.message);

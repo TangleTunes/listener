@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:listener/components/loading_screen.dart';
+import 'package:listener/providers/account_created_provider.dart';
 import 'package:listener/utils/go_to_page.dart';
 import 'package:listener/utils/toast.dart';
 import 'package:listener/screens/account.dart';
@@ -34,6 +35,7 @@ class _LoadingSmartContractState extends State<LoadingSmartContractInfo> {
 
   Future<String> _fetchPrefs(BuildContext context) async {
     nextPage = "/discovery";
+
     // await writeToFile("sc.toml",
     //     "making this toml file unreadbale so that initilizeSmartContractIfNotSet is always triggered and will contain what is set in asset's toml file"); //FIXME for development purposes only, remove this line
     await initilizeSmartContractIfNotSet();

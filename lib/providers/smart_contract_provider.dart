@@ -14,7 +14,7 @@ class SmartContractProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSmartContract(SmartContract contract) {
+  void setSmartContract(SmartContract? contract) {
     _smartContract = contract;
   }
 }

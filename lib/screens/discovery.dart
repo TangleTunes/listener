@@ -35,6 +35,7 @@ class DiscoveryPage extends StatefulWidget {
 class _DiscoveryPageState extends State<DiscoveryPage> {
   int _selectedIndex = 0;
   double _value = 20;
+
   @override
   void initState() {
     super.initState();

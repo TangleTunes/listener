@@ -176,11 +176,16 @@ class _AccountPageStateTest extends State<AccountPage> {
                                     Padding(
                                       padding:
                                           const EdgeInsets.fromLTRB(2, 4, 0, 4),
-                                      child: Text(
-                                          "${weiToMiota(context.watch<BalanceProvider>().getBalance())} MIOTA",
-                                          style: TextStyle(
-                                              color: COLOR_PRIMARY,
-                                              fontSize: 16)),
+                                      child: context
+                                                  .watch<BalanceProvider>()
+                                                  .getBalance() ==
+                                              null
+                                          ? Text("Not fetched yet")
+                                          : Text(
+                                              "${weiToMiota(context.watch<BalanceProvider>().getBalance()!)} MIOTA",
+                                              style: TextStyle(
+                                                  color: COLOR_PRIMARY,
+                                                  fontSize: 16)),
                                     ),
                                     refreshBalanceButton(),
                                   ],
@@ -445,15 +450,15 @@ class _AccountPageStateTest extends State<AccountPage> {
             Center(
                 child: Column(children: [
               Text(
-                "Rpc Url: ${context.watch<SmartContractProvider>().getSmartContract()!.rpcUrl}",
+                "Rpc Url: ${context.read<SmartContractProvider>().getSmartContract()!.rpcUrl}",
                 style: TextStyle(color: COLOR_SECONDARY),
               ),
               Text(
-                "Hex: ${context.watch<SmartContractProvider>().getSmartContract()!.contractAddr}",
+                "Hex: ${context.read<SmartContractProvider>().getSmartContract()!.contractAddr}",
                 style: TextStyle(color: COLOR_SECONDARY),
               ),
               Text(
-                "Chain id: ${context.watch<SmartContractProvider>().getSmartContract()!.chainId}",
+                "Chain id: ${context.read<SmartContractProvider>().getSmartContract()!.chainId}",
                 style: TextStyle(color: COLOR_SECONDARY),
               ),
               ElevatedButton(
