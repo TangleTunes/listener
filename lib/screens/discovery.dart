@@ -92,7 +92,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
                 child: SearchableList<Song>(
                   cursorColor: COLOR_PRIMARY,
                   autoFocusOnSearch: false,
@@ -259,8 +259,8 @@ class _SongItemState extends State<SongItem> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 110,
-        width: 380,
+        //height: 110,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: COLOR_SECONDARY,
           borderRadius: BorderRadius.circular(10),

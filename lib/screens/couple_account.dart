@@ -37,141 +37,148 @@ class _CoupleAccountState extends State<CoupleAccount> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: Center(
-            child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    //the logo of Tangle Tunes and Tangle Tunes text
-                    Container(
-                        height: 82,
-                        width: 82,
-                        child: Center(
-                          child: Image.asset('assets/logo_tangletunes.png'),
-                        )),
-                    SizedBox(height: 5),
-                    Text('Tangle Tunes',
-                        style: GoogleFonts.francoisOne(
-                            fontSize: 30, color: COLOR_SECONDARY)),
-                    SizedBox(height: 20),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.question_mark_rounded),
+        mini: true,
+        foregroundColor: COLOR_SECONDARY,
+        backgroundColor: COLOR_TERTIARY,
+        onPressed: () {
+          goToPage(context, "/help_page");
+        },
+      ),
+      body: Center(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                //the logo of Tangle Tunes and Tangle Tunes text
+                Container(
+                    height: 82,
+                    width: 82,
+                    child: Center(
+                      child: Image.asset('assets/logo_tangletunes.png'),
+                    )),
+                SizedBox(height: 5),
+                Text('Tangle Tunes',
+                    style: GoogleFonts.francoisOne(
+                        fontSize: 30, color: COLOR_SECONDARY)),
+                SizedBox(height: 20),
 
-                    //The first text input box for your Username
-                    SizedBox(
-                      child: Container(
-                        width: 373,
-                        child: Text(
-                          'Password*',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: COLOR_SECONDARY,
-                            fontSize: 18,
-                          ),
-                        ),
+                //The first text input box for your Username
+                SizedBox(
+                  child: Container(
+                    width: 373,
+                    child: Text(
+                      'Password*',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: COLOR_SECONDARY,
+                        fontSize: 18,
                       ),
                     ),
-                    SizedBox(height: 6),
-                    Builder(
-                        builder: (BuildContext context) => createTextInput(
-                            context,
-                            passwordController,
-                            "Your password",
-                            true)),
+                  ),
+                ),
+                SizedBox(height: 6),
+                Builder(
+                    builder: (BuildContext context) => createTextInput(
+                        context, passwordController, "Your password", true)),
 
-                    //The second text input box for your password
-                    SizedBox(height: 20),
-                    SizedBox(
-                      child: Container(
-                        width: 373,
-                        child: Text(
-                          'Repeat password*',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: COLOR_SECONDARY,
-                            fontSize: 18,
-                          ),
-                        ),
+                //The second text input box for your password
+                SizedBox(height: 20),
+                SizedBox(
+                  child: Container(
+                    width: 373,
+                    child: Text(
+                      'Repeat password*',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: COLOR_SECONDARY,
+                        fontSize: 18,
                       ),
                     ),
-                    SizedBox(height: 6),
-                    Builder(
-                        builder: (BuildContext context) => createTextInput(
-                            context,
-                            repeatPasswordController,
-                            "Repeat your password",
-                            true)),
+                  ),
+                ),
+                SizedBox(height: 6),
+                Builder(
+                    builder: (BuildContext context) => createTextInput(
+                        context,
+                        repeatPasswordController,
+                        "Repeat your password",
+                        true)),
 
-                    //The third text input box for inserting your private key
-                    SizedBox(height: 20),
-                    SizedBox(
-                      child: Container(
-                        width: 373,
-                        child: Text(
-                          'Your private key*',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: COLOR_SECONDARY,
-                            fontSize: 18,
-                          ),
-                        ),
+                //The third text input box for inserting your private key
+                SizedBox(height: 20),
+                SizedBox(
+                  child: Container(
+                    width: 373,
+                    child: Text(
+                      'Your private key*',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: COLOR_SECONDARY,
+                        fontSize: 18,
                       ),
                     ),
-                    SizedBox(height: 6),
-                    Builder(
-                        builder: (BuildContext context) => createTextInput(
-                            context,
-                            privateKeyController,
-                            "Your private key",
-                            false)),
+                  ),
+                ),
+                SizedBox(height: 6),
+                Builder(
+                    builder: (BuildContext context) => createTextInput(context,
+                        privateKeyController, "Your private key", false)),
 
-                    SizedBox(height: 25),
-                    //the register button, which redirects you to the discovery page iff you filled in all the boxes
-                    SizedBox(
-                        width: 372,
-                        height: 56,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: COLOR_TERTIARY),
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              if (passwordController.text !=
-                                  repeatPasswordController.text) {
-                                toast("Passwords don't match");
-                              } else {
-                                Either<MyError, Null> setPrivateKeyCall =
-                                    await setPrivateKey(
-                                        privateKeyController.text,
-                                        passwordController.text,
-                                        context);
+                SizedBox(height: 25),
+                //the register button, which redirects you to the discovery page iff you filled in all the boxes
+                SizedBox(
+                  width: 372,
+                  height: 56,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: COLOR_TERTIARY),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        if (passwordController.text !=
+                            repeatPasswordController.text) {
+                          toast("Passwords don't match");
+                        } else {
+                          Either<MyError, Null> setPrivateKeyCall =
+                              await setPrivateKey(privateKeyController.text,
+                                  passwordController.text, context);
 
-                                if (setPrivateKeyCall.isRight) {
-                                  Either<MyError, Null> setOwnCredentialsCall =
-                                      context
-                                          .read<CredentialsProvider>()
-                                          .setOwnCredentials(
-                                              privateKeyController.text);
-                                  if (setOwnCredentialsCall.isRight) {
-                                    goToPage(context, "/load_create_account");
-                                  } else {
-                                    toast(setOwnCredentialsCall.left.message);
-                                  }
-                                } else {
-                                  toast(setPrivateKeyCall.left.message);
-                                }
-                              }
+                          if (setPrivateKeyCall.isRight) {
+                            Either<MyError, Null> setOwnCredentialsCall =
+                                context
+                                    .read<CredentialsProvider>()
+                                    .setOwnCredentials(
+                                        privateKeyController.text);
+                            if (setOwnCredentialsCall.isRight) {
+                              goToPage(context, "/load_create_account");
+                            } else {
+                              toast(setOwnCredentialsCall.left.message);
                             }
-                          },
-                          child: Text('Couple account',
-                              style: GoogleFonts.poppins(fontSize: 16)),
-                        )),
-                  ],
-                )))));
+                          } else {
+                            toast(setPrivateKeyCall.left.message);
+                          }
+                        }
+                      }
+                    },
+                    child: Text('Couple account',
+                        style: GoogleFonts.poppins(fontSize: 16)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

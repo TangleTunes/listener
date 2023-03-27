@@ -8,6 +8,7 @@ import 'package:listener/providers/playback_provider.dart';
 import 'package:listener/screens/account.dart';
 import 'package:listener/screens/account_test.dart';
 import 'package:listener/screens/create_account.dart';
+import 'package:listener/screens/help_page.dart';
 import 'package:listener/screens/load_create_account.dart';
 import 'package:listener/screens/load_songs.dart';
 import 'package:listener/screens/smart_contract_settings.dart';
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
         "/smart_contract_settings": (context) => SmartContractSettings(),
         "/create_account": (context) => RegisterPage(),
         "/load_create_account": (context) => LoadCreateAccount(),
+        '/help_page': (context) => HelpPage(),
       },
       debugShowCheckedModeBanner: false,
       theme: themeData,
