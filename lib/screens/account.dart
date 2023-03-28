@@ -58,9 +58,10 @@ class _AccountPageState extends State<AccountPage> {
     String apiUrl = sc.rpcUrl;
     var httpClient = Client();
     var ethClient = Web3Client(apiUrl, httpClient);
-    EtherAmount balance = await ethClient.getBalance(sc.contractAddr);
-    context.read<BalanceProvider>().updateL1Balance(
-        (BigInt.from(balance.getValueInUnit(EtherUnit.wei).round())));
+    EthereumAddress myAddr =
+        context.read<CredentialsProvider>().getCredentials()!.address;
+    EtherAmount l2Balance = await ethClient.getBalance(myAddr);
+    context.read<BalanceProvider>().updateL2BalanceInWei(l2Balance.getInWei);
     return;
   }
 
@@ -208,11 +209,11 @@ class _AccountPageState extends State<AccountPage> {
                                             2, 4, 0, 4),
                                         child: context
                                                     .watch<BalanceProvider>()
-                                                    .getL1Balance() ==
+                                                    .getL2BalanceInWei() ==
                                                 null
                                             ? Text("Not fetched yet")
                                             : Text(
-                                                "Ledger 1: ${weiToMiota(context.watch<BalanceProvider>().getL1Balance()!).toStringAsPrecision(4)} MIOTA",
+                                                "Ledger 2: ${weiToMiota(context.watch<BalanceProvider>().getL2BalanceInWei()!).toStringAsPrecision(4)} MIOTA",
                                                 style: TextStyle(
                                                     color: COLOR_PRIMARY,
                                                     fontSize: 16)),

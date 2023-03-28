@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class BalanceProvider with ChangeNotifier {
   BigInt? _contractBalance;
-  BigInt? _leger1Balance;
+  BigInt? _leger2BalanceInWei;
 
   BigInt? getContractBalance() {
     return _contractBalance;
@@ -17,16 +17,16 @@ class BalanceProvider with ChangeNotifier {
     _contractBalance = balance;
   }
 
-  BigInt? getL1Balance() {
-    return _leger1Balance;
+  BigInt? getL2BalanceInWei() {
+    return _leger2BalanceInWei;
   }
 
-  void updateL1Balance(BigInt balance) {
-    _leger1Balance = balance;
+  void updateL2BalanceInWei(BigInt balance) {
+    _leger2BalanceInWei = balance;
     notifyListeners();
   }
 
-  void setL1Balance(BigInt? balance) {
-    _leger1Balance = balance;
+  void setL2BalanceInWei(BigInt? balance) {
+    _leger2BalanceInWei = balance;
   }
 }

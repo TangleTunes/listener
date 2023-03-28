@@ -50,7 +50,7 @@ Future<Either<MyError, Null>> setPrivateKey(
     context.read<CredentialsProvider>().setOwnCredentials(privateKey);
     context.read<SmartContractProvider>().setSmartContract(null);
     context.read<BalanceProvider>().setContractBalance(null);
-    context.read<BalanceProvider>().setL1Balance(null);
+    context.read<BalanceProvider>().setL2BalanceInWei(null);
     context.read<UsernameProvider>().setUsername(null);
     context.read<AccountCreatedProvider>().setAccountCreated(false);
 
