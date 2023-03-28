@@ -49,7 +49,8 @@ Future<Either<MyError, Null>> setPrivateKey(
     await writeToFile("pk.json", jsonEncode(data));
     context.read<CredentialsProvider>().setOwnCredentials(privateKey);
     context.read<SmartContractProvider>().setSmartContract(null);
-    context.read<BalanceProvider>().setBalance(null);
+    context.read<BalanceProvider>().setContractBalance(null);
+    context.read<BalanceProvider>().setL1Balance(null);
     context.read<UsernameProvider>().setUsername(null);
     context.read<AccountCreatedProvider>().setAccountCreated(false);
 

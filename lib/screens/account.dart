@@ -10,7 +10,8 @@ import 'package:listener/providers/smart_contract_provider.dart';
 import 'package:listener/user_settings/manage_account.dart';
 import 'package:listener/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
-
+import 'package:http/http.dart';
+import 'package:web3dart/web3dart.dart';
 import '../Components/text_inputs.dart';
 import '../error_handling/app_error.dart';
 import '../utils/toast.dart';
@@ -50,11 +51,16 @@ class _AccountPageState extends State<AccountPage> {
         await sc.users(sc.ownAddress.hex);
     if (potentialBalance.isRight) {
       BigInt balance = potentialBalance.right[4];
-      print("your balance is $balance");
-      context.read<BalanceProvider>().updateBalance(balance);
+      context.read<BalanceProvider>().updateContractBalance(balance);
     } else {
       toast(potentialBalance.left.message);
     }
+    String apiUrl = sc.rpcUrl;
+    var httpClient = Client();
+    var ethClient = Web3Client(apiUrl, httpClient);
+    EtherAmount balance = await ethClient.getBalance(sc.contractAddr);
+    context.read<BalanceProvider>().updateL1Balance(
+        (BigInt.from(balance.getValueInUnit(EtherUnit.wei).round())));
     return;
   }
 
@@ -63,7 +69,7 @@ class _AccountPageState extends State<AccountPage> {
     _privateKeyVisible = false;
 
     super.initState();
-    // _fetchPrefs(context); //running initialisation code; getting prefs etc.
+    _fetchPrefs(context); //running initialisation code; getting prefs etc.
   }
 
   @override
@@ -188,11 +194,25 @@ class _AccountPageState extends State<AccountPage> {
                                             2, 4, 0, 4),
                                         child: context
                                                     .watch<BalanceProvider>()
-                                                    .getBalance() ==
+                                                    .getContractBalance() ==
                                                 null
                                             ? Text("Not fetched yet")
                                             : Text(
-                                                "${weiToMiota(context.watch<BalanceProvider>().getBalance()!)} MIOTA",
+                                                "Contract: ${weiToMiota(context.watch<BalanceProvider>().getContractBalance()!).toStringAsPrecision(4)} MIOTA",
+                                                style: TextStyle(
+                                                    color: COLOR_PRIMARY,
+                                                    fontSize: 16)),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            2, 4, 0, 4),
+                                        child: context
+                                                    .watch<BalanceProvider>()
+                                                    .getL1Balance() ==
+                                                null
+                                            ? Text("Not fetched yet")
+                                            : Text(
+                                                "Ledger 1: ${weiToMiota(context.watch<BalanceProvider>().getL1Balance()!).toStringAsPrecision(4)} MIOTA",
                                                 style: TextStyle(
                                                     color: COLOR_PRIMARY,
                                                     fontSize: 16)),
@@ -338,29 +358,8 @@ class _AccountPageState extends State<AccountPage> {
                                                         toast(
                                                             "Deposit successful!");
                                                       }
-                                                      Either<MyError,
-                                                              List<dynamic>>
-                                                          potentialUserCall =
-                                                          await sc.users((context
-                                                                  .read<
-                                                                      CredentialsProvider>()
-                                                                  .getCredentials()!
-                                                                  .address)
-                                                              .toString());
-                                                      if (potentialUserCall
-                                                          .isLeft) {
-                                                        toast(
-                                                            "Update balance failed!");
-                                                      } else {
-                                                        BigInt newBalance =
-                                                            potentialUserCall
-                                                                .right[4];
-                                                        context
-                                                            .read<
-                                                                BalanceProvider>()
-                                                            .updateBalance(
-                                                                newBalance);
-                                                      }
+                                                      await _fetchPrefs(
+                                                          context);
                                                     }
                                                   },
                                                   child: const Text(
@@ -489,17 +488,8 @@ class _AccountPageState extends State<AccountPage> {
       children: [
         IconButton(
           onPressed: () async {
-            SmartContract sc =
-                context.read<SmartContractProvider>().getSmartContract()!;
-            Either<MyError, List<dynamic>> potentialBalance =
-                await sc.users(sc.ownAddress.hex);
-            if (potentialBalance.isRight) {
-              BigInt balance = potentialBalance.right[4];
-              context.read<BalanceProvider>().updateBalance(balance);
-              toast("Refreshed balance");
-            } else {
-              toast(potentialBalance.left.message);
-            }
+            await _fetchPrefs(context);
+            toast("Refreshed balance");
           },
           icon: Icon(Icons.refresh),
           color: COLOR_TERTIARY,
