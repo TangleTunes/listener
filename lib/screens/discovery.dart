@@ -265,43 +265,56 @@ class _SongItemState extends State<SongItem> {
           color: COLOR_SECONDARY,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.song.songName,
+                        style: const TextStyle(
+                          color: COLOR_PRIMARY,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Artist: ${widget.song.artist}',
+                        style: const TextStyle(
+                          color: COLOR_PRIMARY,
+                        ),
+                      ),
+                      Text(
+                        'Duration: ${formatedTime(widget.song.duration)}',
+                        style: const TextStyle(
+                          color: COLOR_PRIMARY,
+                        ),
+                      ),
+                      Text(
+                        'Price: ${priceInMiotaPerMinute(widget.song.price, widget.song.duration, widget.song.byteSize)} MIOTA/min',
+                        style: const TextStyle(
+                          color: COLOR_PRIMARY,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.song.songName,
-                    style: const TextStyle(
-                      color: COLOR_PRIMARY,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    'Artist: ${widget.song.artist}',
-                    style: const TextStyle(
-                      color: COLOR_PRIMARY,
-                    ),
-                  ),
-                  Text(
-                    'Duration: ${formatedTime(widget.song.duration)}',
-                    style: const TextStyle(
-                      color: COLOR_PRIMARY,
-                    ),
-                  ),
-                  Text(
-                    'Price: ${priceInMiotaPerMinute(widget.song.price, widget.song.duration, widget.song.byteSize)} MIOTA/min',
-                    style: const TextStyle(
-                      color: COLOR_PRIMARY,
-                    ),
-                  ),
-                ],
+              padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+              child: Icon(
+                Icons.library_music_rounded,
+                color: COLOR_TERTIARY,
+                size: 36,
               ),
             ),
           ],
