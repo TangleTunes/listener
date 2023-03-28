@@ -67,83 +67,235 @@ class _SmartContractSettingsState extends State<SmartContractSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-            child: Column(children: [
-      Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'RPCUrl',
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Smart Contract Settings',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.question_mark_rounded),
+        mini: true,
+        foregroundColor: COLOR_SECONDARY,
+        backgroundColor: COLOR_TERTIARY,
+        onPressed: () {
+          goToPage(context, "/help_page");
+        },
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Container(
+          decoration: BoxDecoration(
+              color: COLOR_SECONDARY,
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Change details',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-                controller: rpcUrlController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Required';
-                  }
-                  return null;
-                }),
-            TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Smart Contract Address',
-                ),
-                controller: contractAddrController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Required';
-                  }
-                  return null;
-                }),
-            TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Chain ID',
-                ),
-                keyboardType: TextInputType.number,
-                controller: chainIdController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    int? numValue = int.tryParse(value!);
-                    if (numValue == null) {
-                      return 'Must be a number';
-                    } else {
-                      return 'Required';
-                    }
-                  }
-                  return null;
-                }),
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  Either<MyError, SmartContract> potentialSmartContract =
-                      await SmartContract.create(
-                          rpcUrlController.text,
-                          contractAddrController.text,
-                          int.parse(chainIdController.text),
-                          context
-                              .read<CredentialsProvider>()
-                              .getCredentials()!);
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 4, 0, 4),
+                        child: Text(
+                          'RPC Url',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: COLOR_PRIMARY,
+                          ),
+                        ),
+                      ),
 
-                  if (potentialSmartContract.isRight) {
-                    print("now trying to write to file");
-                    await setContractAdress(contractAddrController.text);
-                    await setChainId(int.parse(chainIdController.text));
-                    await setNodeUrl(rpcUrlController.text);
-                    goToPage(context, "/load_smart_contract");
-                  } else {
-                    toast("Could not reach this smart contract");
-                  }
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
-                  );
-                }
-              },
-              child: const Text('Set'),
+                      // TextFormField(
+                      //     style: TextStyle(color: COLOR_SECONDARY),
+                      //     cursorColor: COLOR_PRIMARY,
+                      //     decoration: InputDecoration(
+                      //       contentPadding:
+                      //           EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                      //       errorStyle: TextStyle(
+                      //         color: COLOR_TERTIARY,
+                      //       ),
+                      //       errorBorder: OutlineInputBorder(
+                      //           borderSide: BorderSide(color: COLOR_TERTIARY)),
+                      //       focusedErrorBorder: OutlineInputBorder(
+                      //         borderSide:
+                      //             BorderSide(color: COLOR_TERTIARY, width: 1.5),
+                      //       ),
+                      //       enabledBorder: OutlineInputBorder(
+                      //           borderSide: BorderSide(color: COLOR_PRIMARY)),
+                      //       focusedBorder: OutlineInputBorder(
+                      //           borderSide: BorderSide(color: COLOR_PRIMARY)),
+                      //     ),
+                      //     controller: rpcUrlController,
+                      //     validator: (value) {
+                      //       if (value == null || value.isEmpty) {
+                      //         return 'Required';
+                      //       }
+                      //       return null;
+                      //     }),
+
+                      smartContractTextFormField(rpcUrlController),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 14, 0, 4),
+                        child: Text(
+                          'Smart Contract Address',
+                          style: TextStyle(fontSize: 15, color: COLOR_PRIMARY),
+                        ),
+                      ),
+                      // TextFormField(
+                      //     decoration: InputDecoration(
+                      //       labelText: 'Smart Contract Address',
+                      //     ),
+                      //     controller: contractAddrController,
+                      //     validator: (value) {
+                      //       if (value == null || value.isEmpty) {
+                      //         return 'Required';
+                      //       }
+                      //       return null;
+                      //     }),
+                      smartContractTextFormField(contractAddrController),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 14, 0, 4),
+                        child: Text(
+                          'Chain ID',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                      TextFormField(
+                          style:
+                              TextStyle(color: COLOR_PRIMARY.withOpacity(0.6)),
+                          cursorColor: COLOR_PRIMARY,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 4),
+                            errorStyle: TextStyle(
+                              color: COLOR_TERTIARY,
+                            ),
+                            errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: COLOR_TERTIARY)),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: COLOR_TERTIARY, width: 1.5),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: COLOR_PRIMARY)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: COLOR_PRIMARY)),
+                          ),
+                          keyboardType: TextInputType.number,
+                          controller: chainIdController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              int? numValue = int.tryParse(value!);
+                              if (numValue == null) {
+                                return 'Must be a number';
+                              } else {
+                                return 'Required';
+                              }
+                            }
+                            return null;
+                          }),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 14, 0, 0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: COLOR_TERTIARY,
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10)),
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                Either<MyError, SmartContract>
+                                    potentialSmartContract =
+                                    await SmartContract.create(
+                                        rpcUrlController.text,
+                                        contractAddrController.text,
+                                        int.parse(chainIdController.text),
+                                        context
+                                            .read<CredentialsProvider>()
+                                            .getCredentials()!);
+
+                                if (potentialSmartContract.isRight) {
+                                  print("now trying to write to file");
+                                  await setContractAdress(
+                                      contractAddrController.text);
+                                  await setChainId(
+                                      int.parse(chainIdController.text));
+                                  await setNodeUrl(rpcUrlController.text);
+                                  goToPage(context, "/load_smart_contract");
+                                } else {
+                                  toast("Could not reach this smart contract");
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Processing Data')),
+                                );
+                              }
+                            },
+                            child: const Text('Confirm changes',
+                                style: TextStyle(
+                                    color: COLOR_SECONDARY, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
-    ])));
+    );
+  }
+
+  Widget smartContractTextFormField(TextEditingController controller) {
+    return TextFormField(
+        style: TextStyle(
+          color: COLOR_PRIMARY.withOpacity(0.6),
+        ),
+        cursorColor: COLOR_PRIMARY,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+          errorStyle: TextStyle(
+            color: COLOR_TERTIARY,
+          ),
+          errorBorder:
+              OutlineInputBorder(borderSide: BorderSide(color: COLOR_TERTIARY)),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: COLOR_TERTIARY, width: 1.5),
+          ),
+          enabledBorder:
+              OutlineInputBorder(borderSide: BorderSide(color: COLOR_PRIMARY)),
+          focusedBorder:
+              OutlineInputBorder(borderSide: BorderSide(color: COLOR_PRIMARY)),
+        ),
+        controller: controller,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required';
+          }
+          return null;
+        });
   }
 }

@@ -8,8 +8,10 @@ import 'package:listener/providers/current_song_provider.dart';
 import 'package:listener/providers/playback_provider.dart';
 import 'package:listener/providers/username_provider.dart';
 import 'package:listener/screens/account.dart';
+import 'package:listener/screens/account.dart';
 import 'package:listener/screens/create_account.dart';
 import 'package:listener/screens/load_couple_account.dart';
+import 'package:listener/screens/help_page.dart';
 import 'package:listener/screens/load_create_account.dart';
 import 'package:listener/screens/load_songs.dart';
 import 'package:listener/screens/please_deposit.dart';
@@ -80,6 +82,7 @@ class MyApp extends StatelessWidget {
         "/provide_username": (context) => ProvideUsername(),
         "/please_deposit": (context) => PleaseDeposit(),
         "/load_couple_account": (context) => LoadCoupleAccount(),
+        '/help_page': (context) => HelpPage(),
       },
       debugShowCheckedModeBanner: false,
       theme: themeData,

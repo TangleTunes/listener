@@ -155,6 +155,12 @@ void goToPage(BuildContext context, String page) {
       }
       break;
 
+    case "/help_page":
+      {
+        Navigator.pushNamed(context, page);
+      }
+      break;
+
     default:
       {
         toast("Page not found $page");
