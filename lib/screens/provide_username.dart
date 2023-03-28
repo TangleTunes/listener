@@ -40,6 +40,15 @@ class _ProvideUsernameState extends State<ProvideUsername> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.question_mark_rounded),
+          mini: true,
+          foregroundColor: COLOR_SECONDARY,
+          backgroundColor: COLOR_TERTIARY,
+          onPressed: () {
+            goToPage(context, "/help_page");
+          },
+        ),
         body: Center(
             child: Form(
                 key: _formKey,
