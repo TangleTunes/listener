@@ -26,6 +26,15 @@ class _ProvideUsernameState extends State<ProvideUsername> {
   final usernameController = TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (context.read<UsernameProvider>().getUsername() != null) {
+      usernameController.text = context.read<UsernameProvider>().getUsername()!;
+    }
+  }
+
+  @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     usernameController.dispose();
