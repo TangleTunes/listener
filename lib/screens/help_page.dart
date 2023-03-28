@@ -18,14 +18,27 @@ import '../providers/credentials_provider.dart';
 import '../providers/song_list_provider.dart';
 import '../theme/theme_constants.dart';
 
-class HelpPage extends StatefulWidget {
+import 'package:either_dart/either.dart';
+import 'package:flutter/material.dart';
+import 'package:listener/distributor_connection/smart_contract.dart';
+import 'package:listener/providers/smart_contract_provider.dart';
+import 'package:listener/user_settings/manage_account.dart';
+import 'package:listener/utils/go_to_page.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+
+import '../Components/text_inputs.dart';
+import '../error_handling/app_error.dart';
+import '../user_settings/manage_smart_contract_details.dart';
+import '../utils/toast.dart';
+import '../providers/balance_provider.dart';
+import '../providers/credentials_provider.dart';
+import '../providers/song_list_provider.dart';
+import '../theme/theme_constants.dart';
+
+class HelpPage extends StatelessWidget {
   const HelpPage({Key? key}) : super(key: key);
 
-  @override
-  State<HelpPage> createState() => _HelpPageState();
-}
-
-class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,4 +77,10 @@ class _HelpPageState extends State<HelpPage> {
       ),
     );
   }
+}
+
+
+@override
+void initState() {
+  initState(); //running initialisation code; getting prefs etc.
 }

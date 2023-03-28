@@ -47,6 +47,8 @@ class _RegisterPageState extends State<RegisterPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
         ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.question_mark_rounded),
