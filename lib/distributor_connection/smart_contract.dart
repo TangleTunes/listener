@@ -179,28 +179,29 @@ class SmartContract {
     return returnEither;
   }
 
-  // Future<Either<MyError, Null>> withdraw(BigInt amount) async {
-  //   Either<MyError, Null> returnEither = Right(null);
-  //   try {
-  //     String tx_hash = await client.sendTransaction(
-  //         ownCredentials,
-  //         Transaction.callContract(
-  //             contract: deployedContract,
-  //             function: deployedContract.function('withdraw'),
-  //             parameters: [amount]),
-  //         chainId: chainId);
-  //     TransactionReceipt? tx_receipt =
-  //         await client.getTransactionReceipt(tx_hash);
-  //   } on Exception catch (e) {
-  //     returnEither = Left(MyError(
-  //         key: AppError.SmartContractTransactionFailed,
-  //         message: "The withdraw transaction failed",
-  //         exception: e));
-  //   } finally {
-  //     await client.dispose();
-  //   }
-  //   return returnEither;
-  // }
+  Future<Either<MyError, Null>> withdraw(BigInt amount) async {
+    Either<MyError, Null> returnEither = Right(null);
+    try {
+      String tx_hash = await client.sendTransaction(
+          ownCredentials,
+          Transaction.callContract(
+              contract: deployedContract,
+              function: deployedContract.function('withdraw'),
+              parameters: [amount, ownAddress]),
+          chainId: chainId);
+      TransactionReceipt? tx_receipt =
+          await client.getTransactionReceipt(tx_hash);
+    } catch (e) {
+      print(e);
+      _updateNonce();
+      returnEither = Left(MyError(
+          key: AppError.SmartContractTransactionFailed,
+          message: "The withdraw transaction failed"));
+    } finally {
+      await client.dispose();
+    }
+    return returnEither;
+  }
 
   Future<Either<MyError, List>> checkChunk(
       Uint8List song, int index, Uint8List chunk) async {

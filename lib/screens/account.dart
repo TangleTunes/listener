@@ -237,7 +237,7 @@ class _AccountPageState extends State<AccountPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("Deposit money",
+                                      Text("Deposit/Withdraw",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 18,
@@ -370,6 +370,60 @@ class _AccountPageState extends State<AccountPage> {
                                                   ),
                                                 ),
                                               ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 4, 0, 4),
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              COLOR_TERTIARY),
+                                                  onPressed: () async {
+                                                    // Validate returns true if the form is valid, or false otherwise.
+                                                    if (_formKeyForBalanceForm
+                                                        .currentState!
+                                                        .validate()) {
+                                                      // If the form is valid, display a snackbar. In the real world,
+                                                      // you'd often call a server or save the information in a database.
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                'Processing Data')),
+                                                      );
+                                                      SmartContract sc = context
+                                                          .read<
+                                                              SmartContractProvider>()
+                                                          .getSmartContract()!;
+
+                                                      ///temporary
+                                                      Either<MyError, Null>
+                                                          potentialWithdraw =
+                                                          await sc.withdraw(
+                                                              miotaToWei(BigInt.parse(
+                                                                  balanceController
+                                                                      .text)));
+                                                      if (potentialWithdraw
+                                                          .isLeft) {
+                                                        toast(
+                                                            "Withdraw transaction failed!");
+                                                      } else {
+                                                        toast(
+                                                            "Withdraw successful!");
+                                                      }
+                                                      await _fetchPrefs(
+                                                          context);
+                                                    }
+                                                  },
+                                                  child: const Text(
+                                                    'Withdraw',
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              )
                                             ],
                                           )),
                                     ],

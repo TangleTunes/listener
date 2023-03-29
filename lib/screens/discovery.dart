@@ -152,55 +152,85 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   },
                   emptyWidget: const EmptyView(),
                   onRefresh: () async {},
-                  onItemSelected: (Song item) async {
-                    context.read<CurrentSongProvider>().updateSong(item);
+                  onItemSelected: (Song item) => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('Are you sure?'),
+                      content: Text(
+                          'This song costs ${priceInMiotaPerMinute(item.price, item.duration, item.byteSize)} MIOTA/min'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'Cancel'),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(color: COLOR_TERTIARY),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pop(context, 'OK');
 
-                    SmartContract sc = context
-                        .read<SmartContractProvider>()
-                        .getSmartContract()!;
-                    Song currentSong =
-                        context.read<CurrentSongProvider>().getSong()!;
-                    toast("Finding a distributor");
-                    Either<MyError, List<dynamic>> scDistributorAnswer =
-                        await sc.getRandDistributor(
-                            currentSong.songId); //FIXME could be null
-                    if (scDistributorAnswer.isRight) {
-                      String distributorHex = scDistributorAnswer.right[0].hex;
-                      Uri uri =
-                          Uri.parse("tcp://" + scDistributorAnswer.right[1]);
-                      Either<MyError, DistributorContact> dc =
-                          await DistributorContact.create(
-                              sc, distributorHex, uri.host, uri.port);
-                      if (dc.isRight) {
-                        context
-                            .read<CurrentSongProvider>()
-                            .setDistributor(dc.right);
-                      }
-                      // else {
-                      //   toast(dc.left.message);
-                      // }
+                            context
+                                .read<CurrentSongProvider>()
+                                .updateSong(item);
 
-                      Playback playback =
-                          context.read<PlaybackProvider>().getPlayback();
+                            SmartContract sc = context
+                                .read<SmartContractProvider>()
+                                .getSmartContract()!;
+                            Song currentSong =
+                                context.read<CurrentSongProvider>().getSong()!;
+                            toast("Finding a distributor");
+                            Either<MyError, List<dynamic>> scDistributorAnswer =
+                                await sc.getRandDistributor(
+                                    currentSong.songId); //FIXME could be null
+                            if (scDistributorAnswer.isRight) {
+                              String distributorHex =
+                                  scDistributorAnswer.right[0].hex;
+                              Uri uri = Uri.parse(
+                                  "tcp://" + scDistributorAnswer.right[1]);
+                              Either<MyError, DistributorContact> dc =
+                                  await DistributorContact.create(
+                                      sc, distributorHex, uri.host, uri.port);
+                              if (dc.isRight) {
+                                context
+                                    .read<CurrentSongProvider>()
+                                    .setDistributor(dc.right);
+                              }
+                              // else {
+                              //   toast(dc.left.message);
+                              // }
 
-                      Uint8List songidBytes = currentSong.songId;
-                      String songIdentifier = hex.encode(songidBytes);
-                      if (currentSong.distributorContact != null) {
-                        Either<MyError, Null> setAudio =
-                            await playback.setAudio(currentSong);
-                        if (setAudio.isRight) {
-                        } else {
-                          toast(setAudio.left.message);
-                        }
-                      } else {
-                        toast("No node is distributing this song");
-                      }
-                    } else {
-                      toast(scDistributorAnswer.left.message);
-                      MaterialPageRoute(
-                          builder: (context) => AccountPage(tabSelected: 1));
-                    }
-                  },
+                              Playback playback = context
+                                  .read<PlaybackProvider>()
+                                  .getPlayback();
+
+                              Uint8List songidBytes = currentSong.songId;
+                              String songIdentifier = hex.encode(songidBytes);
+                              if (currentSong.distributorContact != null) {
+                                Either<MyError, Null> setAudio =
+                                    await playback.setAudio(currentSong);
+                                if (setAudio.isRight) {
+                                } else {
+                                  toast(setAudio.left.message);
+                                }
+                              } else {
+                                toast("No node is distributing this song");
+                              }
+                            } else {
+                              toast(scDistributorAnswer.left.message);
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      AccountPage(tabSelected: 1));
+                            }
+                          },
+                          child: const Text(
+                            'OK',
+                            style: TextStyle(color: COLOR_TERTIARY),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   inputDecoration: InputDecoration(
                     isDense: true,
                     hintText: 'Search here',

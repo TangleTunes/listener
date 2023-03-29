@@ -67,6 +67,15 @@ class _PleaseDepositState extends State<PleaseDeposit> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.question_mark_rounded),
+          mini: true,
+          foregroundColor: COLOR_SECONDARY,
+          backgroundColor: COLOR_TERTIARY,
+          onPressed: () {
+            goToPage(context, "/help_page");
+          },
+        ),
         body: Center(
             child: Form(
                 key: _formKey,
@@ -86,22 +95,50 @@ class _PleaseDepositState extends State<PleaseDeposit> {
                     Text('Tangle Tunes',
                         style: GoogleFonts.francoisOne(
                             fontSize: 30, color: COLOR_SECONDARY)),
-                    SizedBox(height: 20),
-                    Text("Please charge money on your account."),
-                    SelectableText("Your public key: $_publicKey"),
-
-                    SizedBox(height: 25),
-                    Text("create money for debug purposes"),
-                    InkWell(
-                      onTap: () => launchUrl(Uri.parse(
-                          'http://tangletunes.com/debug/faucet/$_publicKey')),
-                      child: Text(
-                        'http://tangletunes.com/debug/faucet/$_publicKey',
-                        style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            color: Colors.blue),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 15, 10, 0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: COLOR_SECONDARY,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Please charge money on your account",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: COLOR_PRIMARY,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                "Your public key: $_publicKey",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: COLOR_PRIMARY, fontSize: 15),
+                              ),
+                              Text("create money for debug purposes"),
+                              InkWell(
+                                onTap: () => launchUrl(Uri.parse(
+                                    'http://tangletunes.com/debug/faucet/$_publicKey')),
+                                child: Text(
+                                  'http://tangletunes.com/debug/faucet/$_publicKey',
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: COLOR_PRIMARY),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
+                    SizedBox(height: 20),
+                    SizedBox(height: 25),
 
                     SizedBox(
                         width: 372,
