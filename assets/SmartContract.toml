@@ -1,3 +1,3 @@
-contract_address = "0xa57D405951896582EB0535f7566556FdEd498bD1"
-node_url = 	"http://217.104.126.34:9090/chains/tst1pr2j82svscklywxj8gyk3dt5jz3vpxhnl48hh6h6rn0g8dfna0zsceya7up/evm"
+contract_address = "0x8fA1fc1Eec824a36fD31497EAa8716Fc9C446d51"
+node_url = 	"http://tangletunes.com:9090/chains/tst1pq9seck5sxl99pkqtk9tfm9nvrrqcfxcuwa64csn93zf5njzrpwjqgysc0m/evm"
 chain_id = 1074
