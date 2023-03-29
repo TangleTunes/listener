@@ -210,6 +210,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                                 Either<MyError, Null> setAudio =
                                     await playback.setAudio(currentSong);
                                 if (setAudio.isRight) {
+                                  playback.play();
                                 } else {
                                   toast(setAudio.left.message);
                                 }
