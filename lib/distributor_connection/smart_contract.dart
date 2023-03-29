@@ -53,7 +53,7 @@ class SmartContract {
     contract.deployedContract = DeployedContract(
         ContractAbi.fromJson(contract.abiCode, 'TangleTunes'),
         contract.contractAddr);
-    Either<MyError, Null> potentialNonce = await contract._updateNonce();
+    Either<MyError, Null> potentialNonce = await contract.updateNonce();
     if (potentialNonce.isRight) {
       return Right(contract);
     } else {
@@ -61,7 +61,7 @@ class SmartContract {
     }
   }
 
-  Future<Either<MyError, Null>> _updateNonce() async {
+  Future<Either<MyError, Null>> updateNonce() async {
     Either<MyError, Null> returnEither = Right(null);
     try {
       nonce = await client.getTransactionCount(ownAddress);
@@ -92,7 +92,7 @@ class SmartContract {
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
-      _updateNonce();
+      updateNonce();
       returnEither = Left(MyError(
         key: AppError.SmartContractTransactionFailed,
         message: "The deposit transaction failed",
@@ -117,11 +117,11 @@ class SmartContract {
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
-      _updateNonce();
+      updateNonce();
       returnEither = Left(MyError(
           key: AppError.SmartContractTransactionFailed,
           message: "The create_user transaction failed"));
-      _updateNonce(); //FIXME error handling
+      updateNonce(); //FIXME error handling
     } finally {
       await client.dispose();
     }
@@ -193,7 +193,7 @@ class SmartContract {
           await client.getTransactionReceipt(tx_hash);
     } catch (e) {
       print(e);
-      _updateNonce();
+      updateNonce();
       returnEither = Left(MyError(
           key: AppError.SmartContractTransactionFailed,
           message: "The withdraw transaction failed"));
@@ -298,7 +298,7 @@ class SmartContract {
         ));
       }
     } catch (e) {
-      _updateNonce();
+      updateNonce();
 
       print("Exception! $e and outputlist ${outputList[0]}");
       returnEither = Left(MyError(

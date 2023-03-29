@@ -92,7 +92,10 @@ class HelpPage extends StatelessWidget {
                             style: BOLD_TEXT_STYLE),
                         TextSpan(
                             text:
-                                "It could be that your contract balance is not sufficient. To change that, go to "),
+                                """It could be that your phone has limited or no internet connection.\n"""),
+                        TextSpan(
+                            text:
+                                "It could also be that your contract balance is not sufficient. To change that, go to "),
                         WidgetSpan(
                             child: Icon(
                           Icons.account_circle,
@@ -101,8 +104,40 @@ class HelpPage extends StatelessWidget {
                         )),
                         TextSpan(
                             text:
-                                """ and deposit. In order to deposit you need Level 2 funds. Scroll to “How do I get money?” to see how to do that.
-It could also be that your phone has limited or no internet connection. \n\n"""),
+                                """ and deposit. In order to deposit you need ledger 2 funds. Scroll to “How do I get money?” to see how to do that.\n"""),
+                        context
+                                    .read<SmartContractProvider>()
+                                    .getSmartContract() !=
+                                null
+                            ? TextSpan(
+                                text:
+                                    "Also, you can try resetting the nonce using this button:")
+                            : WidgetSpan(child: SizedBox.shrink()),
+                        context
+                                    .read<SmartContractProvider>()
+                                    .getSmartContract() !=
+                                null
+                            ? WidgetSpan(
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: COLOR_TERTIARY,
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 10, 0, 10)),
+                                    onPressed: () async {
+                                      Either<MyError, Null> updateNonceCall =
+                                          await context
+                                              .read<SmartContractProvider>()
+                                              .getSmartContract()!
+                                              .updateNonce();
+                                      if (updateNonceCall.isRight) {
+                                        toast("Updated the nonce");
+                                      } else {
+                                        toast(updateNonceCall.left.message);
+                                      }
+                                    },
+                                    child: Text("Update nonce")))
+                            : WidgetSpan(child: SizedBox.shrink()),
+                        TextSpan(text: "\n\n"),
                         TextSpan(
                             text: "What does deposit mean?\n",
                             style: BOLD_TEXT_STYLE),
