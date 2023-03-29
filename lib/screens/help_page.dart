@@ -113,7 +113,7 @@ class HelpPage extends StatelessWidget {
                                   null
                               ? TextSpan(
                                   text:
-                                      "\nIn rare cases where transactions fail you can try resetting the nonce and clicking on a song again:")
+                                      "\nIn rare cases where transactions fail you can try resetting the nonce and clicking on a song again:\n")
                               : WidgetSpan(child: SizedBox.shrink()),
                           context
                                       .read<SmartContractProvider>()
@@ -123,8 +123,8 @@ class HelpPage extends StatelessWidget {
                                   child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                           backgroundColor: COLOR_TERTIARY,
-                                          padding: EdgeInsets.fromLTRB(
-                                              0, 10, 0, 10)),
+                                          padding:
+                                              EdgeInsets.fromLTRB(5, 5, 5, 5)),
                                       onPressed: () async {
                                         Either<MyError, Null> updateNonceCall =
                                             await context
@@ -163,14 +163,16 @@ class HelpPage extends StatelessWidget {
                               style: BOLD_TEXT_STYLE),
                           TextSpan(
                               text:
-                                  "You pay in a cryptocurrency called MIOTA which you can obtain at a cryptocurrency exchange online. Then you have to send this MIOTA from the exchange to your wallet by specifying your public key as the recipient address. Your public key will be shown on screen when creating an account and you have no money. At a later point, you may find your public key on the page labeled with "),
+                                  "You pay in a cryptocurrency called MIOTA which you can obtain at a cryptocurrency exchange online. Then you have to send this MIOTA from the exchange to your wallet by specifying your public key as the recipient address. Your public key will be shown on screen when creating an account and you have no money. At a later point, you may find your public key on the "),
                           WidgetSpan(
                               child: Icon(
                             Icons.account_circle,
                             color: COLOR_PRIMARY,
                             size: 20,
                           )),
-                          TextSpan(text: ".\n\n"),
+                          TextSpan(
+                              text:
+                                  """ page. This is also where your new balance will show up under "Ledger 2". \n\n"""),
                           TextSpan(
                               text: "What does public and private key mean?\n",
                               style: BOLD_TEXT_STYLE),
