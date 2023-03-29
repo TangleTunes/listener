@@ -123,8 +123,10 @@ class _PleaseDepositState extends State<PleaseDeposit> {
                               ),
                               Text("create money for debug purposes"),
                               InkWell(
-                                onTap: () => launchUrl(Uri.parse(
-                                    'http://tangletunes.com/debug/faucet/$_publicKey')),
+                                onTap: () => launchUrl(
+                                    Uri.parse(
+                                        'http://tangletunes.com/debug/faucet/$_publicKey'),
+                                    mode: LaunchMode.externalApplication),
                                 child: Text(
                                   'http://tangletunes.com/debug/faucet/$_publicKey',
                                   style: TextStyle(

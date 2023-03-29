@@ -192,8 +192,10 @@ class HelpPage extends StatelessWidget {
                                   "If you are asked to provide smart contract details, either your device has limited internet access, or you should look on "),
                           WidgetSpan(
                             child: InkWell(
-                              onTap: () => launchUrl(Uri.parse(
-                                  'http://tangletunes.com/smart-contract-information')),
+                              onTap: () => launchUrl(
+                                  Uri.parse(
+                                      'http://tangletunes.com/smart-contract-information'),
+                                  mode: LaunchMode.externalApplication),
                               child: Text(
                                 'http://tangletunes.com/smart-contract-information',
                                 style: TextStyle(
@@ -211,8 +213,10 @@ class HelpPage extends StatelessWidget {
                                   """This app is the listening client on the Tangle Tunes p2p network. \nFind the source code at: """),
                           WidgetSpan(
                             child: InkWell(
-                              onTap: () => launchUrl(Uri.parse(
-                                  'https://github.com/TangleTunes/listener')),
+                              onTap: () => launchUrl(
+                                  Uri.parse(
+                                      'https://github.com/TangleTunes/listener'),
+                                  mode: LaunchMode.externalApplication),
                               child: Text(
                                 'https://github.com/TangleTunes/listener',
                                 style: TextStyle(
@@ -225,8 +229,10 @@ class HelpPage extends StatelessWidget {
                               text: ".\nConsider becoming a distributor: \n"),
                           WidgetSpan(
                             child: InkWell(
-                              onTap: () => launchUrl(Uri.parse(
-                                  'https://github.com/TangleTunes/distributing_client')),
+                              onTap: () => launchUrl(
+                                  Uri.parse(
+                                      'https://github.com/TangleTunes/distributing_client'),
+                                  mode: LaunchMode.externalApplication),
                               child: Text(
                                 'https://github.com/TangleTunes/distributing_client',
                                 style: TextStyle(
