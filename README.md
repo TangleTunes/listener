@@ -10,6 +10,7 @@ An app that lets you listen to songs distributed by  [distributors](https://gith
 4) Run the app ```flutter run```
 
 ## How to use the app
-For information on how to use the app, consider the information provided on the [help page](lib/screens/help_page.dart) of the app that may be accessed by tapping the question mark icon on the bottom right of the app.
+For information on how to use the app, consider the information provided on the [help page](lib/screens/help_page.dart) that may be accessed by tapping the question mark icon ❔ on the bottom right of the app.
+
 
 
