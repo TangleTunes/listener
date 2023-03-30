@@ -11,7 +11,7 @@ class SongListProvider with ChangeNotifier {
     return _songsList;
   }
 
-  void setSongsList(List<Song> songs) {
+  void setSongsList(List<Song>? songs) {
     _songsList = songs;
   }
 

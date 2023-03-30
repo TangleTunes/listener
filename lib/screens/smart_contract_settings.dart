@@ -3,7 +3,10 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:listener/distributor_connection/smart_contract.dart';
+import 'package:listener/providers/account_created_provider.dart';
+import 'package:listener/providers/current_song_provider.dart';
 import 'package:listener/providers/smart_contract_provider.dart';
+import 'package:listener/providers/username_provider.dart';
 import 'package:listener/user_settings/manage_account.dart';
 import 'package:listener/utils/go_to_page.dart';
 import 'package:provider/provider.dart';
@@ -242,6 +245,21 @@ class _SmartContractSettingsState extends State<SmartContractSettings> {
                                   await setChainId(
                                       int.parse(chainIdController.text));
                                   await setNodeUrl(rpcUrlController.text);
+                                  context
+                                      .read<BalanceProvider>()
+                                      .setContractBalance(null);
+                                  context
+                                      .read<AccountCreatedProvider>()
+                                      .setAccountCreated(false);
+                                  context
+                                      .read<SongListProvider>()
+                                      .setSongsList(null);
+                                  context
+                                      .read<UsernameProvider>()
+                                      .setUsername(null);
+                                  context
+                                      .read<CurrentSongProvider>()
+                                      .setSong(null);
                                   goToPage(context, "/load_smart_contract");
                                 } else {
                                   toast("Could not reach this smart contract");
