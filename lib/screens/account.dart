@@ -213,7 +213,7 @@ class _AccountPageState extends State<AccountPage> {
                                                 null
                                             ? Text("Not fetched yet")
                                             : Text(
-                                                "Ledger 2: ${weiToMiota(context.watch<BalanceProvider>().getL2BalanceInWei()!).toStringAsPrecision(4)} MIOTA",
+                                                "Layer 2: ${weiToMiota(context.watch<BalanceProvider>().getL2BalanceInWei()!).toStringAsPrecision(4)} MIOTA",
                                                 style: TextStyle(
                                                     color: COLOR_PRIMARY,
                                                     fontSize: 16)),
