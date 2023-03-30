@@ -185,9 +185,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                                     currentSong.songId); //FIXME could be null
                             if (scDistributorAnswer.isRight) {
                               String distributorHex =
-                                  scDistributorAnswer.right[0].hex;
+                                  scDistributorAnswer.right[0][0].hex;
                               Uri uri = Uri.parse(
-                                  "tcp://" + scDistributorAnswer.right[1]);
+                                  "tcp://" + scDistributorAnswer.right[0][1]);
                               Either<MyError, DistributorContact> dc =
                                   await DistributorContact.create(
                                       sc, distributorHex, uri.host, uri.port);
