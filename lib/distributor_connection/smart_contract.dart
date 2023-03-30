@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:either_dart/either.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/crypto.dart';
 import 'package:convert/convert.dart';
-
 import 'package:web3dart/web3dart.dart';
 
 import '../error_handling/app_error.dart';
@@ -33,6 +33,15 @@ class SmartContract {
   @override
   String toString() {
     return "contractAddr: $contractAddr, rpcUrl: $rpcUrl,ownAddress: $ownAddress";
+  }
+
+  BigInt generateRandom256BitNumber() {
+    final random = Random.secure();
+    final List<int> bytes = List.generate(32, (_) => random.nextInt(256));
+    final BigInt result = BigInt.parse(
+        bytes.map((e) => e.toRadixString(16).padLeft(2, '0')).join(),
+        radix: 16);
+    return result;
   }
 
   /// Public factory
@@ -116,63 +125,12 @@ class SmartContract {
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
+      nonce++;
     } catch (e) {
       updateNonce();
       returnEither = Left(MyError(
           key: AppError.SmartContractTransactionFailed,
           message: "The create_user transaction failed"));
-      updateNonce(); //FIXME error handling
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
-  // Future<Either<MyError, Null>> deleteUser() async {
-  //   Either<MyError, Null> returnEither = Right(null);
-  //   try {
-  //     String tx_hash = await client.sendTransaction(
-  //         ownCredentials,
-  //         Transaction.callContract(
-  //             contract: deployedContract,
-  //             function: deployedContract.function('delete_user'),
-  //             parameters: []),
-  //         chainId: chainId);
-  //     TransactionReceipt? tx_receipt =
-  //         await client.getTransactionReceipt(tx_hash);
-  //   } on Exception catch (e) {
-
-  //     returnEither = Left(MyError(
-  //         key: AppError.SmartContractTransactionFailed,
-  //         message: "The delete_user transaction failed",
-  //         exception: e));
-  //   }
-  //   return returnEither;
-  // }
-
-  Future<Either<MyError, Null>> getChunks(
-      Uint8List song, int index, int amount, String distributor) async {
-    Either<MyError, Null> returnEither = Right(null);
-    try {
-      String tx_hash = await client.sendTransaction(
-          ownCredentials,
-          Transaction.callContract(
-              contract: deployedContract,
-              function: deployedContract.function('get_chunks'),
-              parameters: [
-                song,
-                index,
-                amount,
-                EthereumAddress.fromHex(distributor)
-              ]),
-          chainId: chainId);
-      TransactionReceipt? tx_receipt =
-          await client.getTransactionReceipt(tx_hash);
-    } catch (e) {
-      returnEither = Left(MyError(
-        key: AppError.SmartContractTransactionFailed,
-        message: "The get_chunks transaction failed",
-      ));
     } finally {
       await client.dispose();
     }
@@ -186,8 +144,8 @@ class SmartContract {
           ownCredentials,
           Transaction.callContract(
               contract: deployedContract,
-              function: deployedContract.function('withdraw'),
-              parameters: [amount, ownAddress]),
+              function: deployedContract.function('withdraw_to_chain'),
+              parameters: [amount]),
           chainId: chainId);
       TransactionReceipt? tx_receipt =
           await client.getTransactionReceipt(tx_hash);
@@ -203,84 +161,6 @@ class SmartContract {
     return returnEither;
   }
 
-  Future<Either<MyError, List>> checkChunk(
-      Uint8List song, int index, Uint8List chunk) async {
-    List outputList = List.empty();
-    Either<MyError, List> returnEither = Right(outputList);
-    try {
-      outputList = await client.call(
-          contract: deployedContract,
-          function: deployedContract.function('check_chunk'),
-          params: [song, index, chunk]);
-      returnEither = Right(outputList);
-    } catch (e) {
-      returnEither = Left(MyError(
-          key: AppError.SmartContractCallFailed,
-          message: "The check_chunk call failed"));
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
-  Future<Either<MyError, List>> chunksLength(Uint8List song) async {
-    List outputList = List.empty();
-    Either<MyError, List> returnEither = Right(outputList);
-    try {
-      outputList = await client.call(
-          contract: deployedContract,
-          function: deployedContract.function('chunks_length'),
-          params: [song]);
-      returnEither = Right(outputList);
-    } catch (e) {
-      returnEither = Left(MyError(
-        key: AppError.SmartContractCallFailed,
-        message: "The chunks_length call failed",
-      ));
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
-  Future<Either<MyError, List>> distributions(Uint8List song) async {
-    List outputList = List.empty();
-    Either<MyError, List> returnEither = Right(outputList);
-    try {
-      outputList = await client.call(
-          contract: deployedContract,
-          function: deployedContract.function('distributions'),
-          params: [song]);
-      returnEither = Right(outputList);
-    } catch (e) {
-      returnEither = Left(MyError(
-          key: AppError.SmartContractCallFailed,
-          message: "The distributions call failed"));
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
-  Future<Either<MyError, List>> genSongId(String name, String author) async {
-    List outputList = List.empty();
-    Either<MyError, List> returnEither = Right(outputList);
-    try {
-      outputList = await client.call(
-          contract: deployedContract,
-          function: deployedContract.function('gen_song_id'),
-          params: [name, EthereumAddress.fromHex(author)]);
-      returnEither = Right(outputList);
-    } catch (e) {
-      returnEither = Left(MyError(
-          key: AppError.SmartContractCallFailed,
-          message: "The gen_song_id call failed"));
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
   Future<Either<MyError, List>> getRandDistributor(Uint8List song) async {
     List outputList = List.empty();
     Either<MyError, List> returnEither = Right(outputList);
@@ -288,7 +168,7 @@ class SmartContract {
       outputList = await client.call(
           contract: deployedContract,
           function: deployedContract.function('get_rand_distributor'),
-          params: [song]);
+          params: [song, generateRandom256BitNumber()]);
       if (outputList.length > 0) {
         returnEither = Right(outputList);
       } else {
@@ -324,26 +204,6 @@ class SmartContract {
       returnEither = Left(MyError(
         key: AppError.SmartContractCallFailed,
         message: "The get_songs call failed",
-      ));
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
-  Future<Either<MyError, List>> songList(int index) async {
-    List outputList = List.empty();
-    Either<MyError, List> returnEither = Right(outputList);
-    try {
-      outputList = await client.call(
-          contract: deployedContract,
-          function: deployedContract.function('song_list'),
-          params: [BigInt.from(index)]);
-      returnEither = Right(outputList);
-    } catch (e) {
-      returnEither = Left(MyError(
-        key: AppError.SmartContractCallFailed,
-        message: "The songs_list call failed",
       ));
     } finally {
       await client.dispose();
