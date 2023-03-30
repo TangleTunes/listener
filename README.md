@@ -1,16 +1,16 @@
-# listener13
+# TangleTunes Listener
 
-A new Flutter project.
+An app that lets you listen to songs distributed by  [distributors](https://github.com/TangleTunes/distributing_client) on the network, and interacts with a [smart contract](https://github.com/TangleTunes/smart_contract).
 
-## Getting Started
+## Development Setup
 
-This project is a starting point for a Flutter application.
+1) Install flutter: [https://docs.flutter.dev/get-started/install](https://docs.flutter.dev/get-started/install)
+2) Resolve all dependencies: ```flutter pub get```
+3) Connect an emulator: [https://docs.flutter.dev/get-started/test-drive](https://docs.flutter.dev/get-started/test-drive)
+4) Run the app ```flutter run```
 
-A few resources to get you started if this is your first Flutter project:
+## How to use the app
+For information on how to use the app, consider the information provided on the [help page](lib/screens/help_page.dart) that may be accessed by tapping the question mark icon ❔ on the bottom right of the app.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+

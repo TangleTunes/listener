@@ -1,6 +1,6 @@
 {
-    "name": "listener13",
-    "short_name": "listener13",
+    "name": "listener",
+    "short_name": "listener",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
