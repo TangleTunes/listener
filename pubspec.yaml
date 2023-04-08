@@ -55,6 +55,9 @@ dependencies:
   flutter_native_splash: ^2.2.19
   just_audio_background: ^0.0.1-beta.9
   url_launcher: ^6.1.10
+  mockito: ^5.4.0
+  path_provider_platform_interface: ^2.0.6
+  plugin_platform_interface: ^2.1.4
 
 
 dev_dependencies:
