@@ -1,6 +1,6 @@
 # TangleTunes Listener
 
-An app that lets you listen to songs distributed by  [distributors](https://github.com/TangleTunes/distributing_client) on the network, and interacts with a [smart contract](https://github.com/TangleTunes/smart_contract).
+An app that lets you listen to songs distributed by  [distributors](https://github.com/TangleTunes/distributing_client) on the network, and interacts with a [smart contract](https://github.com/TangleTunes/smart_contract). The app is supported on Android devices as the main development platform.
 
 ## Development Setup
 

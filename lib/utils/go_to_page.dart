@@ -105,7 +105,7 @@ void goToPage(BuildContext context, String page) {
         } else if (!context
             .read<AccountCreatedProvider>()
             .getAccountCreated()) {
-          goToPage(context, "/provide_username");
+          goToPage(context, "/load_couple_account");
         } else {
           Navigator.pushNamed(context, page);
         }
@@ -140,6 +140,9 @@ void goToPage(BuildContext context, String page) {
       {
         if (context.read<SmartContractProvider>().getSmartContract() == null) {
           goToPage(context, "/load_smart_contract");
+        } else if (context.read<CredentialsProvider>().getCredentials() ==
+            null) {
+          goToPage(context, "/load_credentials");
         } else {
           Navigator.pushNamed(context, page);
         }

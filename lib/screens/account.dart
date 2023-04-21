@@ -172,9 +172,16 @@ class _AccountPageState extends State<AccountPage> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
                           child: Column(
+                            //mainAxisSize: MainAxisSize.max,
                             children: [
                               Container(
-                                width: 190,
+                                constraints: BoxConstraints(
+                                    minWidth:
+                                        MediaQuery.of(context).size.width / 2,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width / 2),
+                                //width: 190,
+                                //width: double.maxFinite,
                                 decoration: BoxDecoration(
                                     color: COLOR_SECONDARY,
                                     borderRadius:
@@ -192,7 +199,7 @@ class _AccountPageState extends State<AccountPage> {
                                               color: COLOR_PRIMARY)),
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
-                                            2, 4, 0, 4),
+                                            0, 4, 0, 4),
                                         child: context
                                                     .watch<BalanceProvider>()
                                                     .getContractBalance() ==
@@ -200,9 +207,12 @@ class _AccountPageState extends State<AccountPage> {
                                             ? Text("Not fetched yet")
                                             : Text(
                                                 "Contract: ${weiToMiota(context.watch<BalanceProvider>().getContractBalance()!).toStringAsPrecision(4)} MIOTA",
+                                                
                                                 style: TextStyle(
                                                     color: COLOR_PRIMARY,
-                                                    fontSize: 16)),
+                                                    fontSize: 16),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
@@ -213,11 +223,14 @@ class _AccountPageState extends State<AccountPage> {
                                                 null
                                             ? Text("Not fetched yet")
                                             : Text(
-                                                "Ledger 2: ${weiToMiota(context.watch<BalanceProvider>().getL2BalanceInWei()!).toStringAsPrecision(4)} MIOTA",
+                                                "Layer 2: ${weiToMiota(context.watch<BalanceProvider>().getL2BalanceInWei()!).toStringAsPrecision(4)} MIOTA",
                                                 style: TextStyle(
                                                     color: COLOR_PRIMARY,
-                                                    fontSize: 16)),
+                                                    fontSize: 16),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                       ),
+                                      
                                       refreshBalanceButton(),
                                     ],
                                   ),
@@ -226,7 +239,10 @@ class _AccountPageState extends State<AccountPage> {
                               SizedBox(height: 10),
                               //Deposit money container
                               Container(
-                                width: 190,
+                                constraints: BoxConstraints(
+                                    minWidth:
+                                        MediaQuery.of(context).size.width / 2),
+                                // width: 190,
                                 decoration: BoxDecoration(
                                     color: COLOR_SECONDARY,
                                     borderRadius:
@@ -319,7 +335,7 @@ class _AccountPageState extends State<AccountPage> {
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.fromLTRB(
-                                                        0, 4, 0, 4),
+                                                        0, 4, 0, 0),
                                                 child: ElevatedButton(
                                                   style:
                                                       ElevatedButton.styleFrom(
@@ -373,7 +389,7 @@ class _AccountPageState extends State<AccountPage> {
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.fromLTRB(
-                                                        0, 4, 0, 4),
+                                                        0, 0, 0, 4),
                                                 child: ElevatedButton(
                                                   style:
                                                       ElevatedButton.styleFrom(
@@ -538,20 +554,15 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget refreshBalanceButton() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        IconButton(
-          onPressed: () async {
-            await _fetchPrefs(context);
-            toast("Refreshed balance");
-          },
-          icon: Icon(Icons.refresh),
-          color: COLOR_TERTIARY,
-          tooltip: "Refresh",
-          iconSize: 28,
-        ),
-      ],
+    return IconButton(
+      onPressed: () async {
+        await _fetchPrefs(context);
+        toast("Refreshed balance");
+      },
+      icon: Icon(Icons.refresh),
+      color: COLOR_TERTIARY,
+      tooltip: "Refresh",
+      iconSize: 28,
     );
   }
 

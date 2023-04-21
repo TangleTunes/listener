@@ -79,6 +79,7 @@ Widget audioPlayer(BuildContext context) {
                       color: Color(0xFFA5C0FF).withOpacity(0.7),
                       fontSize: 11,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   )
                 ],
               ),

@@ -11,12 +11,16 @@ class CurrentSongProvider with ChangeNotifier {
     return _song;
   }
 
+  void setSong(Song? song) {
+    _song = song;
+  }
+
   void updateSong(Song song) {
     _song = song;
     notifyListeners();
   }
 
-  void setDistributor(DistributorContact distributor) {
+  void setDistributor(DistributorContact? distributor) {
     _song?.distributorContact = distributor;
     notifyListeners();
   }

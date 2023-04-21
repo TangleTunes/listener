@@ -196,10 +196,10 @@ class HelpPage extends StatelessWidget {
                             child: InkWell(
                               onTap: () => launchUrl(
                                   Uri.parse(
-                                      'http://tangletunes.com/smart-contract-information'),
+                                      'http://tangletunes.com/information'),
                                   mode: LaunchMode.externalApplication),
                               child: Text(
-                                'http://tangletunes.com/smart-contract-information',
+                                'http://tangletunes.com/information',
                                 style: TextStyle(
                                     decoration: TextDecoration.underline,
                                     color: COLOR_PRIMARY),

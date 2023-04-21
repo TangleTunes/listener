@@ -252,26 +252,6 @@ class SmartContract {
     return returnEither;
   }
 
-  Future<Either<MyError, List>> songs(Uint8List song) async {
-    List outputList = List.empty();
-    Either<MyError, List> returnEither = Right(outputList);
-    try {
-      outputList = await client.call(
-          contract: deployedContract,
-          function: deployedContract.function('songs'),
-          params: [song]);
-      returnEither = Right(outputList);
-    } catch (e) {
-      returnEither = Left(MyError(
-        key: AppError.SmartContractCallFailed,
-        message: "The songs call failed",
-      ));
-    } finally {
-      await client.dispose();
-    }
-    return returnEither;
-  }
-
   Future<Either<MyError, Uint8List>> createChunkGetTransaction(
       Uint8List song, int index, int amount, String distributor) async {
     Uint8List signedTx = Uint8List(0);

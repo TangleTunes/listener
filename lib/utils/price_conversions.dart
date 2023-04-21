@@ -16,9 +16,13 @@ BigInt miotaToWei(BigInt miota) {
 }
 
 double priceInMiotaPerMinute(BigInt wei, int seconds, int byteLength) {
-  BigInt weiPerMinute =
-      ((wei * BigInt.from(byteLength / chunkSize)) ~/ BigInt.from(seconds)) *
-          BigInt.from(60);
+  BigInt totalprice = wei * BigInt.from(byteLength / chunkSize);
+  print("total: $totalprice");
+
+  BigInt pricePerSecond = totalprice ~/ BigInt.from(60);
+  print("price per second:$pricePerSecond ");
+  BigInt weiPerMinute = ((wei * BigInt.from(byteLength / chunkSize)) ~/
+      BigInt.from(seconds / 60));
   double miotaPerMinute = weiToMiota(weiPerMinute);
   return miotaPerMinute;
 }
